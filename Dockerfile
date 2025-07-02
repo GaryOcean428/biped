@@ -17,10 +17,9 @@ COPY . .
 ENV PYTHONPATH=/app/backend
 ENV FLASK_APP=src.main:app
 
-# Expose port (Railway will set PORT environment variable)
-EXPOSE $PORT
-
-# Change to backend directory and start with gunicorn
+# Change to backend directory (best practice)
 WORKDIR /app/backend
-CMD ["sh", "-c", "python -m gunicorn --bind 0.0.0.0:$PORT src.main:app"]
+
+# Start the application using gunicorn (production-ready)
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:$PORT", "src.main:app"]
 
