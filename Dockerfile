@@ -3,16 +3,13 @@
 
 FROM node:20-slim AS frontend-builder
 
-# Install yarn globally
-RUN npm install -g yarn
-
 # Set working directory for frontend build
 WORKDIR /app/frontend
 
 # Copy frontend package files
 COPY frontend/package*.json frontend/yarn.lock* ./
 
-# Install frontend dependencies with yarn
+# Install frontend dependencies with yarn (already available in node:20-slim)
 RUN yarn install --frozen-lockfile
 
 # Copy frontend source code
@@ -29,29 +26,17 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies for OpenCV and other libraries
+# Install essential system dependencies only
 RUN apt-get update && apt-get install -y \
     # Essential build tools
     build-essential \
     pkg-config \
     curl \
-    # OpenCV system dependencies (headless)
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    # Image processing libraries
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    libwebp-dev \
-    # Scientific computing dependencies
-    libopenblas-dev \
-    liblapack-dev \
-    gfortran \
     # PostgreSQL client
     libpq-dev \
+    # OpenCV headless dependencies (minimal)
+    libglib2.0-0 \
+    libgomp1 \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
