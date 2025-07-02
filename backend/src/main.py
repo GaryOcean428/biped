@@ -98,14 +98,17 @@ with app.app_context():
         db.session.commit()
         print("Default admin user created: admin / admin123")
 
+@app.route('/admin')
+def admin_dashboard():
+    """Serve the admin dashboard"""
+    return send_from_directory('static', 'admin.html')
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def serve(path):
-    """Serve static files and handle client-side routing"""
-    static_folder_path = app.static_folder
-    if static_folder_path is None:
-        return "Static folder not configured", 404
-
+def serve_static(path):
+    """Serve static files"""
+    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
+    
     if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
         return send_from_directory(static_folder_path, path)
     else:
