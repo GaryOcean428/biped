@@ -166,6 +166,8 @@ def health_check():
     return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8180))
+    # Get port from environment variable, default to 8080
+    port = int(os.environ.get('PORT', 8080))
+    print(f"🚀 Starting Biped Platform on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
 
