@@ -20,11 +20,10 @@ RUN chmod +x /app/start.sh
 # Set environment variables
 ENV PYTHONPATH=/app/backend
 ENV FLASK_APP=src.main:app
-ENV PORT=8080
 
 # Expose port
 EXPOSE 8080
 
-# Use startup script
-CMD ["/app/start.sh"]
+# Use shell form to enable variable expansion
+CMD /app/start.sh
 
