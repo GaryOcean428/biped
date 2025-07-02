@@ -1,17 +1,23 @@
 from flask import Blueprint, request, jsonify, session
 from src.models.user import db, User, CustomerProfile, ProviderProfile
+from src.utils.validation import InputValidator, validate_registration_data
+from src.utils.rate_limiting import auth_rate_limit, api_rate_limit
 from datetime import datetime
 import re
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint('auth', __name__)
 
 def validate_email(email):
-    """Validate email format"""
+    """Validate email format (legacy function - use InputValidator instead)"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
 def validate_password(password):
-    """Validate password strength"""
+    """Validate password strength (legacy function - use InputValidator instead)"""
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
     if not re.search(r'[A-Z]', password):
@@ -23,29 +29,21 @@ def validate_password(password):
     return True, "Password is valid"
 
 @auth_bp.route('/register', methods=['POST'])
+@auth_rate_limit
 def register():
     """Register a new user"""
     try:
-        data = request.get_json()
+        # Get and validate JSON data
+        data, error = InputValidator.get_request_json()
+        if error:
+            logger.warning(f"Registration failed - invalid JSON: {error}")
+            return jsonify({'error': error}), 400
         
-        # Validate required fields
-        required_fields = ['email', 'password', 'first_name', 'last_name', 'user_type']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'{field} is required'}), 400
-        
-        # Validate email format
-        if not validate_email(data['email']):
-            return jsonify({'error': 'Invalid email format'}), 400
-        
-        # Validate password
-        is_valid, message = validate_password(data['password'])
+        # Comprehensive validation
+        is_valid, error = validate_registration_data(data)
         if not is_valid:
-            return jsonify({'error': message}), 400
-        
-        # Validate user type
-        if data['user_type'] not in ['customer', 'provider']:
-            return jsonify({'error': 'User type must be either customer or provider'}), 400
+            logger.warning(f"Registration failed - validation error: {error}")
+            return jsonify({'error': error}), 400
         
         # Check if user already exists
         existing_user = User.query.filter_by(email=data['email']).first()
@@ -104,22 +102,38 @@ def register():
         return jsonify({'error': str(e)}), 500
 
 @auth_bp.route('/login', methods=['POST'])
+@auth_rate_limit
 def login():
     """Login user"""
     try:
-        data = request.get_json()
+        # Get and validate JSON data
+        data, error = InputValidator.get_request_json()
+        if error:
+            logger.warning(f"Login failed - invalid JSON: {error}")
+            return jsonify({'error': error}), 400
         
         # Validate required fields
-        if not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email and password are required'}), 400
+        required_fields = ['email', 'password']
+        is_valid, error = InputValidator.validate_required_fields(data, required_fields)
+        if not is_valid:
+            logger.warning(f"Login failed - missing fields: {error}")
+            return jsonify({'error': error}), 400
+        
+        # Validate email format
+        is_valid, error = InputValidator.validate_email(data['email'])
+        if not is_valid:
+            logger.warning(f"Login failed - invalid email format: {data['email']}")
+            return jsonify({'error': 'Invalid email format'}), 400
         
         # Find user
-        user = User.query.filter_by(email=data['email']).first()
+        user = User.query.filter_by(email=data['email'].strip().lower()).first()
         if not user or not user.check_password(data['password']):
+            logger.warning(f"Login failed - invalid credentials for email: {data['email']}")
             return jsonify({'error': 'Invalid email or password'}), 401
         
         # Check if user is active
         if not user.is_active:
+            logger.warning(f"Login failed - inactive account: {data['email']}")
             return jsonify({'error': 'Account is deactivated'}), 401
         
         # Set session
@@ -133,6 +147,7 @@ def login():
         elif user.user_type == 'provider' and user.provider_profile:
             profile_data = user.provider_profile.to_dict()
         
+        logger.info(f"Successful login for user: {user.email}")
         return jsonify({
             'message': 'Login successful',
             'user': user.to_dict(),
@@ -140,7 +155,8 @@ def login():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Login error: {str(e)}")
+        return jsonify({'error': 'Login failed'}), 500
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

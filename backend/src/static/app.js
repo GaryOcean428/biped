@@ -14,6 +14,15 @@ class BipedApp {
         await this.loadServiceCategories();
         this.setupEventListeners();
         this.checkAuthStatus();
+        this.initializeValidation();
+    }
+    
+    initializeValidation() {
+        // Set up real-time validation for forms
+        if (typeof formValidator !== 'undefined') {
+            formValidator.setupRealTimeValidation('loginForm');
+            formValidator.setupRealTimeValidation('signupForm');
+        }
     }
 
     // API Methods
@@ -389,13 +398,37 @@ class BipedApp {
         // Auth forms
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+            
+            const formData = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+            
+            // Validate form data
+            const validation = formValidator.validateLoginForm(formData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    const fieldId = field === 'email' ? 'loginEmail' : 'loginPassword';
+                    formValidator.showFieldError(fieldId, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Clear any existing errors
+            formValidator.clearFieldErrors('loginForm');
             
             try {
-                await this.login(email, password);
+                // Use loading manager for form submission
+                const resetLoading = loadingManager.handleFormSubmission('loginForm', 'loginBtn', 'Signing in...');
+                
+                await this.login(formData.email, formData.password);
+                
+                resetLoading();
             } catch (error) {
                 // Error already shown by apiCall
+                const resetLoading = loadingManager.handleFormSubmission('loginForm', 'loginBtn');
+                resetLoading();
             }
         });
 
@@ -403,17 +436,46 @@ class BipedApp {
             e.preventDefault();
             
             const userData = {
-                first_name: document.getElementById('firstName').value,
-                last_name: document.getElementById('lastName').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
                 email: document.getElementById('signupEmail').value,
                 password: document.getElementById('signupPassword').value,
-                user_type: document.getElementById('customerTab').classList.contains('border-blue-600') ? 'customer' : 'provider'
+                userType: document.getElementById('customerTab').classList.contains('border-blue-600') ? 'customer' : 'provider'
+            };
+            
+            // Validate registration form
+            const validation = formValidator.validateRegistrationForm(userData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    formValidator.showFieldError(field, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Clear any existing errors
+            formValidator.clearFieldErrors('signupForm');
+            
+            // Convert to backend format
+            const backendData = {
+                first_name: userData.firstName,
+                last_name: userData.lastName,
+                email: userData.email,
+                password: userData.password,
+                user_type: userData.userType
             };
             
             try {
-                await this.signup(userData);
+                // Use loading manager for form submission
+                const resetLoading = loadingManager.handleFormSubmission('signupForm', 'signupBtn', 'Creating account...');
+                
+                await this.signup(backendData);
+                
+                resetLoading();
             } catch (error) {
                 // Error already shown by apiCall
+                const resetLoading = loadingManager.handleFormSubmission('signupForm', 'signupBtn');
+                resetLoading();
             }
         });
 
