@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-07-02T09:42:01.213659",
+  "test_suite": "BIPED Performance Benchmark v1.0",
+  "response_time_tests": [
+    {
+      "test_name": "Health Check Performance",
+      "endpoint": "/api/health",
+      "iterations": 10,
+      "avg_response_time_ms": 24.58,
+      "min_response_time_ms": 20.07,
+      "max_response_time_ms": 29.1,
+      "sub_second_compliance": true,
+      "status": "PASS",
+      "target_ms": 100
+    },
+    {
+      "test_name": "Analytics Dashboard Performance",
+      "endpoint": "/api/analytics/dashboard",
+      "iterations": 5,
+      "avg_response_time_ms": 190.09,
+      "min_response_time_ms": 150.07,
+      "max_response_time_ms": 230.1,
+      "sub_second_compliance": true,
+      "status": "PASS",
+      "target_ms": 500
+    },
+    {
+      "test_name": "API Endpoint Performance",
+      "endpoint": "/api/services",
+      "iterations": 3,
+      "avg_response_time_ms": 120.1,
+      "target_ms": 200,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    },
+    {
+      "test_name": "API Endpoint Performance",
+      "endpoint": "/api/users/profile",
+      "iterations": 3,
+      "avg_response_time_ms": 100.1,
+      "target_ms": 150,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    },
+    {
+      "test_name": "API Endpoint Performance",
+      "endpoint": "/api/jobs",
+      "iterations": 3,
+      "avg_response_time_ms": 200.1,
+      "target_ms": 300,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    },
+    {
+      "test_name": "API Endpoint Performance",
+      "endpoint": "/api/analytics/metrics",
+      "iterations": 3,
+      "avg_response_time_ms": 250.1,
+      "target_ms": 400,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    },
+    {
+      "test_name": "API Endpoint Performance",
+      "endpoint": "/api/reviews",
+      "iterations": 3,
+      "avg_response_time_ms": 130.1,
+      "target_ms": 200,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    },
+    {
+      "test_name": "Cache Performance",
+      "cache_miss_time_ms": 200.07,
+      "cache_hit_time_ms": 50.07,
+      "improvement_percentage": 75.0,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    }
+  ],
+  "concurrent_user_tests": [
+    {
+      "test_name": "Concurrent User Performance",
+      "concurrent_users": 10,
+      "total_duration_ms": 181.54,
+      "avg_response_time_ms": 140.09,
+      "min_response_time_ms": 100.09,
+      "max_response_time_ms": 180.07,
+      "throughput_requests_per_second": 55.08,
+      "sub_second_compliance": true,
+      "status": "PASS"
+    }
+  ],
+  "throughput_tests": [],
+  "sub_second_compliance": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "compliance_rate": 100.0
+  },
+  "summary": {
+    "total_tests_run": 9,
+    "overall_avg_response_time_ms": 144.41,
+    "sub_second_compliance_rate": 100.0,
+    "performance_grade": "A",
+    "meets_claimed_performance": true,
+    "recommendations": [
+      "Performance meets sub-second requirements - consider monitoring for sustained load"
+    ]
+  }
+}
