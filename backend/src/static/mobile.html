@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Biped - Mobile</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Biped">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/biped-logo.png">
+    <link rel="apple-touch-icon" href="/biped-logo.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: #333;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile-First Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e40af, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(30, 64, 175, 0.1);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            height: 100vh;
+            background: white;
+            z-index: 1001;
+            transition: left 0.3s ease;
+            padding: 2rem 1rem;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu.active {
+            left: 0;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .menu-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .menu-items {
+            list-style: none;
+            margin-top: 3rem;
+        }
+        
+        .menu-items li {
+            margin-bottom: 1rem;
+        }
+        
+        .menu-items a {
+            display: block;
+            padding: 1rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-items a:hover {
+            background: linear-gradient(135deg, #1e40af, #0d9488);
+            color: white;
+            transform: translateX(8px);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 1rem;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #1e40af;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            border-radius: 20px;
+            margin: 2rem 0;
+            padding: 2rem 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-actions h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1e40af;
+            font-size: 1.5rem;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .action-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.15);
+            border-color: #1e40af;
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 0.9rem;
+        }
+        
+        /* Features Section */
+        .features {
+            background: white;
+            border-radius: 20px;
+            margin: 2rem 0;
+            padding: 2rem 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .features h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1e40af;
+            font-size: 1.5rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1e40af, #0d9488);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .feature-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.25rem;
+        }
+        
+        .feature-content p {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #64748b;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 12px;
+            min-width: 60px;
+        }
+        
+        .nav-item.active,
+        .nav-item:hover {
+            color: #1e40af;
+            background: rgba(30, 64, 175, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        /* Touch Optimizations */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Swipe Gestures */
+        .swipeable {
+            touch-action: pan-x;
+        }
+        
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1e40af;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 375px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 600px;
+                margin: 80px auto 0;
+            }
+            
+            .cta-buttons {
+                flex-direction: row;
+                max-width: 500px;
+            }
+            
+            .action-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* PWA Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 100px;
+            left: 1rem;
+            right: 1rem;
+            background: #1e40af;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 30px rgba(30, 64, 175, 0.3);
+            z-index: 1001;
+        }
+        
+        .install-prompt.show {
+            display: flex;
+        }
+        
+        .install-text {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .install-text h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .install-text p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .install-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .install-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .install-btn.primary {
+            background: white;
+            color: #1e40af;
+        }
+        
+        .install-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 80px;
+            left: 1rem;
+            right: 1rem;
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 1002;
+        }
+        
+        .offline-indicator.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="logo">Biped</div>
+        <button class="menu-toggle touch-target" onclick="toggleMenu()">☰</button>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div class="menu-overlay" onclick="closeMenu()"></div>
+    <div class="mobile-menu">
+        <button class="menu-close touch-target" onclick="closeMenu()">✕</button>
+        <ul class="menu-items">
+            <li><a href="#" onclick="navigateTo('home')">🏠 Home</a></li>
+            <li><a href="#" onclick="navigateTo('jobs')">💼 Find Jobs</a></li>
+            <li><a href="#" onclick="navigateTo('providers')">👥 Find Providers</a></li>
+            <li><a href="#" onclick="navigateTo('dashboard')">📊 Dashboard</a></li>
+            <li><a href="#" onclick="navigateTo('messages')">💬 Messages</a></li>
+            <li><a href="#" onclick="navigateTo('profile')">👤 Profile</a></li>
+            <li><a href="#" onclick="navigateTo('settings')">⚙️ Settings</a></li>
+        </ul>
+    </div>
+    
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📡 You're offline. Some features may be limited.
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>AI-Powered Trades Marketplace</h1>
+            <p>Connect with skilled professionals instantly. Get quality work done with intelligent matching and real-time progress tracking.</p>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-primary" onclick="navigateTo('post-job')">Post a Job</a>
+                <a href="#" class="btn btn-secondary" onclick="navigateTo('find-providers')">Find Providers</a>
+            </div>
+        </section>
+        
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+                <div class="action-card touch-target" onclick="navigateTo('emergency')">
+                    <span class="action-icon">🚨</span>
+                    <div class="action-title">Emergency Service</div>
+                </div>
+                <div class="action-card touch-target" onclick="navigateTo('quotes')">
+                    <span class="action-icon">💰</span>
+                    <div class="action-title">Get Quotes</div>
+                </div>
+                <div class="action-card touch-target" onclick="navigateTo('track')">
+                    <span class="action-icon">📍</span>
+                    <div class="action-title">Track Progress</div>
+                </div>
+                <div class="action-card touch-target" onclick="navigateTo('support')">
+                    <span class="action-icon">🎧</span>
+                    <div class="action-title">Support</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features -->
+        <section class="features">
+            <h2>Why Choose Biped?</h2>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-content">
+                        <h3>AI-Powered Matching</h3>
+                        <p>Smart algorithms connect you with the perfect provider for your needs</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">👁️</div>
+                    <div class="feature-content">
+                        <h3>Quality Vision</h3>
+                        <p>Computer vision technology ensures work quality and progress tracking</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-content">
+                        <h3>Instant Responses</h3>
+                        <p>Get quotes and responses from providers within minutes</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-content">
+                        <h3>Secure Payments</h3>
+                        <p>Protected transactions with escrow and milestone-based payments</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-content">
+                        <h3>Mobile-First</h3>
+                        <p>Optimized for mobile with offline capabilities and push notifications</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active touch-target" onclick="setActiveTab(this, 'home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="#" class="nav-item touch-target" onclick="setActiveTab(this, 'search')">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">Search</span>
+        </a>
+        <a href="#" class="nav-item touch-target" onclick="setActiveTab(this, 'jobs')">
+            <span class="nav-icon">💼</span>
+            <span class="nav-label">Jobs</span>
+        </a>
+        <a href="#" class="nav-item touch-target" onclick="setActiveTab(this, 'messages')">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">Messages</span>
+        </a>
+        <a href="#" class="nav-item touch-target" onclick="setActiveTab(this, 'profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profile</span>
+        </a>
+    </nav>
+    
+    <!-- PWA Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-text">
+            <h3>Install Biped App</h3>
+            <p>Get the full experience with offline access</p>
+        </div>
+        <div class="install-buttons">
+            <button class="install-btn primary" onclick="installPWA()">Install</button>
+            <button class="install-btn secondary" onclick="dismissInstall()">Later</button>
+        </div>
+    </div>
+    
+    <script>
+        // PWA and Mobile Functionality
+        let deferredPrompt;
+        let isOnline = navigator.onLine;
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // PWA Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPrompt();
+        });
+        
+        function showInstallPrompt() {
+            const prompt = document.getElementById('installPrompt');
+            if (prompt && !localStorage.getItem('installDismissed')) {
+                setTimeout(() => {
+                    prompt.classList.add('show');
+                }, 3000);
+            }
+        }
+        
+        function installPWA() {
+            const prompt = document.getElementById('installPrompt');
+            prompt.classList.remove('show');
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        function dismissInstall() {
+            const prompt = document.getElementById('installPrompt');
+            prompt.classList.remove('show');
+            localStorage.setItem('installDismissed', 'true');
+        }
+        
+        // Online/Offline Detection
+        window.addEventListener('online', () => {
+            isOnline = true;
+            document.getElementById('offlineIndicator').classList.remove('show');
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            document.getElementById('offlineIndicator').classList.add('show');
+        });
+        
+        // Mobile Menu Functions
+        function toggleMenu() {
+            const menu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeMenu() {
+            const menu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        // Navigation Functions
+        function navigateTo(page) {
+            console.log(`Navigating to: ${page}`);
+            closeMenu();
+            
+            // Add loading state
+            showLoading();
+            
+            // Simulate navigation delay
+            setTimeout(() => {
+                hideLoading();
+                // In a real app, this would navigate to the actual page
+                alert(`Navigating to ${page} page`);
+            }, 500);
+        }
+        
+        function setActiveTab(element, tab) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Navigate to tab
+            navigateTo(tab);
+        }
+        
+        // Loading States
+        function showLoading() {
+            // Add loading indicator to the page
+            const loading = document.createElement('div');
+            loading.className = 'loading';
+            loading.style.position = 'fixed';
+            loading.style.top = '50%';
+            loading.style.left = '50%';
+            loading.style.transform = 'translate(-50%, -50%)';
+            loading.style.zIndex = '9999';
+            loading.id = 'globalLoading';
+            document.body.appendChild(loading);
+        }
+        
+        function hideLoading() {
+            const loading = document.getElementById('globalLoading');
+            if (loading) {
+                loading.remove();
+            }
+        }
+        
+        // Touch Gestures
+        let startX, startY, distX, distY;
+        
+        document.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!startX || !startY) return;
+            
+            const touch = e.touches[0];
+            distX = touch.clientX - startX;
+            distY = touch.clientY - startY;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            if (!startX || !startY) return;
+            
+            // Swipe right to open menu
+            if (distX > 100 && Math.abs(distY) < 100) {
+                if (!document.querySelector('.mobile-menu').classList.contains('active')) {
+                    toggleMenu();
+                }
+            }
+            
+            // Swipe left to close menu
+            if (distX < -100 && Math.abs(distY) < 100) {
+                if (document.querySelector('.mobile-menu').classList.contains('active')) {
+                    closeMenu();
+                }
+            }
+            
+            startX = null;
+            startY = null;
+            distX = null;
+            distY = null;
+        });
+        
+        // Push Notifications (if supported)
+        if ('Notification' in window && 'serviceWorker' in navigator) {
+            // Request notification permission
+            setTimeout(() => {
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            console.log('Notification permission granted');
+                        }
+                    });
+                }
+            }, 5000);
+        }
+        
+        // Haptic Feedback (if supported)
+        function hapticFeedback(type = 'light') {
+            if ('vibrate' in navigator) {
+                switch (type) {
+                    case 'light':
+                        navigator.vibrate(10);
+                        break;
+                    case 'medium':
+                        navigator.vibrate(50);
+                        break;
+                    case 'heavy':
+                        navigator.vibrate(100);
+                        break;
+                }
+            }
+        }
+        
+        // Add haptic feedback to buttons
+        document.querySelectorAll('.btn, .action-card, .nav-item').forEach(element => {
+            element.addEventListener('click', () => {
+                hapticFeedback('light');
+            });
+        });
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Biped Mobile App Initialized');
+            
+            // Check if offline
+            if (!isOnline) {
+                document.getElementById('offlineIndicator').classList.add('show');
+            }
+            
+            // Show install prompt after delay
+            setTimeout(showInstallPrompt, 3000);
+        });
+    </script>
+</body>
+</html>
+
