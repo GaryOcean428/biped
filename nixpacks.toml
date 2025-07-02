@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["python311", "pip"]
+
+[phases.install]
+cmds = [
+    "cd backend",
+    "pip install -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+    "cd backend",
+    "python create_db.py",
+    "python populate_services.py"
+]
+
+[start]
+cmd = "cd backend && python src/main.py"
+

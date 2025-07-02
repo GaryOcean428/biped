@@ -20,7 +20,7 @@ from src.routes.job import job_bp
 from src.routes.review import review_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'tradehub-secret-key-change-in-production'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tradehub-secret-key-change-in-production')
 
 # Enable CORS for all routes
 CORS(app, origins="*")
@@ -32,8 +32,17 @@ app.register_blueprint(service_bp, url_prefix='/api/services')
 app.register_blueprint(job_bp, url_prefix='/api/jobs')
 app.register_blueprint(review_bp, url_prefix='/api/reviews')
 
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+# Database configuration - support both PostgreSQL (Railway) and SQLite (local)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Railway PostgreSQL
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -89,5 +98,6 @@ def health_check():
     return {'status': 'healthy', 'message': 'TradeHub API is running'}
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8180, debug=True)
+    port = int(os.environ.get('PORT', 8180))
+    app.run(host='0.0.0.0', port=port, debug=False)
 
