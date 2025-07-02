@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - Biped AI-Powered Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .ai-suggestion {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: white;
+        }
+        
+        .step-indicator.completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            transform: translateY(-2px);
+        }
+        
+        .ai-insight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .budget-suggestion {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid #3b82f6;
+        }
+        
+        .provider-preview {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #22c55e;
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .category-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-card.selected {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: white;
+        }
+        
+        .urgency-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .timeline-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .flexible-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img src="biped-logo.png" alt="Biped" class="h-8 w-8">
+                    <span class="text-2xl font-bold text-gray-900">Biped</span>
+                    <span class="ai-suggestion text-xs px-2 py-1 rounded-full text-white font-medium">AI-Guided</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium">← Back to Home</a>
+                    <button class="btn-secondary px-4 py-2 rounded-lg font-medium">
+                        Save Draft
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Indicator -->
+    <div class="bg-white border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="step-indicator active w-10 h-10 rounded-full flex items-center justify-center font-semibold">
+                        1
+                    </div>
+                    <div class="w-16 h-1 bg-gray-200 rounded"></div>
+                    <div class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-200 text-gray-600">
+                        2
+                    </div>
+                    <div class="w-16 h-1 bg-gray-200 rounded"></div>
+                    <div class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-200 text-gray-600">
+                        3
+                    </div>
+                    <div class="w-16 h-1 bg-gray-200 rounded"></div>
+                    <div class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-200 text-gray-600">
+                        4
+                    </div>
+                </div>
+                
+                <div class="text-sm text-gray-600">
+                    Step <span id="currentStep">1</span> of 4
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="text-lg font-semibold text-gray-900" id="stepTitle">Describe Your Project</div>
+                <div class="text-gray-600" id="stepDescription">Tell us what you need done and our AI will guide you through the process</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Main Form -->
+            <div class="lg:col-span-2">
+                <!-- Step 1: Project Description -->
+                <div id="step1" class="form-section active">
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">What do you need done?</h3>
+                            <p class="text-gray-600">Describe your project in detail. The more information you provide, the better we can match you with the right professionals.</p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Project Title</label>
+                                <input type="text" id="projectTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Kitchen renovation, Website development, Plumbing repair">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Detailed Description</label>
+                                <textarea id="projectDescription" rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe your project in detail. Include specific requirements, materials, timeline, and any special considerations..."></textarea>
+                                <div class="mt-2 text-sm text-gray-500">
+                                    <span id="charCount">0</span>/1000 characters
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Upload Images (Optional)</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                                    <p class="text-gray-600 mb-2">Drag and drop images here, or click to browse</p>
+                                    <p class="text-sm text-gray-500">PNG, JPG up to 10MB each</p>
+                                    <input type="file" multiple accept="image/*" class="hidden" id="imageUpload">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-end">
+                            <button onclick="nextStep()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Category Selection -->
+                <div id="step2" class="form-section">
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Select Category</h3>
+                            <p class="text-gray-600">Choose the category that best matches your project.</p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 mb-8">
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'construction')">
+                                <div class="text-blue-600 text-3xl mb-3">
+                                    <i class="fas fa-hammer"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Construction & Renovation</h4>
+                                <p class="text-sm text-gray-600">General contractors, carpenters, painters</p>
+                            </div>
+                            
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'plumbing')">
+                                <div class="text-green-600 text-3xl mb-3">
+                                    <i class="fas fa-wrench"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Plumbing & Electrical</h4>
+                                <p class="text-sm text-gray-600">Licensed plumbers, electricians, HVAC</p>
+                            </div>
+                            
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'tech')">
+                                <div class="text-purple-600 text-3xl mb-3">
+                                    <i class="fas fa-laptop-code"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Tech & Digital</h4>
+                                <p class="text-sm text-gray-600">Web developers, designers, IT support</p>
+                            </div>
+                            
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'automotive')">
+                                <div class="text-orange-600 text-3xl mb-3">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Automotive</h4>
+                                <p class="text-sm text-gray-600">Mechanics, auto electricians</p>
+                            </div>
+                            
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'landscaping')">
+                                <div class="text-teal-600 text-3xl mb-3">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Landscaping</h4>
+                                <p class="text-sm text-gray-600">Gardeners, landscapers, maintenance</p>
+                            </div>
+                            
+                            <div class="category-card bg-gray-50 p-6 rounded-xl border border-gray-200" onclick="selectCategory(this, 'cleaning')">
+                                <div class="text-red-600 text-3xl mb-3">
+                                    <i class="fas fa-broom"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-2">Cleaning & Maintenance</h4>
+                                <p class="text-sm text-gray-600">Professional cleaners, facility management</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button onclick="prevStep()" class="btn-secondary px-6 py-3 rounded-lg font-semibold">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back
+                            </button>
+                            <button onclick="nextStep()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold" disabled id="categoryNext">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Budget & Timeline -->
+                <div id="step3" class="form-section">
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Budget & Timeline</h3>
+                            <p class="text-gray-600">Help us find providers that match your budget and timeline requirements.</p>
+                        </div>
+                        
+                        <div class="space-y-8">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-4">Budget Range</label>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, 'under-500')">
+                                        <div class="font-semibold text-gray-900">Under $500</div>
+                                        <div class="text-sm text-gray-600">Small repairs, quick fixes</div>
+                                    </div>
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, '500-2000')">
+                                        <div class="font-semibold text-gray-900">$500 - $2,000</div>
+                                        <div class="text-sm text-gray-600">Medium projects, installations</div>
+                                    </div>
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, '2000-5000')">
+                                        <div class="font-semibold text-gray-900">$2,000 - $5,000</div>
+                                        <div class="text-sm text-gray-600">Large projects, renovations</div>
+                                    </div>
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, '5000-10000')">
+                                        <div class="font-semibold text-gray-900">$5,000 - $10,000</div>
+                                        <div class="text-sm text-gray-600">Major renovations, commercial</div>
+                                    </div>
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, 'over-10000')">
+                                        <div class="font-semibold text-gray-900">$10,000+</div>
+                                        <div class="text-sm text-gray-600">Large scale projects</div>
+                                    </div>
+                                    <div class="budget-suggestion p-4 rounded-lg cursor-pointer" onclick="selectBudget(this, 'custom')">
+                                        <div class="font-semibold text-gray-900">Custom Range</div>
+                                        <div class="text-sm text-gray-600">Specify your own budget</div>
+                                    </div>
+                                </div>
+                                
+                                <div id="customBudget" class="mt-4 hidden">
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Budget</label>
+                                            <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="$0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Budget</label>
+                                            <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="$10,000">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-4">When do you need this done?</label>
+                                <div class="grid md:grid-cols-4 gap-4">
+                                    <div class="urgency-badge text-white p-4 rounded-lg cursor-pointer text-center" onclick="selectTimeline(this, 'asap')">
+                                        <div class="font-semibold">ASAP</div>
+                                        <div class="text-sm opacity-90">Within 24-48 hours</div>
+                                    </div>
+                                    <div class="timeline-badge text-white p-4 rounded-lg cursor-pointer text-center" onclick="selectTimeline(this, 'week')">
+                                        <div class="font-semibold">This Week</div>
+                                        <div class="text-sm opacity-90">Within 7 days</div>
+                                    </div>
+                                    <div class="timeline-badge text-white p-4 rounded-lg cursor-pointer text-center" onclick="selectTimeline(this, 'month')">
+                                        <div class="font-semibold">This Month</div>
+                                        <div class="text-sm opacity-90">Within 30 days</div>
+                                    </div>
+                                    <div class="flexible-badge text-white p-4 rounded-lg cursor-pointer text-center" onclick="selectTimeline(this, 'flexible')">
+                                        <div class="font-semibold">Flexible</div>
+                                        <div class="text-sm opacity-90">No rush</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Location</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your address or suburb">
+                                <div class="mt-2 text-sm text-gray-500">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    We'll find providers in your area
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button onclick="prevStep()" class="btn-secondary px-6 py-3 rounded-lg font-semibold">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back
+                            </button>
+                            <button onclick="nextStep()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                Continue
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review & Submit -->
+                <div id="step4" class="form-section">
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Review Your Project</h3>
+                            <p class="text-gray-600">Review your project details before we find the perfect providers for you.</p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h4 class="font-semibold text-gray-900 mb-3">Project Summary</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div><span class="font-medium">Title:</span> <span id="reviewTitle">Kitchen Renovation</span></div>
+                                    <div><span class="font-medium">Category:</span> <span id="reviewCategory">Construction & Renovation</span></div>
+                                    <div><span class="font-medium">Budget:</span> <span id="reviewBudget">$5,000 - $10,000</span></div>
+                                    <div><span class="font-medium">Timeline:</span> <span id="reviewTimeline">This Month</span></div>
+                                    <div><span class="font-medium">Location:</span> <span id="reviewLocation">Sydney, NSW</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-6">
+                                <h4 class="font-semibold text-gray-900 mb-3">Project Description</h4>
+                                <p class="text-gray-600 text-sm" id="reviewDescription">
+                                    Complete kitchen renovation including new cabinets, countertops, appliances, and flooring. Looking for a professional contractor with experience in modern kitchen designs.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-blue-600 text-xl">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-blue-900 mb-2">AI Matching Ready</h4>
+                                    <p class="text-blue-800 text-sm mb-3">
+                                        Our AI will analyze your project and instantly match you with the top 3-5 providers who are:
+                                    </p>
+                                    <ul class="text-blue-800 text-sm space-y-1">
+                                        <li>✓ Verified and highly rated</li>
+                                        <li>✓ Available for your timeline</li>
+                                        <li>✓ Within your budget range</li>
+                                        <li>✓ Located in your area</li>
+                                        <li>✓ Experienced with similar projects</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button onclick="prevStep()" class="btn-secondary px-6 py-3 rounded-lg font-semibold">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back
+                            </button>
+                            <button onclick="submitProject()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                                <i class="fas fa-magic mr-2"></i>
+                                Find AI-Matched Providers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistant Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-8">
+                    <!-- AI Assistant -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="ai-suggestion w-10 h-10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-robot text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">AI Assistant</h4>
+                                <p class="text-sm text-gray-600">Here to help</p>
+                            </div>
+                        </div>
+                        
+                        <div id="aiInsights" class="space-y-4">
+                            <div class="ai-insight p-4 rounded-lg">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-lightbulb text-yellow-600 mt-1"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Tip</p>
+                                        <p class="text-sm text-gray-700">Include specific details about materials and finishes to get more accurate quotes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Provider Preview -->
+                    <div class="provider-preview rounded-2xl shadow-lg p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">
+                            <i class="fas fa-users mr-2"></i>
+                            Available Providers
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">In your area</span>
+                                <span class="font-semibold text-green-600">247 providers</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Available this week</span>
+                                <span class="font-semibold text-green-600">89 providers</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Average rating</span>
+                                <span class="font-semibold text-green-600">4.8 ★</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-green-200">
+                            <p class="text-sm text-gray-700">
+                                <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                                All providers are verified and background checked
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedCategory = null;
+        let selectedBudget = null;
+        let selectedTimeline = null;
+
+        // Character counter for description
+        document.getElementById('projectDescription').addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('charCount').textContent = count;
+            
+            if (count > 800) {
+                document.getElementById('charCount').classList.add('text-red-500');
+            } else {
+                document.getElementById('charCount').classList.remove('text-red-500');
+            }
+        });
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                // Hide current step
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                
+                // Update step indicator
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.remove('active');
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.add('completed');
+                
+                currentStep++;
+                
+                // Show next step
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.add('active');
+                
+                // Update progress
+                updateStepInfo();
+                updateAIInsights();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.remove('active');
+                
+                currentStep--;
+                
+                // Show previous step
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.remove('completed');
+                document.querySelector(`.step-indicator:nth-child(${currentStep * 2 - 1})`).classList.add('active');
+                
+                // Update progress
+                updateStepInfo();
+                updateAIInsights();
+            }
+        }
+
+        function updateStepInfo() {
+            const stepTitles = [
+                'Describe Your Project',
+                'Select Category',
+                'Budget & Timeline',
+                'Review & Submit'
+            ];
+            
+            const stepDescriptions = [
+                'Tell us what you need done and our AI will guide you through the process',
+                'Choose the category that best matches your project',
+                'Help us find providers that match your budget and timeline',
+                'Review your project details before we find the perfect providers'
+            ];
+            
+            document.getElementById('currentStep').textContent = currentStep;
+            document.getElementById('stepTitle').textContent = stepTitles[currentStep - 1];
+            document.getElementById('stepDescription').textContent = stepDescriptions[currentStep - 1];
+        }
+
+        function updateAIInsights() {
+            const insights = {
+                1: [
+                    {
+                        icon: 'fas fa-lightbulb',
+                        title: 'Tip',
+                        text: 'Include specific details about materials and finishes to get more accurate quotes.',
+                        color: 'yellow'
+                    }
+                ],
+                2: [
+                    {
+                        icon: 'fas fa-chart-line',
+                        title: 'Popular Choice',
+                        text: 'Construction & Renovation is the most requested category in your area.',
+                        color: 'blue'
+                    }
+                ],
+                3: [
+                    {
+                        icon: 'fas fa-dollar-sign',
+                        title: 'Budget Insight',
+                        text: 'Similar projects in your area typically cost $3,000 - $7,000.',
+                        color: 'green'
+                    }
+                ],
+                4: [
+                    {
+                        icon: 'fas fa-rocket',
+                        title: 'Ready to Launch',
+                        text: 'Your project looks great! We\'ll find the perfect providers for you.',
+                        color: 'purple'
+                    }
+                ]
+            };
+            
+            const container = document.getElementById('aiInsights');
+            container.innerHTML = '';
+            
+            insights[currentStep].forEach(insight => {
+                const div = document.createElement('div');
+                div.className = 'ai-insight p-4 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex items-start space-x-2">
+                        <i class="${insight.icon} text-${insight.color}-600 mt-1"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${insight.title}</p>
+                            <p class="text-sm text-gray-700">${insight.text}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Category selection
+        function selectCategory(element, category) {
+            // Remove previous selection
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            element.classList.add('selected');
+            selectedCategory = category;
+            
+            // Enable next button
+            document.getElementById('categoryNext').disabled = false;
+        }
+
+        // Budget selection
+        function selectBudget(element, budget) {
+            // Remove previous selection
+            document.querySelectorAll('.budget-suggestion').forEach(card => {
+                card.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            
+            // Add selection to clicked card
+            element.classList.add('border-blue-500', 'bg-blue-50');
+            selectedBudget = budget;
+            
+            // Show custom budget input if selected
+            if (budget === 'custom') {
+                document.getElementById('customBudget').classList.remove('hidden');
+            } else {
+                document.getElementById('customBudget').classList.add('hidden');
+            }
+        }
+
+        // Timeline selection
+        function selectTimeline(element, timeline) {
+            // Remove previous selection
+            document.querySelectorAll('[onclick*="selectTimeline"]').forEach(card => {
+                card.classList.remove('ring-4', 'ring-white', 'ring-opacity-50');
+            });
+            
+            // Add selection to clicked card
+            element.classList.add('ring-4', 'ring-white', 'ring-opacity-50');
+            selectedTimeline = timeline;
+        }
+
+        // Submit project
+        function submitProject() {
+            // Show loading state
+            const button = event.target;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Finding Providers...';
+            button.disabled = true;
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                alert('🎉 Success! We found 5 perfect providers for your project. You\'ll receive their profiles and quotes within 24 hours.');
+                window.location.href = 'index.html';
+            }, 3000);
+        }
+
+        // Initialize
+        updateAIInsights();
+    </script>
+</body>
+</html>
+
