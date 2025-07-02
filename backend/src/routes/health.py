@@ -1,366 +1,153 @@
 """
-Health monitoring endpoints for TradeHub Platform
-Provides comprehensive health checks and monitoring capabilities
+Health Check Routes for Railway Deployment
+Provides comprehensive system status for debugging
 """
-from flask import Blueprint, jsonify, request
-from datetime import datetime, timedelta
-from src.models.user import db, User
-from src.models.job import Job
-from src.models.service import ServiceCategory
-from src.utils.error_handling import handle_errors, app_logger
-from src.utils.rate_limiting import api_rate_limit
-import os
+
+from flask import Blueprint, jsonify
 import sys
-import psutil
-import time
+import os
+from datetime import datetime
+from ..utils.redis_client import redis_client
+from ..utils.storage import get_db_connection
 
 health_bp = Blueprint('health', __name__)
 
-# Global health metrics
-health_metrics = {
-    'start_time': datetime.utcnow(),
-    'request_count': 0,
-    'error_count': 0,
-    'last_error': None
-}
-
-
-@health_bp.before_request
-def track_request():
-    """Track request metrics"""
-    health_metrics['request_count'] += 1
-
-
 @health_bp.route('/health', methods=['GET'])
-@api_rate_limit
 def health_check():
-    """Basic health check endpoint"""
+    """Comprehensive health check for Railway deployment"""
+    
+    health_status = {
+        'status': 'healthy',
+        'timestamp': datetime.utcnow().isoformat(),
+        'version': '2.0.0',
+        'environment': os.environ.get('ENVIRONMENT', 'development'),
+        'checks': {}
+    }
+    
+    # Check Python dependencies
     try:
-        return jsonify({
+        import pandas
+        import numpy
+        import sklearn
+        import matplotlib
+        import seaborn
+        import plotly
+        health_status['checks']['dependencies'] = {
             'status': 'healthy',
-            'service': 'TradeHub Platform API',
-            'timestamp': datetime.utcnow().isoformat(),
-            'version': '1.0.0',
-            'uptime_seconds': (datetime.utcnow() - health_metrics['start_time']).total_seconds()
-        }), 200
-    except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Health check failed: {e}")
-        return jsonify({
-            'status': 'unhealthy',
-            'error': 'Health check failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 503
-
-
-@health_bp.route('/health/detailed', methods=['GET'])
-@api_rate_limit
-@handle_errors(app_logger)
-def detailed_health_check():
-    """Detailed health check with system metrics"""
-    try:
-        # Database health check
-        db_healthy = True
-        db_latency = None
-        db_error = None
-        
-        try:
-            start_time = time.time()
-            db.session.execute('SELECT 1')
-            db_latency = round((time.time() - start_time) * 1000, 2)  # ms
-        except Exception as e:
-            db_healthy = False
-            db_error = str(e)
-            app_logger.error(f"Database health check failed: {e}")
-        
-        # System metrics
-        system_metrics = {}
-        try:
-            system_metrics = {
-                'cpu_percent': psutil.cpu_percent(interval=1),
-                'memory_percent': psutil.virtual_memory().percent,
-                'disk_percent': psutil.disk_usage('/').percent,
-                'load_average': os.getloadavg() if hasattr(os, 'getloadavg') else None
-            }
-        except Exception as e:
-            app_logger.warning(f"Could not get system metrics: {e}")
-        
-        # Application metrics
-        uptime = datetime.utcnow() - health_metrics['start_time']
-        
-        # Data integrity checks
-        data_checks = {}
-        try:
-            data_checks = {
-                'total_users': User.query.count(),
-                'active_users': User.query.filter_by(is_active=True).count(),
-                'total_jobs': Job.query.count(),
-                'service_categories': ServiceCategory.query.count()
-            }
-        except Exception as e:
-            app_logger.error(f"Data integrity check failed: {e}")
-            data_checks['error'] = str(e)
-        
-        # Overall health status
-        overall_status = 'healthy'
-        if not db_healthy:
-            overall_status = 'unhealthy'
-        elif system_metrics.get('cpu_percent', 0) > 90 or system_metrics.get('memory_percent', 0) > 90:
-            overall_status = 'degraded'
-        elif health_metrics['error_count'] > 100:  # Too many errors
-            overall_status = 'degraded'
-        
-        return jsonify({
-            'status': overall_status,
-            'timestamp': datetime.utcnow().isoformat(),
-            'service': 'TradeHub Platform API',
-            'version': '1.0.0',
-            'uptime': {
-                'seconds': uptime.total_seconds(),
-                'human_readable': str(uptime).split('.')[0]  # Remove microseconds
-            },
-            'database': {
-                'healthy': db_healthy,
-                'latency_ms': db_latency,
-                'error': db_error
-            },
-            'system': system_metrics,
-            'application': {
-                'request_count': health_metrics['request_count'],
-                'error_count': health_metrics['error_count'],
-                'error_rate': round(health_metrics['error_count'] / max(health_metrics['request_count'], 1) * 100, 2),
-                'last_error': health_metrics['last_error'],
-                'python_version': sys.version
-            },
-            'data_integrity': data_checks
-        }), 200
-        
-    except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Detailed health check failed: {e}")
-        return jsonify({
-            'status': 'unhealthy',
-            'error': 'Detailed health check failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 503
-
-
-@health_bp.route('/health/ready', methods=['GET'])
-@api_rate_limit
-def readiness_check():
-    """Readiness check for load balancers"""
-    try:
-        # Check if essential services are ready
-        ready = True
-        checks = {}
-        
-        # Database readiness
-        try:
-            db.session.execute('SELECT 1')
-            checks['database'] = 'ready'
-        except Exception as e:
-            ready = False
-            checks['database'] = f'not ready: {str(e)}'
-        
-        # Check if essential data exists
-        try:
-            if ServiceCategory.query.count() == 0:
-                ready = False
-                checks['service_categories'] = 'not ready: no service categories'
-            else:
-                checks['service_categories'] = 'ready'
-        except Exception as e:
-            ready = False
-            checks['service_categories'] = f'not ready: {str(e)}'
-        
-        status_code = 200 if ready else 503
-        return jsonify({
-            'ready': ready,
-            'timestamp': datetime.utcnow().isoformat(),
-            'checks': checks
-        }), status_code
-        
-    except Exception as e:
-        app_logger.error(f"Readiness check failed: {e}")
-        return jsonify({
-            'ready': False,
-            'error': 'Readiness check failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 503
-
-
-@health_bp.route('/health/live', methods=['GET'])
-@api_rate_limit
-def liveness_check():
-    """Liveness check for container orchestration"""
-    try:
-        # Simple liveness check - if we can respond, we're alive
-        return jsonify({
-            'alive': True,
-            'timestamp': datetime.utcnow().isoformat(),
-            'service': 'TradeHub Platform API'
-        }), 200
-    except Exception as e:
-        app_logger.error(f"Liveness check failed: {e}")
-        return jsonify({
-            'alive': False,
-            'error': 'Liveness check failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 503
-
-
-@health_bp.route('/health/metrics', methods=['GET'])
-@api_rate_limit
-@handle_errors(app_logger)
-def metrics_endpoint():
-    """Metrics endpoint for monitoring systems"""
-    try:
-        uptime = datetime.utcnow() - health_metrics['start_time']
-        
-        # Get database metrics
-        db_metrics = {}
-        try:
-            db_metrics = {
-                'total_users': User.query.count(),
-                'active_users': User.query.filter_by(is_active=True).count(),
-                'total_jobs': Job.query.count(),
-                'recent_jobs': Job.query.filter(
-                    Job.created_at > datetime.utcnow() - timedelta(days=7)
-                ).count()
-            }
-        except Exception as e:
-            app_logger.error(f"Database metrics failed: {e}")
-            db_metrics['error'] = str(e)
-        
-        return jsonify({
-            'timestamp': datetime.utcnow().isoformat(),
-            'uptime_seconds': uptime.total_seconds(),
-            'requests': {
-                'total': health_metrics['request_count'],
-                'errors': health_metrics['error_count'],
-                'error_rate': round(health_metrics['error_count'] / max(health_metrics['request_count'], 1) * 100, 2)
-            },
-            'database': db_metrics,
-            'system': {
-                'python_version': sys.version,
-                'platform': sys.platform
-            }
-        }), 200
-        
-    except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Metrics endpoint failed: {e}")
-        return jsonify({
-            'error': 'Metrics collection failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 500
-
-
-@health_bp.route('/health/performance', methods=['GET'])
-@api_rate_limit
-def performance_metrics():
-    """Enhanced performance metrics endpoint"""
-    try:
-        # Import performance monitor
-        from src.utils.performance import performance_monitor
-        
-        # Get performance metrics
-        perf_metrics = performance_monitor.get_metrics()
-        
-        # Add health-specific metrics
-        uptime = datetime.utcnow() - health_metrics['start_time']
-        
-        enhanced_metrics = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'uptime_seconds': uptime.total_seconds(),
-            'performance': perf_metrics,
-            'health': {
-                'total_requests': health_metrics['request_count'],
-                'total_errors': health_metrics['error_count'],
-                'error_rate': (health_metrics['error_count'] / max(1, health_metrics['request_count'])) * 100,
-                'last_error': health_metrics.get('last_error'),
-                'status': 'healthy' if health_metrics['error_count'] < 100 else 'degraded'
-            }
+            'pandas': pandas.__version__,
+            'numpy': numpy.__version__,
+            'sklearn': sklearn.__version__,
+            'matplotlib': matplotlib.__version__,
+            'seaborn': seaborn.__version__,
+            'plotly': plotly.__version__
         }
-        
-        return jsonify(enhanced_metrics), 200
-        
-    except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Performance metrics failed: {e}")
-        return jsonify({
-            'error': 'Performance metrics collection failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 500
-
-
-@health_bp.route('/health/quality', methods=['GET'])
-@api_rate_limit
-def quality_metrics():
-    """Comprehensive quality metrics and scoring endpoint"""
+    except ImportError as e:
+        health_status['checks']['dependencies'] = {
+            'status': 'unhealthy',
+            'error': str(e)
+        }
+        health_status['status'] = 'unhealthy'
+    
+    # Check Redis connection
     try:
-        from src.utils.quality_metrics import quality_metrics as qm
-        
-        # Calculate comprehensive quality score
-        quality_report = qm.calculate_overall_score()
-        
-        return jsonify({
-            'timestamp': datetime.utcnow().isoformat(),
-            'platform': 'TradeHub Platform',
-            'version': '1.0.0',
-            'quality_assessment': quality_report,
-            'status': 'healthy' if quality_report['overall_score'] >= 90 else 'degraded'
-        }), 200
-        
+        if redis_client and redis_client.is_connected():
+            redis_client.redis_client.ping()
+            health_status['checks']['redis'] = {
+                'status': 'healthy',
+                'connected': True,
+                'url': os.environ.get('REDIS_URL', 'not_set')[:20] + '...' if os.environ.get('REDIS_URL') else 'not_set'
+            }
+        else:
+            health_status['checks']['redis'] = {
+                'status': 'degraded',
+                'connected': False,
+                'message': 'Redis not available, running in degraded mode'
+            }
     except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Quality metrics failed: {e}")
-        return jsonify({
-            'error': 'Quality metrics collection failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 500
-
-
-@health_bp.route('/health/config', methods=['GET'])
-@api_rate_limit
-def configuration_info():
-    """Configuration and environment information endpoint"""
+        health_status['checks']['redis'] = {
+            'status': 'unhealthy',
+            'error': str(e)
+        }
+    
+    # Check database connection
     try:
-        from src.utils.config import config_manager
-        
-        config_info = config_manager.get_environment_info()
-        
-        return jsonify({
-            'timestamp': datetime.utcnow().isoformat(),
-            'environment': config_info,
-            'status': 'healthy'
-        }), 200
-        
+        db_conn = get_db_connection()
+        if db_conn:
+            health_status['checks']['database'] = {
+                'status': 'healthy',
+                'connected': True,
+                'url': os.environ.get('DATABASE_URL', 'not_set')[:30] + '...' if os.environ.get('DATABASE_URL') else 'not_set'
+            }
+        else:
+            health_status['checks']['database'] = {
+                'status': 'unhealthy',
+                'connected': False
+            }
     except Exception as e:
-        health_metrics['error_count'] += 1
-        health_metrics['last_error'] = str(e)
-        app_logger.error(f"Configuration info failed: {e}")
-        return jsonify({
-            'error': 'Configuration info collection failed',
-            'timestamp': datetime.utcnow().isoformat()
-        }), 500
+        health_status['checks']['database'] = {
+            'status': 'unhealthy',
+            'error': str(e)
+        }
+    
+    # System information
+    health_status['system'] = {
+        'python_version': sys.version,
+        'platform': sys.platform,
+        'working_directory': os.getcwd(),
+        'environment_variables': {
+            'PORT': os.environ.get('PORT', 'not_set'),
+            'ENVIRONMENT': os.environ.get('ENVIRONMENT', 'not_set'),
+            'DEBUG': os.environ.get('DEBUG', 'not_set'),
+            'DATA_DIR': os.environ.get('DATA_DIR', 'not_set'),
+            'PYTHONPATH': os.environ.get('PYTHONPATH', 'not_set')
+        }
+    }
+    
+    # Determine overall status
+    if any(check.get('status') == 'unhealthy' for check in health_status['checks'].values()):
+        health_status['status'] = 'unhealthy'
+        status_code = 503
+    elif any(check.get('status') == 'degraded' for check in health_status['checks'].values()):
+        health_status['status'] = 'degraded'
+        status_code = 200
+    else:
+        status_code = 200
+    
+    return jsonify(health_status), status_code
 
+@health_bp.route('/health/simple', methods=['GET'])
+def simple_health_check():
+    """Simple health check for Railway health monitoring"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
 
-# Error handler for health blueprint
-@health_bp.errorhandler(Exception)
-def handle_health_error(error):
-    """Handle errors in health endpoints"""
-    health_metrics['error_count'] += 1
-    health_metrics['last_error'] = str(error)
-    app_logger.error(f"Health endpoint error: {error}")
+@health_bp.route('/health/dependencies', methods=['GET'])
+def dependencies_check():
+    """Check all Python dependencies"""
+    dependencies = {}
+    
+    required_packages = [
+        'pandas', 'numpy', 'sklearn', 'matplotlib', 'seaborn', 'plotly',
+        'flask', 'redis', 'celery', 'gunicorn', 'psycopg2', 'sqlalchemy'
+    ]
+    
+    for package in required_packages:
+        try:
+            module = __import__(package)
+            dependencies[package] = {
+                'status': 'available',
+                'version': getattr(module, '__version__', 'unknown')
+            }
+        except ImportError:
+            dependencies[package] = {
+                'status': 'missing',
+                'error': f'Module {package} not found'
+            }
     
     return jsonify({
-        'error': 'Health check failed',
-        'timestamp': datetime.utcnow().isoformat(),
-        'status': 'unhealthy'
-    }), 503
+        'dependencies': dependencies,
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
+

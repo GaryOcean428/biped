@@ -18,6 +18,7 @@ from src.utils.performance import TradingCacheService, configure_performance
 from src.routes.analytics import analytics_bp
 from src.services.data_pipeline import create_data_services
 from src.routes.websocket import websocket_bp, init_socketio
+from src.routes.health import health_bp
 
 # Import core models
 from src.models.user import db, User, CustomerProfile, ProviderProfile
@@ -41,67 +42,8 @@ from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
 from src.routes.storage import storage_bp
 
-# Create health blueprint
-from flask import Blueprint
-health_bp = Blueprint('health', __name__)
-
-@health_bp.route('/health')
-def health_check():
-    """Enhanced health check endpoint"""
-    start_time = time.time()
-    
-    health_status = {
-        'status': 'healthy',
-        'timestamp': time.time(),
-        'version': '2.0.0',
-        'services': {}
-    }
-    
-    # Check database
-    try:
-        db.session.execute('SELECT 1').scalar()
-        health_status['services']['database'] = {
-            'status': 'healthy',
-            'latency_ms': (time.time() - start_time) * 1000
-        }
-    except Exception as e:
-        health_status['services']['database'] = {
-            'status': 'unhealthy',
-            'error': str(e)
-        }
-        health_status['status'] = 'degraded'
-    
-    # Check Redis
-    try:
-        redis_start = time.time()
-        redis_client.redis_client.ping()
-        health_status['services']['redis'] = {
-            'status': 'healthy',
-            'latency_ms': (time.time() - redis_start) * 1000,
-            'connected': redis_client.is_connected()
-        }
-    except Exception as e:
-        health_status['services']['redis'] = {
-            'status': 'unhealthy',
-            'error': str(e)
-        }
-        health_status['status'] = 'degraded'
-    
-    # Overall response time
-    health_status['response_time_ms'] = (time.time() - start_time) * 1000
-    
-    return health_status
-
-@health_bp.route('/ready')
-def readiness_check():
-    """Kubernetes readiness probe"""
-    try:
-        # Quick checks for readiness
-        db.session.execute('SELECT 1').scalar()
-        redis_client.redis_client.ping()
-        return {'status': 'ready'}, 200
-    except Exception as e:
-        return {'status': 'not ready', 'error': str(e)}, 503
+# Import Flask and other dependencies
+import os
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
