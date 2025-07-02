@@ -115,9 +115,13 @@ app.config['ENVIRONMENT'] = os.environ.get('ENVIRONMENT', 'production')
 # Configure performance optimizations
 configure_performance(app)
 
-# Initialize database with migrations (only if not already initialized)
+# Initialize database with app and set up migrations (check if already initialized)
 if not hasattr(app, 'extensions') or 'sqlalchemy' not in app.extensions:
     db.init_app(app)
+    print("✅ Database initialized with app")
+else:
+    print("✅ Database already initialized, skipping")
+
 migrate = Migrate(app, db)
 
 # Initialize caching
