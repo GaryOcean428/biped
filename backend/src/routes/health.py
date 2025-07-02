@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 from ..utils.redis_client import redis_client
 from ..models.user import db
+from ..utils.cv_fallback import ComputerVisionChecker
 
 health_bp = Blueprint('health', __name__)
 
@@ -82,6 +83,25 @@ def health_check():
         health_status['checks']['database'] = {
             'status': 'unhealthy',
             'connected': False,
+            'error': str(e)
+        }
+    
+    # Check computer vision capabilities
+    try:
+        cv_status = ComputerVisionChecker.get_cv_status()
+        is_available = ComputerVisionChecker.is_cv_available()
+        
+        health_status['checks']['computer_vision'] = {
+            'status': 'healthy' if is_available else 'degraded',
+            'available': is_available,
+            'libraries': cv_status.get('libraries', {}),
+            'environment': cv_status.get('environment', 'unknown'),
+            'headless': cv_status.get('headless', False)
+        }
+    except Exception as e:
+        health_status['checks']['computer_vision'] = {
+            'status': 'unhealthy',
+            'available': False,
             'error': str(e)
         }
     

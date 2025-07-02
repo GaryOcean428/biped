@@ -1,17 +1,21 @@
 [build]
-builder = "nixpacks"
-buildCommand = "cd backend && pip install --no-cache-dir -r requirements.txt"
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/api/health"
-healthcheckTimeout = 30
+healthcheckPath = "/health"
+healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [env]
 DATA_DIR = "/data"
-PYTHONPATH = "/app/backend"
 ENVIRONMENT = "production"
 DEBUG = "false"
 FORCE_HTTPS = "true"
+PYTHONPATH = "/app/backend"
+# OpenCV headless configuration
+OPENCV_HEADLESS = "true"
+# Disable GUI features
+DISPLAY = ""
 
