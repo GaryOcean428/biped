@@ -9,9 +9,9 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 import json
 
-from src.models.base import db
+from src.models.user import db
 from src.models.user import User
-from src.models.financial import Invoice, Quote
+from src.models.financial import Invoice, FinancialQuote
 
 real_estate_bp = Blueprint('real_estate', __name__, url_prefix='/api/real-estate')
 

@@ -1,13 +1,14 @@
 import os
 import sys
 import time
+from flask import Flask, send_from_directory, g
+
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory
 from flask_cors import CORS
 
-# Import all models
+# Import core models only
 from src.models.user import db, User, CustomerProfile, ProviderProfile
 from src.models.service import ServiceCategory, Service, ProviderService, PortfolioItem
 from src.models.job import Job, Quote, JobMilestone, JobMessage
@@ -15,43 +16,39 @@ from src.models.review import Review, Message, Notification
 from src.models.admin import Admin, AdminAction
 from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 
-# Import routes
+# Import core routes only
 from src.routes.user import user_bp
 from src.routes.auth import auth_bp
 from src.routes.service import service_bp
-from src.routes.job i# Import routes
-from src.routes.user import user_bp
+from src.routes.job import job_bp
+from src.routes.review import review_bp
 from src.routes.admin import admin_bp
 from src.routes.payment import payment_bp
 from src.routes.ai import ai_bp
 from src.routes.vision import vision_bp
 from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
-from src.routes.financial import financial_bp
-from src.routes.integrations import integrations_bp
-from src.routes.real_estate import real_estate_bpp
-from src.routes.health import health_bp
 
-# Import new performance and security utilities
-from src.utils.security import security_headers, performance_monitor
-from src.utils.performance import response_cache, compression_middleware, static_optimizer
-from src.utils.config import config_manager
+# Create health blueprint
+from flask import Blueprint
+health_bp = Blueprint('health', __name__)
+
+@health_bp.route('/health')
+def health_check():
+    """Health check endpoint"""
+    return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# Apply advanced configuration
-flask_config = config_manager.get_flask_config()
-app.config.update(flask_config)
-
-# Log configuration validation issues
-config_issues = config_manager.validate_config()
-if config_issues:
-    app.logger.warning(f"Configuration issues detected: {config_issues}")
+# Basic configuration
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-production-secret-key-2025')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///biped.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Enable CORS for all routes
 CORS(app, origins="*")
 
-# Register blueprints
+# Register core blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(service_bp, url_prefix='/api/services')
@@ -63,40 +60,9 @@ app.register_blueprint(ai_bp)
 app.register_blueprint(vision_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
-app.register_blueprint(financial_bp)
-app.register_blueprint(integrations_bp)
-app.register_blueprint(real_estate_bp)
 app.register_blueprint(health_bp, url_prefix='/api')
 
-
-# Security and Performance Middleware
-@app.after_request
-def apply_security_headers(response):
-    """Apply security headers to all responses"""
-    return security_headers.apply_security_headers(response)
-
-
-@app.after_request
-def apply_compression(response):
-    """Apply response compression for large responses"""
-    return compression_middleware.compress_response(response)
-
-
-@app.before_request
-def monitor_request_start():
-    """Monitor request start time for performance tracking"""
-    g.start_time = time.time()
-
-
-@app.after_request
-def monitor_request_end(response):
-    """Monitor request completion and record metrics"""
-    if hasattr(g, 'start_time'):
-        response_time = time.time() - g.start_time
-        performance_monitor.record_request(response_time, response.status_code)
-    return response
-
-# Database initialization (configuration handled by config_manager)
+# Database initialization
 db.init_app(app)
 
 # Create all tables
@@ -132,7 +98,7 @@ with app.app_context():
     if Admin.query.count() == 0:
         admin = Admin(
             username='admin',
-            email='admin@tradehub.com',
+            email='admin@biped.com',
             first_name='System',
             last_name='Administrator',
             role='super_admin',
@@ -165,11 +131,6 @@ def serve_static(path):
             return send_from_directory(static_folder_path, 'index.html')
         else:
             return "index.html not found", 404
-
-@app.route('/api/health')
-def health_check():
-    """Health check endpoint"""
-    return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
 
 if __name__ == '__main__':
     # Get port from environment variable, default to 8080

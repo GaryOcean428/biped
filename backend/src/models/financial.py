@@ -6,9 +6,10 @@ Comprehensive business management for all stakeholders
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from sqlalchemy import Column, Integer, String, DateTime, Decimal as SQLDecimal, Boolean, Text, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, JSON
+from sqlalchemy.sql.sqltypes import Numeric
 from sqlalchemy.orm import relationship
-from src.models.base import db
+from src.models.user import db
 
 class InvoiceStatus(Enum):
     DRAFT = "draft"
@@ -33,8 +34,8 @@ class Invoice(db.Model):
     
     id = Column(Integer, primary_key=True)
     invoice_number = Column(String(50), unique=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    job_id = Column(Integer, ForeignKey('jobs.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    job_id = Column(Integer, ForeignKey('job.id'), nullable=True)
     
     # Client Information
     client_name = Column(String(200), nullable=False)
@@ -48,10 +49,10 @@ class Invoice(db.Model):
     status = Column(String(20), default=InvoiceStatus.DRAFT.value)
     
     # Financial Information
-    subtotal = Column(SQLDecimal(10, 2), nullable=False)
-    tax_rate = Column(SQLDecimal(5, 2), default=Decimal('10.00'))  # GST
-    tax_amount = Column(SQLDecimal(10, 2), nullable=False)
-    total_amount = Column(SQLDecimal(10, 2), nullable=False)
+    subtotal = Column(Numeric(10, 2), nullable=False)
+    tax_rate = Column(Numeric(5, 2), default=Decimal('10.00'))  # GST
+    tax_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
     
     # Payment Information
     payment_terms = Column(String(100), default="Net 30")
@@ -125,14 +126,14 @@ class Invoice(db.Model):
             'is_overdue': self.is_overdue()
         }
 
-class Quote(db.Model):
+class FinancialQuote(db.Model):
     """Professional quote management"""
-    __tablename__ = 'quotes'
+    __tablename__ = 'financial_quotes'
     
     id = Column(Integer, primary_key=True)
     quote_number = Column(String(50), unique=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    job_id = Column(Integer, ForeignKey('jobs.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    job_id = Column(Integer, ForeignKey('job.id'), nullable=True)
     
     # Client Information
     client_name = Column(String(200), nullable=False)
@@ -152,10 +153,10 @@ class Quote(db.Model):
     start_date = Column(DateTime, nullable=True)
     
     # Financial Information
-    subtotal = Column(SQLDecimal(10, 2), nullable=False)
-    tax_rate = Column(SQLDecimal(5, 2), default=Decimal('10.00'))
-    tax_amount = Column(SQLDecimal(10, 2), nullable=False)
-    total_amount = Column(SQLDecimal(10, 2), nullable=False)
+    subtotal = Column(Numeric(10, 2), nullable=False)
+    tax_rate = Column(Numeric(5, 2), default=Decimal('10.00'))
+    tax_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
     
     # Quote Items (JSON for flexibility)
     quote_items = Column(JSON, nullable=False)
@@ -167,7 +168,7 @@ class Quote(db.Model):
     
     # AI Analysis Results
     ai_analysis = Column(JSON, nullable=True)
-    confidence_score = Column(SQLDecimal(3, 2), nullable=True)
+    confidence_score = Column(Numeric(3, 2), nullable=True)
     
     # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -229,13 +230,13 @@ class Expense(db.Model):
     __tablename__ = 'expenses'
     
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    job_id = Column(Integer, ForeignKey('jobs.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    job_id = Column(Integer, ForeignKey('job.id'), nullable=True)
     
     # Expense Details
     description = Column(String(500), nullable=False)
     category = Column(String(50), nullable=False)
-    amount = Column(SQLDecimal(10, 2), nullable=False)
+    amount = Column(Numeric(10, 2), nullable=False)
     expense_date = Column(DateTime, nullable=False)
     
     # Receipt Information
@@ -245,7 +246,7 @@ class Expense(db.Model):
     # Tax Information
     is_tax_deductible = Column(Boolean, default=True)
     tax_category = Column(String(100), nullable=True)
-    gst_amount = Column(SQLDecimal(10, 2), nullable=True)
+    gst_amount = Column(Numeric(10, 2), nullable=True)
     
     # Vendor Information
     vendor_name = Column(String(200), nullable=True)
@@ -257,7 +258,7 @@ class Expense(db.Model):
     
     # Approval Workflow
     is_approved = Column(Boolean, default=True)
-    approved_by = Column(Integer, ForeignKey('users.id'), nullable=True)
+    approved_by = Column(Integer, ForeignKey('user.id'), nullable=True)
     approved_at = Column(DateTime, nullable=True)
     
     # Metadata
@@ -295,14 +296,14 @@ class PlatformRevenue(db.Model):
     source_id = Column(Integer, nullable=False)  # ID of the source record
     
     # Financial Information
-    gross_amount = Column(SQLDecimal(10, 2), nullable=False)  # Total transaction amount
-    commission_rate = Column(SQLDecimal(5, 2), nullable=False)  # Commission percentage
-    commission_amount = Column(SQLDecimal(10, 2), nullable=False)  # Platform commission
-    net_amount = Column(SQLDecimal(10, 2), nullable=False)  # Amount to provider
+    gross_amount = Column(Numeric(10, 2), nullable=False)  # Total transaction amount
+    commission_rate = Column(Numeric(5, 2), nullable=False)  # Commission percentage
+    commission_amount = Column(Numeric(10, 2), nullable=False)  # Platform commission
+    net_amount = Column(Numeric(10, 2), nullable=False)  # Amount to provider
     
     # User Information
-    provider_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    customer_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    provider_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    customer_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     
     # Payment Information
     payment_status = Column(String(20), default="pending")  # pending, completed, failed
@@ -367,7 +368,7 @@ class FinancialReport(db.Model):
     __tablename__ = 'financial_reports'
     
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     
     # Report Details
     report_type = Column(String(50), nullable=False)  # monthly, quarterly, annual, custom
