@@ -23,6 +23,7 @@ from src.routes.review import review_bp
 from src.routes.admin import admin_bp
 from src.routes.payment import payment_bp
 from src.routes.ai import ai_bp
+from src.routes.vision import vision_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-secret-key-change-in-production')
@@ -39,6 +40,7 @@ app.register_blueprint(review_bp, url_prefix='/api/reviews')
 app.register_blueprint(admin_bp)
 app.register_blueprint(payment_bp, url_prefix='/api/payments')
 app.register_blueprint(ai_bp)
+app.register_blueprint(vision_bp)
 
 # Database configuration - support both PostgreSQL (Railway) and SQLite (local)
 database_url = os.environ.get('DATABASE_URL')
