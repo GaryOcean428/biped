@@ -29,5 +29,26 @@ redis==5.0.1
 celery==5.3.4
 reportlab==4.0.7
 fpdf2==2.7.6
-python-dateutil==2.8.2
+gunicorn==21.2.0
+gevent==23.9.1
+flask-socketio==5.3.6
+eventlet==0.33.3
+python-socketio==5.9.0
+websocket-client==1.6.4
+flask-limiter==3.5.0
+flask-talisman==1.1.0
+flask-jwt-extended==4.5.3
+flask-migrate==4.0.5
+flask-caching==2.1.0
+flask-compress==1.13
+pyotp==2.9.0
+qrcode==7.4.2
+email-validator==2.1.0
+prometheus-client==0.19.0
+structlog==23.2.0
+sentry-sdk[flask]==1.38.0
+elasticsearch==8.11.0
+orjson==3.9.10
+psutil==5.9.6
+alembic==1.12.1
 

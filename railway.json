@@ -1,12 +1,25 @@
 {
   "build": {
-    "builder": "dockerfile"
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install --no-cache-dir -r requirements.txt",
+    "watchPatterns": ["**/*.py", "requirements.txt"]
   },
   "deploy": {
-    "startCommand": "python -m gunicorn --bind 0.0.0.0:$PORT --workers 1 src.main:app",
+    "runtime": "PYTHON",
+    "startCommand": "gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 --keep-alive 2 --max-requests 1000 --max-requests-jitter 100 src.main:app",
     "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 300,
-    "restartPolicyType": "on_failure"
+    "healthcheckTimeout": 30,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "ENVIRONMENT": "production",
+        "DEBUG": "false",
+        "FORCE_HTTPS": "true"
+      }
+    }
   }
 }
 

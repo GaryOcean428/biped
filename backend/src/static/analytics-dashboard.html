@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biped Analytics Dashboard</title>
+    <link rel="stylesheet" href="/css/design-system.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+    <style>
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+        
+        .analytics-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+        }
+        
+        .analytics-card h3 {
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .metric-positive {
+            color: var(--success-color);
+        }
+        
+        .metric-negative {
+            color: var(--error-color);
+        }
+        
+        .metric-neutral {
+            color: var(--text-primary);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background-color: var(--success-color);
+        }
+        
+        .status-offline {
+            background-color: var(--error-color);
+        }
+        
+        .alert-item {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert-high {
+            background: var(--error-bg);
+            border-color: var(--error-color);
+        }
+        
+        .alert-medium {
+            background: var(--warning-bg);
+            border-color: var(--warning-color);
+        }
+        
+        .alert-low {
+            background: var(--info-bg);
+            border-color: var(--info-color);
+        }
+        
+        .refresh-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+        
+        .refresh-button:hover {
+            background: var(--primary-hover);
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .last-updated {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">
+            <span class="status-indicator" id="connectionStatus"></span>
+            Biped Analytics Dashboard
+        </h1>
+        <div>
+            <span class="last-updated" id="lastUpdated">Loading...</span>
+            <button class="refresh-button" onclick="refreshAllData()">
+                <span id="refreshIcon">🔄</span> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+        <!-- Portfolio Summary -->
+        <div class="analytics-card">
+            <h3>Portfolio Summary</h3>
+            <div id="portfolioSummary">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="analytics-card">
+            <h3>Performance Metrics</h3>
+            <div id="performanceMetrics">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="analytics-card">
+            <h3>Risk Assessment</h3>
+            <div id="riskAssessment">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Market Data -->
+        <div class="analytics-card">
+            <h3>Real-Time Market Data</h3>
+            <div id="marketData">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Portfolio Performance Chart -->
+        <div class="analytics-card" style="grid-column: span 2;">
+            <h3>Portfolio Performance</h3>
+            <div class="chart-container">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Market Sentiment -->
+        <div class="analytics-card">
+            <h3>Market Sentiment</h3>
+            <div id="marketSentiment">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Trading Patterns -->
+        <div class="analytics-card">
+            <h3>Trading Patterns</h3>
+            <div id="tradingPatterns">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Risk Alerts -->
+        <div class="analytics-card" style="grid-column: span 2;">
+            <h3>Risk Alerts & Notifications</h3>
+            <div id="riskAlerts">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/design-system.js"></script>
+    <script>
+        class AnalyticsDashboard {
+            constructor() {
+                this.socket = null;
+                this.charts = {};
+                this.refreshInterval = null;
+                this.isConnected = false;
+                
+                this.init();
+            }
+            
+            async init() {
+                await this.initializeWebSocket();
+                await this.loadInitialData();
+                this.startAutoRefresh();
+                this.updateConnectionStatus();
+            }
+            
+            async initializeWebSocket() {
+                try {
+                    this.socket = io('/analytics', {
+                        transports: ['websocket'],
+                        upgrade: true
+                    });
+                    
+                    this.socket.on('connect', () => {
+                        console.log('Connected to analytics WebSocket');
+                        this.isConnected = true;
+                        this.updateConnectionStatus();
+                    });
+                    
+                    this.socket.on('disconnect', () => {
+                        console.log('Disconnected from analytics WebSocket');
+                        this.isConnected = false;
+                        this.updateConnectionStatus();
+                    });
+                    
+                    this.socket.on('market_data_update', (data) => {
+                        this.updateMarketData(data);
+                    });
+                    
+                    this.socket.on('portfolio_update', (data) => {
+                        this.updatePortfolioData(data);
+                    });
+                    
+                    this.socket.on('risk_alert', (alert) => {
+                        this.addRiskAlert(alert);
+                    });
+                    
+                } catch (error) {
+                    console.error('WebSocket initialization failed:', error);
+                    this.isConnected = false;
+                    this.updateConnectionStatus();
+                }
+            }
+            
+            updateConnectionStatus() {
+                const statusElement = document.getElementById('connectionStatus');
+                if (this.isConnected) {
+                    statusElement.className = 'status-indicator status-online';
+                    statusElement.title = 'Connected to real-time data';
+                } else {
+                    statusElement.className = 'status-indicator status-offline';
+                    statusElement.title = 'Disconnected from real-time data';
+                }
+            }
+            
+            async loadInitialData() {
+                try {
+                    await Promise.all([
+                        this.loadPortfolioSummary(),
+                        this.loadPerformanceMetrics(),
+                        this.loadRiskAssessment(),
+                        this.loadMarketData(),
+                        this.loadMarketSentiment(),
+                        this.loadTradingPatterns()
+                    ]);
+                    
+                    this.updateLastUpdated();
+                } catch (error) {
+                    console.error('Failed to load initial data:', error);
+                }
+            }
+            
+            async loadPortfolioSummary() {
+                try {
+                    const response = await fetch('/api/v2/analytics/performance/summary');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderPortfolioSummary(result.data);
+                    } else {
+                        this.renderError('portfolioSummary', 'Failed to load portfolio data');
+                    }
+                } catch (error) {
+                    this.renderError('portfolioSummary', 'Network error loading portfolio');
+                }
+            }
+            
+            async loadPerformanceMetrics() {
+                try {
+                    const response = await fetch('/api/v2/analytics/performance/summary');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderPerformanceMetrics(result.data.performance_metrics);
+                        this.updatePortfolioChart(result.data);
+                    } else {
+                        this.renderError('performanceMetrics', 'Failed to load performance data');
+                    }
+                } catch (error) {
+                    this.renderError('performanceMetrics', 'Network error loading performance');
+                }
+            }
+            
+            async loadRiskAssessment() {
+                try {
+                    const response = await fetch('/api/v2/analytics/risk/assessment');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderRiskAssessment(result.data);
+                    } else {
+                        this.renderError('riskAssessment', 'Failed to load risk data');
+                    }
+                } catch (error) {
+                    this.renderError('riskAssessment', 'Network error loading risk data');
+                }
+            }
+            
+            async loadMarketData() {
+                try {
+                    const response = await fetch('/api/v2/analytics/real-time/market-data');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderMarketData(result.data);
+                    } else {
+                        this.renderError('marketData', 'Failed to load market data');
+                    }
+                } catch (error) {
+                    this.renderError('marketData', 'Network error loading market data');
+                }
+            }
+            
+            async loadMarketSentiment() {
+                try {
+                    const response = await fetch('/api/v2/analytics/market/sentiment');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderMarketSentiment(result.data);
+                    } else {
+                        this.renderError('marketSentiment', 'Failed to load sentiment data');
+                    }
+                } catch (error) {
+                    this.renderError('marketSentiment', 'Network error loading sentiment');
+                }
+            }
+            
+            async loadTradingPatterns() {
+                try {
+                    const response = await fetch('/api/v2/analytics/trading/patterns');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        this.renderTradingPatterns(result.data);
+                    } else {
+                        this.renderError('tradingPatterns', 'Failed to load trading patterns');
+                    }
+                } catch (error) {
+                    this.renderError('tradingPatterns', 'Network error loading patterns');
+                }
+            }
+            
+            renderPortfolioSummary(data) {
+                const container = document.getElementById('portfolioSummary');
+                container.innerHTML = `
+                    <div class="metric-row">
+                        <span class="metric-label">Portfolio Value</span>
+                        <span class="metric-value metric-neutral">$${this.formatNumber(data.portfolio_value)}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total P&L</span>
+                        <span class="metric-value ${data.total_pnl >= 0 ? 'metric-positive' : 'metric-negative'}">
+                            $${this.formatNumber(data.total_pnl)} (${data.total_pnl_percent.toFixed(2)}%)
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Daily Change</span>
+                        <span class="metric-value ${data.daily_change >= 0 ? 'metric-positive' : 'metric-negative'}">
+                            $${this.formatNumber(data.daily_change)}
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Positions</span>
+                        <span class="metric-value metric-neutral">${data.position_count}</span>
+                    </div>
+                `;
+            }
+            
+            renderPerformanceMetrics(metrics) {
+                const container = document.getElementById('performanceMetrics');
+                if (!metrics) {
+                    container.innerHTML = '<p class="metric-label">No performance data available</p>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="metric-row">
+                        <span class="metric-label">Win Rate</span>
+                        <span class="metric-value metric-neutral">${(metrics.win_rate || 0).toFixed(1)}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total Trades</span>
+                        <span class="metric-value metric-neutral">${metrics.total_trades || 0}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Profit Factor</span>
+                        <span class="metric-value ${(metrics.profit_factor || 0) > 1 ? 'metric-positive' : 'metric-negative'}">
+                            ${(metrics.profit_factor || 0).toFixed(2)}
+                        </span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Best Trade</span>
+                        <span class="metric-value metric-positive">$${this.formatNumber(metrics.best_trade || 0)}</span>
+                    </div>
+                `;
+            }
+            
+            renderRiskAssessment(data) {
+                const container = document.getElementById('riskAssessment');
+                const riskLevel = data.risk_level || 'unknown';
+                const riskColor = riskLevel === 'low' ? 'metric-positive' : 
+                                riskLevel === 'medium' ? 'metric-neutral' : 'metric-negative';
+                
+                container.innerHTML = `
+                    <div class="metric-row">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value ${riskColor}">${riskLevel.toUpperCase()}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Risk Score</span>
+                        <span class="metric-value metric-neutral">${(data.risk_score || 0).toFixed(1)}/100</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Volatility</span>
+                        <span class="metric-value metric-neutral">${((data.risk_metrics?.volatility || 0) * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Max Drawdown</span>
+                        <span class="metric-value metric-negative">${(data.risk_metrics?.max_drawdown || 0).toFixed(1)}%</span>
+                    </div>
+                `;
+            }
+            
+            renderMarketData(data) {
+                const container = document.getElementById('marketData');
+                let html = '';
+                
+                for (const [symbol, marketData] of Object.entries(data)) {
+                    const change = marketData.change || 0;
+                    const changeClass = change >= 0 ? 'metric-positive' : 'metric-negative';
+                    
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">${symbol}</span>
+                            <span class="metric-value ${changeClass}">
+                                $${this.formatNumber(marketData.price)} (${change.toFixed(2)}%)
+                            </span>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html || '<p class="metric-label">No market data available</p>';
+            }
+            
+            renderMarketSentiment(data) {
+                const container = document.getElementById('marketSentiment');
+                const overallSentiment = data.overall_sentiment || {};
+                
+                let html = `
+                    <div class="metric-row">
+                        <span class="metric-label">Overall Sentiment</span>
+                        <span class="metric-value metric-neutral">${overallSentiment.label || 'Neutral'}</span>
+                    </div>
+                `;
+                
+                const symbolSentiment = data.symbol_sentiment || {};
+                for (const [symbol, sentiment] of Object.entries(symbolSentiment)) {
+                    const sentimentClass = sentiment.score > 0.2 ? 'metric-positive' : 
+                                         sentiment.score < -0.2 ? 'metric-negative' : 'metric-neutral';
+                    
+                    html += `
+                        <div class="metric-row">
+                            <span class="metric-label">${symbol}</span>
+                            <span class="metric-value ${sentimentClass}">${sentiment.label || 'Neutral'}</span>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            renderTradingPatterns(data) {
+                const container = document.getElementById('tradingPatterns');
+                
+                container.innerHTML = `
+                    <div class="metric-row">
+                        <span class="metric-label">Trading Style</span>
+                        <span class="metric-value metric-neutral">${data.trading_style || 'Unknown'}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Efficiency Score</span>
+                        <span class="metric-value metric-neutral">${(data.efficiency_score || 0).toFixed(1)}/100</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Risk Tolerance</span>
+                        <span class="metric-value metric-neutral">${data.behavioral_insights?.risk_tolerance || 'Unknown'}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Discipline</span>
+                        <span class="metric-value metric-neutral">${data.behavioral_insights?.emotional_discipline || 'Unknown'}</span>
+                    </div>
+                `;
+            }
+            
+            updatePortfolioChart(data) {
+                const ctx = document.getElementById('portfolioChart').getContext('2d');
+                
+                if (this.charts.portfolio) {
+                    this.charts.portfolio.destroy();
+                }
+                
+                // Generate sample data for demonstration
+                const dates = [];
+                const values = [];
+                const currentValue = data.portfolio_value || 10000;
+                
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    dates.push(date.toLocaleDateString());
+                    
+                    // Simulate portfolio value changes
+                    const randomChange = (Math.random() - 0.5) * 0.02; // ±1% daily change
+                    const value = currentValue * (1 + randomChange * i / 30);
+                    values.push(value);
+                }
+                
+                this.charts.portfolio = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: values,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            renderError(containerId, message) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = `<p class="metric-label" style="color: var(--error-color);">${message}</p>`;
+            }
+            
+            formatNumber(num) {
+                if (typeof num !== 'number') return '0';
+                return num.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
+            }
+            
+            updateLastUpdated() {
+                const element = document.getElementById('lastUpdated');
+                element.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+            }
+            
+            startAutoRefresh() {
+                this.refreshInterval = setInterval(() => {
+                    this.loadInitialData();
+                }, 30000); // Refresh every 30 seconds
+            }
+            
+            stopAutoRefresh() {
+                if (this.refreshInterval) {
+                    clearInterval(this.refreshInterval);
+                    this.refreshInterval = null;
+                }
+            }
+            
+            updateMarketData(data) {
+                this.renderMarketData(data);
+            }
+            
+            updatePortfolioData(data) {
+                this.renderPortfolioSummary(data);
+            }
+            
+            addRiskAlert(alert) {
+                const container = document.getElementById('riskAlerts');
+                const alertElement = document.createElement('div');
+                alertElement.className = `alert-item alert-${alert.severity}`;
+                alertElement.innerHTML = `
+                    <strong>${alert.type}</strong>: ${alert.message}
+                    <br><small>${new Date(alert.timestamp).toLocaleString()}</small>
+                `;
+                
+                if (container.firstChild) {
+                    container.insertBefore(alertElement, container.firstChild);
+                } else {
+                    container.appendChild(alertElement);
+                }
+                
+                // Keep only last 10 alerts
+                while (container.children.length > 10) {
+                    container.removeChild(container.lastChild);
+                }
+            }
+        }
+        
+        // Global functions
+        function refreshAllData() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.style.animation = 'spin 1s linear infinite';
+            
+            dashboard.loadInitialData().then(() => {
+                refreshIcon.style.animation = '';
+            });
+        }
+        
+        // Initialize dashboard
+        let dashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboard = new AnalyticsDashboard();
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (dashboard) {
+                dashboard.stopAutoRefresh();
+                if (dashboard.socket) {
+                    dashboard.socket.disconnect();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

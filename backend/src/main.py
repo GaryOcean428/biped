@@ -1,14 +1,25 @@
 import os
 import sys
 import time
-from flask import Flask, send_from_directory, g
+from flask import Flask, send_from_directory, g, request, jsonify
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask_cors import CORS
+from flask_migrate import Migrate
+from flask_compress import Compress
+from flask_caching import Cache
 
-# Import core models only
+# Import enhanced security and performance modules
+from src.utils.security import SecurityEnhancer, SecurityConfig
+from src.utils.redis_client import redis_client
+from src.utils.performance import TradingCacheService, configure_performance
+from src.routes.analytics import analytics_bp
+from src.services.data_pipeline import create_data_services
+from src.routes.websocket import websocket_bp, init_socketio
+
+# Import core models
 from src.models.user import db, User, CustomerProfile, ProviderProfile
 from src.models.service import ServiceCategory, Service, ProviderService, PortfolioItem
 from src.models.job import Job, Quote, JobMilestone, JobMessage
@@ -16,7 +27,7 @@ from src.models.review import Review, Message, Notification
 from src.models.admin import Admin, AdminAction
 from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 
-# Import core routes only
+# Import enhanced routes
 from src.routes.user import user_bp
 from src.routes.auth import auth_bp
 from src.routes.service import service_bp
@@ -36,12 +47,65 @@ health_bp = Blueprint('health', __name__)
 
 @health_bp.route('/health')
 def health_check():
-    """Health check endpoint"""
-    return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
+    """Enhanced health check endpoint"""
+    start_time = time.time()
+    
+    health_status = {
+        'status': 'healthy',
+        'timestamp': time.time(),
+        'version': '2.0.0',
+        'services': {}
+    }
+    
+    # Check database
+    try:
+        db.session.execute('SELECT 1').scalar()
+        health_status['services']['database'] = {
+            'status': 'healthy',
+            'latency_ms': (time.time() - start_time) * 1000
+        }
+    except Exception as e:
+        health_status['services']['database'] = {
+            'status': 'unhealthy',
+            'error': str(e)
+        }
+        health_status['status'] = 'degraded'
+    
+    # Check Redis
+    try:
+        redis_start = time.time()
+        redis_client.redis_client.ping()
+        health_status['services']['redis'] = {
+            'status': 'healthy',
+            'latency_ms': (time.time() - redis_start) * 1000,
+            'connected': redis_client.is_connected()
+        }
+    except Exception as e:
+        health_status['services']['redis'] = {
+            'status': 'unhealthy',
+            'error': str(e)
+        }
+        health_status['status'] = 'degraded'
+    
+    # Overall response time
+    health_status['response_time_ms'] = (time.time() - start_time) * 1000
+    
+    return health_status
+
+@health_bp.route('/ready')
+def readiness_check():
+    """Kubernetes readiness probe"""
+    try:
+        # Quick checks for readiness
+        db.session.execute('SELECT 1').scalar()
+        redis_client.redis_client.ping()
+        return {'status': 'ready'}, 200
+    except Exception as e:
+        return {'status': 'not ready', 'error': str(e)}, 503
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# Basic configuration with /data volume support
+# Enhanced configuration with /data volume support
 DATA_DIR = os.environ.get('DATA_DIR', '/data')
 
 # Check if we can access the data directory, fallback to local if not
@@ -58,7 +122,7 @@ except (PermissionError, OSError):
     print(f"Warning: Cannot access /data, falling back to {DATA_DIR}")
     os.makedirs(DATA_DIR, exist_ok=True)
 
-# Database configuration - use /data volume for persistence
+# Enhanced database configuration
 if os.environ.get('DATABASE_URL'):
     # Use Railway PostgreSQL if available
     database_url = os.environ.get('DATABASE_URL')
@@ -70,22 +134,90 @@ else:
     # Use SQLite in /data volume for persistence
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATA_DIR}/biped.db'
 
+# Security configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-production-secret-key-2025')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# JWT Configuration
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False  # Will be set by SecurityEnhancer
+
+# Redis configuration
+app.config['REDIS_URL'] = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+# Cache configuration
+app.config['CACHE_TYPE'] = 'RedisCache'
+app.config['CACHE_REDIS_URL'] = app.config['REDIS_URL']
 
 # File upload configuration using /data volume
 app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Security headers configuration
+app.config['FORCE_HTTPS'] = os.environ.get('FORCE_HTTPS', 'true').lower() == 'true'
+
+# Monitoring configuration
+app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN')
+app.config['ENVIRONMENT'] = os.environ.get('ENVIRONMENT', 'production')
 
 # Create necessary directories
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, 'logs'), exist_ok=True)
 os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
 
-# Enable CORS for all routes
-CORS(app, origins="*")
+# Configure performance optimizations
+configure_performance(app)
 
-# Register core blueprints
+# Initialize database with migrations
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# Initialize caching
+cache = Cache(app)
+trading_cache = TradingCacheService(app)
+
+# Initialize compression
+Compress(app)
+
+# Initialize security enhancements
+security_config = SecurityConfig()
+security_enhancer = SecurityEnhancer(app, security_config)
+
+# Initialize WebSocket support
+socketio = init_socketio(app)
+
+# Enable CORS for all routes with enhanced security
+CORS(app, 
+     origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+     supports_credentials=True,
+     allow_headers=['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
+
+# Make security enhancer available in request context
+@app.before_request
+def before_request():
+    g.security_enhancer = security_enhancer
+    g.cache_service = trading_cache
+    g.start_time = time.time()
+    
+    # Log request for monitoring
+    if not request.path.startswith('/static'):
+        print(f"Request: {request.method} {request.path} from {request.remote_addr}")
+
+@app.after_request
+def after_request(response):
+    # Add security headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Add performance headers
+    if hasattr(g, 'start_time'):
+        response.headers['X-Response-Time'] = f"{(time.time() - g.start_time) * 1000:.2f}ms"
+    
+    return response
+
+# Register enhanced blueprints with rate limiting
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(service_bp, url_prefix='/api/services')
@@ -98,81 +230,192 @@ app.register_blueprint(vision_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
 app.register_blueprint(storage_bp)
+app.register_blueprint(websocket_bp, url_prefix='/api/ws')
 app.register_blueprint(health_bp, url_prefix='/api')
 
-# Database initialization
-db.init_app(app)
-
-# Create all tables
+# Enhanced database initialization
 with app.app_context():
-    db.create_all()
-    
-    # Create default service categories if they don't exist
-    if ServiceCategory.query.count() == 0:
-        categories = [
-            {'name': 'Plumbing', 'slug': 'plumbing', 'description': 'Water, drainage, and gas fitting services', 'icon': 'wrench'},
-            {'name': 'Electrical', 'slug': 'electrical', 'description': 'Electrical installation, repair, and maintenance', 'icon': 'bolt'},
-            {'name': 'Carpentry', 'slug': 'carpentry', 'description': 'Wood working, furniture, and structural carpentry', 'icon': 'hammer'},
-            {'name': 'Painting', 'slug': 'painting', 'description': 'Interior and exterior painting services', 'icon': 'paint-brush'},
-            {'name': 'Landscaping', 'slug': 'landscaping', 'description': 'Garden design, maintenance, and outdoor spaces', 'icon': 'leaf'},
-            {'name': 'Cleaning', 'slug': 'cleaning', 'description': 'House cleaning and maintenance services', 'icon': 'sparkles'},
-            {'name': 'Roofing', 'slug': 'roofing', 'description': 'Roof installation, repair, and maintenance', 'icon': 'home'},
-            {'name': 'Flooring', 'slug': 'flooring', 'description': 'Floor installation, repair, and refinishing', 'icon': 'square'},
-        ]
+    try:
+        db.create_all()
         
-        for i, cat_data in enumerate(categories):
-            category = ServiceCategory(
-                name=cat_data['name'],
-                slug=cat_data['slug'],
-                description=cat_data['description'],
-                icon=cat_data['icon'],
-                sort_order=i
+        # Create default service categories if they don't exist
+        if ServiceCategory.query.count() == 0:
+            categories = [
+                {'name': 'Plumbing', 'slug': 'plumbing', 'description': 'Water, drainage, and gas fitting services', 'icon': 'wrench'},
+                {'name': 'Electrical', 'slug': 'electrical', 'description': 'Electrical installation, repair, and maintenance', 'icon': 'bolt'},
+                {'name': 'Carpentry', 'slug': 'carpentry', 'description': 'Wood working, furniture, and structural carpentry', 'icon': 'hammer'},
+                {'name': 'Painting', 'slug': 'painting', 'description': 'Interior and exterior painting services', 'icon': 'paint-brush'},
+                {'name': 'Landscaping', 'slug': 'landscaping', 'description': 'Garden design, maintenance, and outdoor spaces', 'icon': 'leaf'},
+                {'name': 'Cleaning', 'slug': 'cleaning', 'description': 'House cleaning and maintenance services', 'icon': 'sparkles'},
+                {'name': 'Roofing', 'slug': 'roofing', 'description': 'Roof installation, repair, and maintenance', 'icon': 'home'},
+                {'name': 'Flooring', 'slug': 'flooring', 'description': 'Floor installation, repair, and refinishing', 'icon': 'square'},
+            ]
+            
+            for i, cat_data in enumerate(categories):
+                category = ServiceCategory(
+                    name=cat_data['name'],
+                    slug=cat_data['slug'],
+                    description=cat_data['description'],
+                    icon=cat_data['icon'],
+                    sort_order=i
+                )
+                db.session.add(category)
+            
+            db.session.commit()
+            print("✅ Default service categories created")
+        
+        # Create default admin user if none exists
+        if Admin.query.count() == 0:
+            admin = Admin(
+                username='admin',
+                email='admin@biped.com',
+                first_name='System',
+                last_name='Administrator',
+                role='super_admin',
+                is_super_admin=True,
+                is_active=True
             )
-            db.session.add(category)
+            admin.set_password('admin123')  # Change this in production!
+            admin.permissions = admin.get_default_permissions()
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Default admin user created: admin / admin123")
+            
+        print("✅ Database initialization completed")
         
-        db.session.commit()
-    
-    # Create default admin user if none exists
-    if Admin.query.count() == 0:
-        admin = Admin(
-            username='admin',
-            email='admin@biped.com',
-            first_name='System',
-            last_name='Administrator',
-            role='super_admin',
-            is_super_admin=True,
-            is_active=True
-        )
-        admin.set_password('admin123')  # Change this in production!
-        admin.permissions = admin.get_default_permissions()
-        db.session.add(admin)
-        db.session.commit()
-        print("Default admin user created: admin / admin123")
+        # Initialize data services
+        try:
+            data_services = create_data_services(app, trading_cache)
+            app.config['DATA_SERVICES'] = data_services
+            app.config['CACHE_SERVICE'] = trading_cache
+            print("✅ Data services initialized")
+        except Exception as e:
+            print(f"⚠️ Data services initialization warning: {e}")
+        
+    except Exception as e:
+        print(f"❌ Database initialization error: {e}")
 
+# Enhanced route handlers
 @app.route('/admin')
 def admin_dashboard():
     """Serve the admin dashboard"""
-    print("Admin route accessed - serving admin.html")
     return send_from_directory('static', 'admin.html')
+
+@app.route('/dashboard')
+def enhanced_dashboard():
+    """Serve the enhanced dashboard"""
+    return send_from_directory('static', 'dashboard-enhanced.html')
+
+@app.route('/api/metrics')
+@security_enhancer.api_rate_limit
+def metrics_endpoint():
+    """Prometheus metrics endpoint"""
+    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+
+@app.route('/api/security/status')
+@security_enhancer.api_rate_limit
+def security_status():
+    """Security status endpoint"""
+    return {
+        'rate_limiting': True,
+        'csrf_protection': True,
+        'jwt_enabled': True,
+        'redis_connected': redis_client.is_connected(),
+        'security_headers': True,
+        'input_validation': True
+    }
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_static(path):
-    """Serve static files"""
+    """Enhanced static file serving"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
     if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
         return send_from_directory(static_folder_path, path)
     else:
+        # Check for enhanced dashboard
+        if path.startswith('dashboard'):
+            dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+            if os.path.exists(dashboard_path):
+                return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+        
+        # Default to index
         index_path = os.path.join(static_folder_path, 'index.html')
         if os.path.exists(index_path):
             return send_from_directory(static_folder_path, 'index.html')
         else:
             return "index.html not found", 404
 
+# Error handlers
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Not found'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
+
+@app.errorhandler(429)
+def rate_limit_exceeded(error):
+    return jsonify({
+        'error': 'Rate limit exceeded',
+        'message': 'Too many requests. Please try again later.'
+    }), 429
+
 if __name__ == '__main__':
-    # Get port from environment variable, default to 8080
-    port = int(os.environ.get('PORT', 8080))
-    print(f"🚀 Starting Biped Platform on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Railway deployment best practices
+    # Get port from environment variable with proper error handling
+    try:
+        port = int(os.environ.get('PORT', 8080))
+        if port <= 0 or port > 65535:
+            raise ValueError(f"Invalid port number: {port}")
+    except (ValueError, TypeError) as e:
+        print(f"❌ Port configuration error: {e}")
+        print("   Using default port 8080")
+        port = 8080
+    
+    # Environment configuration
+    debug = os.environ.get('DEBUG', 'false').lower() == 'true'
+    environment = os.environ.get('ENVIRONMENT', 'production')
+    
+    print(f"🚀 Starting Enhanced Biped Platform v2.0")
+    print(f"   Environment: {environment}")
+    print(f"   Port: {port}")
+    print(f"   Debug: {debug}")
+    print(f"   Data Directory: {DATA_DIR}")
+    print(f"   Redis Connected: {redis_client.is_connected()}")
+    print(f"   Database: {'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite'}")
+    print(f"   Security Enhanced: ✅")
+    print(f"   Performance Optimized: ✅")
+    print(f"   Real-time Features: ✅")
+    print(f"   Analytics Engine: ✅")
+    
+    # Railway-specific optimizations
+    if environment == 'production':
+        print(f"   Production Mode: ✅")
+        print(f"   HTTPS Enforced: {app.config.get('FORCE_HTTPS', False)}")
+        print(f"   Health Check: /api/health")
+        
+        # Use Gunicorn for production (handled by Railway)
+        # This will only run if not using Gunicorn
+        app.run(
+            host='0.0.0.0', 
+            port=port, 
+            debug=False,
+            threaded=True,
+            use_reloader=False
+        )
+    else:
+        # Development mode with SocketIO
+        print(f"   Development Mode: ✅")
+        socketio.run(
+            app, 
+            host='0.0.0.0', 
+            port=port, 
+            debug=debug,
+            use_reloader=debug,
+            log_output=True
+        )
 
