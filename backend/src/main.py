@@ -130,7 +130,7 @@ def serve_static(path):
 @app.route('/api/health')
 def health_check():
     """Health check endpoint"""
-    return {'status': 'healthy', 'message': 'TradeHub API is running'}
+    return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8180))

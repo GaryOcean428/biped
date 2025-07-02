@@ -14,16 +14,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variables
-ENV PYTHONPATH=/app/backend/src
-ENV FLASK_APP=main.py
+ENV PYTHONPATH=/app/backend
+ENV FLASK_APP=src.main:app
 
-# Expose port
-EXPOSE 8080
+# Expose port (Railway will set PORT environment variable)
+EXPOSE $PORT
 
-# Create startup script
-RUN echo '#!/bin/bash\ncd /app/backend && python -m gunicorn --bind 0.0.0.0:$PORT src.main:app' > /app/start.sh
-RUN chmod +x /app/start.sh
-
-# Start the application
-CMD ["/app/start.sh"]
+# Change to backend directory and start with gunicorn
+WORKDIR /app/backend
+CMD ["sh", "-c", "python -m gunicorn --bind 0.0.0.0:$PORT src.main:app"]
 
