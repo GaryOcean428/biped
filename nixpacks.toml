@@ -1,19 +1,22 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip"]
+nixPkgs = ["python311", "python311Packages.pip", "python311Packages.virtualenv"]
 
 [phases.install]
 cmds = [
+    "python -m venv /opt/venv",
+    ". /opt/venv/bin/activate",
     "cd backend",
     "pip install -r requirements.txt"
 ]
 
 [phases.build]
 cmds = [
+    ". /opt/venv/bin/activate",
     "cd backend",
     "python create_db.py",
     "python populate_services.py"
 ]
 
 [start]
-cmd = "cd backend && python src/main.py"
+cmd = ". /opt/venv/bin/activate && cd backend && python src/main.py"
 
