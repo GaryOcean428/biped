@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Provider Dashboard - Biped</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: #f8fafc;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-icon {
+            margin: 0 auto;
+        }
+        
+        .metric-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            border-color: #1e40af;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
+        }
+        
+        .metric-card.primary {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: white;
+            border: none;
+        }
+        
+        .metric-card.success {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border: none;
+        }
+        
+        .metric-card.warning {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            color: white;
+            border: none;
+        }
+        
+        .metric-card.danger {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            border: none;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #64748b;
+        }
+        
+        .nav-item:hover {
+            background: #f1f5f9;
+            color: #1e40af;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: white;
+        }
+        
+        .nav-icon {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #10b981;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1e40af;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 999;
+                height: 100vh;
+            }
+            
+            .sidebar.mobile-open {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .metric-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar fixed left-0 top-0 h-full w-64 z-50" id="sidebar">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-teal-600 rounded-lg mr-3"></div>
+                    <span class="sidebar-text text-xl font-bold text-gray-800">Biped Pro</span>
+                </div>
+                <button onclick="toggleSidebar()" class="p-1 rounded-lg hover:bg-gray-100">
+                    <i class="fas fa-bars text-gray-600"></i>
+                </button>
+            </div>
+            
+            <nav>
+                <div class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showSection('jobs')">
+                    <i class="nav-icon fas fa-briefcase"></i>
+                    <span class="sidebar-text">Job Pipeline</span>
+                </div>
+                <div class="nav-item" onclick="showSection('customers')">
+                    <i class="nav-icon fas fa-users"></i>
+                    <span class="sidebar-text">Customers</span>
+                </div>
+                <div class="nav-item" onclick="showSection('finances')">
+                    <i class="nav-icon fas fa-dollar-sign"></i>
+                    <span class="sidebar-text">Finances</span>
+                </div>
+                <div class="nav-item" onclick="showSection('analytics')">
+                    <i class="nav-icon fas fa-chart-bar"></i>
+                    <span class="sidebar-text">Analytics</span>
+                </div>
+                <div class="nav-item" onclick="showSection('marketing')">
+                    <i class="nav-icon fas fa-bullhorn"></i>
+                    <span class="sidebar-text">Marketing</span>
+                </div>
+                <div class="nav-item" onclick="showSection('profile')">
+                    <i class="nav-icon fas fa-user-circle"></i>
+                    <span class="sidebar-text">Profile</span>
+                </div>
+                <div class="nav-item" onclick="showSection('settings')">
+                    <i class="nav-icon fas fa-cog"></i>
+                    <span class="sidebar-text">Settings</span>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300" id="mainContent">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Provider Dashboard</h1>
+                    <p class="text-gray-600">Manage your business and grow your revenue</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="btn btn-secondary" onclick="showNotification('Sync completed successfully!')">
+                        <i class="fas fa-sync-alt"></i>
+                        Sync Data
+                    </button>
+                    <button class="btn btn-primary" onclick="openModal('newJobModal')">
+                        <i class="fas fa-plus"></i>
+                        New Service
+                    </button>
+                    <div class="relative">
+                        <button class="p-2 rounded-lg hover:bg-gray-100 relative">
+                            <i class="fas fa-bell text-gray-600"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section p-6">
+            <!-- Key Metrics -->
+            <div class="metric-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="metric-card primary">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-90">Monthly Revenue</p>
+                            <p class="text-3xl font-bold">$12,450</p>
+                            <p class="text-sm opacity-90">+18% from last month</p>
+                        </div>
+                        <i class="fas fa-dollar-sign text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="metric-card success">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-90">Active Jobs</p>
+                            <p class="text-3xl font-bold">24</p>
+                            <p class="text-sm opacity-90">6 starting this week</p>
+                        </div>
+                        <i class="fas fa-briefcase text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="metric-card warning">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm opacity-90">Customer Rating</p>
+                            <p class="text-3xl font-bold">4.8</p>
+                            <p class="text-sm opacity-90">Based on 156 reviews</p>
+                        </div>
+                        <i class="fas fa-star text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600">Response Time</p>
+                            <p class="text-3xl font-bold text-gray-900">2.3h</p>
+                            <p class="text-sm text-green-600">-15% improvement</p>
+                        </div>
+                        <i class="fas fa-clock text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="chart-grid grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="chart-container">
+                    <h3 class="text-lg font-semibold mb-4">Revenue Trend</h3>
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="text-lg font-semibold mb-4">Job Completion Rate</h3>
+                    <canvas id="completionChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="table-container">
+                <div class="table-header p-4">
+                    <h3 class="text-lg font-semibold">Recent Jobs</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Job</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-4">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Kitchen Renovation</p>
+                                        <p class="text-sm text-gray-500">Complete kitchen remodel</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                            JS
+                                        </div>
+                                        <span class="text-gray-900">John Smith</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-gray-900 font-medium">$8,500</td>
+                                <td class="px-4 py-4">
+                                    <span class="status-badge status-active">Active</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <span class="text-sm text-gray-500 mt-1">65%</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-secondary btn-sm">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Bathroom Plumbing</p>
+                                        <p class="text-sm text-gray-500">Fix leaking pipes</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                            MJ
+                                        </div>
+                                        <span class="text-gray-900">Mary Johnson</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-gray-900 font-medium">$1,200</td>
+                                <td class="px-4 py-4">
+                                    <span class="status-badge status-completed">Completed</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 100%"></div>
+                                    </div>
+                                    <span class="text-sm text-gray-500 mt-1">100%</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-secondary btn-sm">Invoice</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Electrical Wiring</p>
+                                        <p class="text-sm text-gray-500">Install new outlets</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                            RB
+                                        </div>
+                                        <span class="text-gray-900">Robert Brown</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-gray-900 font-medium">$950</td>
+                                <td class="px-4 py-4">
+                                    <span class="status-badge status-pending">Pending</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="text-sm text-gray-500 mt-1">0%</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-primary btn-sm">Start</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Other sections (hidden by default) -->
+        <div id="jobs-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Job Pipeline Management</h2>
+            <!-- Job pipeline content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-briefcase text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Job pipeline management interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="customers-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Customer Relationship Management</h2>
+            <!-- CRM content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Customer management interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="finances-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Financial Management</h2>
+            <!-- Financial content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-dollar-sign text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Financial management interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="analytics-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Business Analytics</h2>
+            <!-- Analytics content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Advanced analytics interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="marketing-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Marketing & Growth</h2>
+            <!-- Marketing content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-bullhorn text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Marketing tools interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="profile-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Professional Profile</h2>
+            <!-- Profile content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-user-circle text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Profile management interface coming soon...</p>
+            </div>
+        </div>
+        
+        <div id="settings-section" class="section p-6" style="display: none;">
+            <h2 class="text-2xl font-bold mb-6">Settings & Preferences</h2>
+            <!-- Settings content will be loaded here -->
+            <div class="text-center py-12">
+                <i class="fas fa-cog text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">Settings interface coming soon...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="newJobModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Add New Service</h3>
+                <button onclick="closeModal('newJobModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="newServiceForm">
+                <div class="form-group">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" class="form-input" placeholder="e.g., Kitchen Renovation">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input">
+                        <option>Construction</option>
+                        <option>Plumbing</option>
+                        <option>Electrical</option>
+                        <option>Landscaping</option>
+                        <option>Cleaning</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Base Price</label>
+                    <input type="number" class="form-input" placeholder="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" rows="3" placeholder="Describe your service..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newJobModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-3"></i>
+            <span id="notificationText">Action completed successfully!</span>
+        </div>
+    </div>
+    
+    <script>
+        // Dashboard functionality
+        let currentSection = 'dashboard';
+        
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadDashboardData();
+        });
+        
+        function initializeCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [8500, 9200, 8800, 10500, 11200, 12450],
+                        borderColor: '#1e40af',
+                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Completion Chart
+            const completionCtx = document.getElementById('completionChart').getContext('2d');
+            new Chart(completionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending'],
+                    datasets: [{
+                        data: [75, 20, 5],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadDashboardData() {
+            // Simulate loading dashboard data
+            console.log('Loading dashboard data...');
+            
+            // In a real application, this would fetch data from the API
+            // fetch('/api/provider/dashboard')
+            //     .then(response => response.json())
+            //     .then(data => updateDashboard(data));
+        }
+        
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Load section-specific data
+            loadSectionData(sectionName);
+        }
+        
+        function loadSectionData(sectionName) {
+            console.log(`Loading data for ${sectionName} section`);
+            
+            // In a real application, this would load section-specific data
+            switch(sectionName) {
+                case 'jobs':
+                    // Load job pipeline data
+                    break;
+                case 'customers':
+                    // Load customer data
+                    break;
+                case 'finances':
+                    // Load financial data
+                    break;
+                case 'analytics':
+                    // Load analytics data
+                    break;
+                case 'marketing':
+                    // Load marketing data
+                    break;
+                case 'profile':
+                    // Load profile data
+                    break;
+                case 'settings':
+                    // Load settings
+                    break;
+            }
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                mainContent.style.marginLeft = '80px';
+            } else {
+                mainContent.style.marginLeft = '256px';
+            }
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Form handling
+        document.getElementById('newServiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            showNotification('New service added successfully!');
+            closeModal('newJobModal');
+            
+            // Reset form
+            this.reset();
+        });
+        
+        // Mobile responsiveness
+        function handleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('mobile-open');
+            }
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const isClickInsideSidebar = sidebar.contains(e.target);
+            
+            if (!isClickInsideSidebar && window.innerWidth <= 768) {
+                sidebar.classList.remove('mobile-open');
+            }
+        });
+        
+        // Real-time updates simulation
+        setInterval(() => {
+            // Simulate real-time metric updates
+            const metrics = document.querySelectorAll('.metric-card');
+            // Update metrics with new data
+        }, 30000); // Update every 30 seconds
+        
+        console.log('Advanced Provider Dashboard initialized');
+    </script>
+</body>
+</html>
+
