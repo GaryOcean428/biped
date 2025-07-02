@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "startCommand": "python -m gunicorn --bind 0.0.0.0:$PORT --workers 1 src.main:app",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "on_failure"
+  }
+}
+

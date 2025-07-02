@@ -13,13 +13,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire project
 COPY . .
 
+# Copy and make startup script executable
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Set environment variables
 ENV PYTHONPATH=/app/backend
 ENV FLASK_APP=src.main:app
+ENV PORT=8080
 
-# Change to backend directory (best practice)
-WORKDIR /app/backend
+# Expose port
+EXPOSE 8080
 
-# Start the application using gunicorn (production-ready)
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:$PORT", "src.main:app"]
+# Use startup script
+CMD ["/app/start.sh"]
 
