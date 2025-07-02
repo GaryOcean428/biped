@@ -8,7 +8,7 @@ import sys
 import os
 from datetime import datetime
 from ..utils.redis_client import redis_client
-from ..utils.storage import get_db_connection
+from ..models.user import db
 
 health_bp = Blueprint('health', __name__)
 
@@ -71,21 +71,17 @@ def health_check():
     
     # Check database connection
     try:
-        db_conn = get_db_connection()
-        if db_conn:
-            health_status['checks']['database'] = {
-                'status': 'healthy',
-                'connected': True,
-                'url': os.environ.get('DATABASE_URL', 'not_set')[:30] + '...' if os.environ.get('DATABASE_URL') else 'not_set'
-            }
-        else:
-            health_status['checks']['database'] = {
-                'status': 'unhealthy',
-                'connected': False
-            }
+        # Test database connection using SQLAlchemy
+        db.session.execute(db.text('SELECT 1')).scalar()
+        health_status['checks']['database'] = {
+            'status': 'healthy',
+            'connected': True,
+            'url': os.environ.get('DATABASE_URL', 'not_set')[:30] + '...' if os.environ.get('DATABASE_URL') else 'not_set'
+        }
     except Exception as e:
         health_status['checks']['database'] = {
             'status': 'unhealthy',
+            'connected': False,
             'error': str(e)
         }
     
