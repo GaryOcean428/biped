@@ -11,6 +11,7 @@ from src.models.user import db, User, CustomerProfile, ProviderProfile
 from src.models.service import ServiceCategory, Service, ProviderService, PortfolioItem
 from src.models.job import Job, Quote, JobMilestone, JobMessage
 from src.models.review import Review, Message, Notification
+from src.models.admin import Admin, AdminAction
 
 # Import routes
 from src.routes.user import user_bp
@@ -18,6 +19,7 @@ from src.routes.auth import auth_bp
 from src.routes.service import service_bp
 from src.routes.job import job_bp
 from src.routes.review import review_bp
+from src.routes.admin import admin_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tradehub-secret-key-change-in-production')
@@ -31,6 +33,7 @@ app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(service_bp, url_prefix='/api/services')
 app.register_blueprint(job_bp, url_prefix='/api/jobs')
 app.register_blueprint(review_bp, url_prefix='/api/reviews')
+app.register_blueprint(admin_bp)
 
 # Database configuration - support both PostgreSQL (Railway) and SQLite (local)
 database_url = os.environ.get('DATABASE_URL')
@@ -74,6 +77,23 @@ with app.app_context():
             db.session.add(category)
         
         db.session.commit()
+    
+    # Create default admin user if none exists
+    if Admin.query.count() == 0:
+        admin = Admin(
+            username='admin',
+            email='admin@tradehub.com',
+            first_name='System',
+            last_name='Administrator',
+            role='super_admin',
+            is_super_admin=True,
+            is_active=True
+        )
+        admin.set_password('admin123')  # Change this in production!
+        admin.permissions = admin.get_default_permissions()
+        db.session.add(admin)
+        db.session.commit()
+        print("Default admin user created: admin / admin123")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
