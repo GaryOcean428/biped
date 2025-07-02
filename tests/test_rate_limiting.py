@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import sys
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
@@ -63,7 +63,7 @@ class TestRateLimiter(unittest.TestCase):
         
         # Simulate old requests by manually adding them
         client_id = self.rate_limiter._get_client_id()
-        old_time = datetime.utcnow() - timedelta(minutes=2)
+        old_time = datetime.now(timezone.utc) - timedelta(minutes=2)
         self.rate_limiter.requests[client_id] = [old_time] * 5
         
         # Should allow new request as old ones are cleaned up

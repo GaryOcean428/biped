@@ -259,6 +259,70 @@ def metrics_endpoint():
         }), 500
 
 
+@health_bp.route('/health/performance', methods=['GET'])
+@api_rate_limit
+def performance_metrics():
+    """Enhanced performance metrics endpoint"""
+    try:
+        # Import performance monitor
+        from src.utils.performance import performance_monitor
+        
+        # Get performance metrics
+        perf_metrics = performance_monitor.get_metrics()
+        
+        # Add health-specific metrics
+        uptime = datetime.utcnow() - health_metrics['start_time']
+        
+        enhanced_metrics = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'uptime_seconds': uptime.total_seconds(),
+            'performance': perf_metrics,
+            'health': {
+                'total_requests': health_metrics['request_count'],
+                'total_errors': health_metrics['error_count'],
+                'error_rate': (health_metrics['error_count'] / max(1, health_metrics['request_count'])) * 100,
+                'last_error': health_metrics.get('last_error'),
+                'status': 'healthy' if health_metrics['error_count'] < 100 else 'degraded'
+            }
+        }
+        
+        return jsonify(enhanced_metrics), 200
+        
+    except Exception as e:
+        health_metrics['error_count'] += 1
+        health_metrics['last_error'] = str(e)
+        app_logger.error(f"Performance metrics failed: {e}")
+        return jsonify({
+            'error': 'Performance metrics collection failed',
+            'timestamp': datetime.utcnow().isoformat()
+        }), 500
+
+
+@health_bp.route('/health/config', methods=['GET'])
+@api_rate_limit
+def configuration_info():
+    """Configuration and environment information endpoint"""
+    try:
+        from src.utils.config import config_manager
+        
+        config_info = config_manager.get_environment_info()
+        
+        return jsonify({
+            'timestamp': datetime.utcnow().isoformat(),
+            'environment': config_info,
+            'status': 'healthy'
+        }), 200
+        
+    except Exception as e:
+        health_metrics['error_count'] += 1
+        health_metrics['last_error'] = str(e)
+        app_logger.error(f"Configuration info failed: {e}")
+        return jsonify({
+            'error': 'Configuration info collection failed',
+            'timestamp': datetime.utcnow().isoformat()
+        }), 500
+
+
 # Error handler for health blueprint
 @health_bp.errorhandler(Exception)
 def handle_health_error(error):

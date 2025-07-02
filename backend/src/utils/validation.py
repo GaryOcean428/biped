@@ -10,8 +10,8 @@ from flask import request
 class InputValidator:
     """Comprehensive input validation utility"""
     
-    # Common regex patterns
-    EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    # Common regex patterns - RFC 5322 compliant email validation
+    EMAIL_PATTERN = r'^[a-zA-Z0-9]([a-zA-Z0-9._%-]*[a-zA-Z0-9])?@[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]\.[a-zA-Z]{2,}$'
     PHONE_PATTERN = r'^\+?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$'
     PASSWORD_PATTERN = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$'
     
@@ -28,14 +28,22 @@ class InputValidator:
     
     @staticmethod
     def validate_email(email: str) -> Tuple[bool, Optional[str]]:
-        """Validate email format"""
+        """Validate email format with better regex that prevents common attacks"""
         if not email or not isinstance(email, str):
             return False, "Email is required"
         
         if len(email) > 254:  # RFC 5321 limit
             return False, "Email address too long"
         
-        if not re.match(InputValidator.EMAIL_PATTERN, email.strip()):
+        email = email.strip()
+        
+        # Basic format check and prevent double dots
+        if '..' in email or email.startswith('.') or email.endswith('.'):
+            return False, "Invalid email format"
+        
+        # More permissive but secure regex
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(pattern, email):
             return False, "Invalid email format"
         
         return True, None

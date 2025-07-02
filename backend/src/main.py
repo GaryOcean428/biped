@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -28,8 +29,21 @@ from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
 from src.routes.health import health_bp
 
+# Import new performance and security utilities
+from src.utils.security import security_headers, performance_monitor
+from src.utils.performance import response_cache, compression_middleware, static_optimizer
+from src.utils.config import config_manager
+
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-secret-key-change-in-production')
+
+# Apply advanced configuration
+flask_config = config_manager.get_flask_config()
+app.config.update(flask_config)
+
+# Log configuration validation issues
+config_issues = config_manager.validate_config()
+if config_issues:
+    app.logger.warning(f"Configuration issues detected: {config_issues}")
 
 # Enable CORS for all routes
 CORS(app, origins="*")
@@ -48,18 +62,35 @@ app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
 app.register_blueprint(health_bp, url_prefix='/api')
 
-# Database configuration - support both PostgreSQL (Railway) and SQLite (local)
-database_url = os.environ.get('DATABASE_URL')
-if database_url:
-    # Railway PostgreSQL
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # Local SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Security and Performance Middleware
+@app.after_request
+def apply_security_headers(response):
+    """Apply security headers to all responses"""
+    return security_headers.apply_security_headers(response)
+
+
+@app.after_request
+def apply_compression(response):
+    """Apply response compression for large responses"""
+    return compression_middleware.compress_response(response)
+
+
+@app.before_request
+def monitor_request_start():
+    """Monitor request start time for performance tracking"""
+    g.start_time = time.time()
+
+
+@app.after_request
+def monitor_request_end(response):
+    """Monitor request completion and record metrics"""
+    if hasattr(g, 'start_time'):
+        response_time = time.time() - g.start_time
+        performance_monitor.record_request(response_time, response.status_code)
+    return response
+
+# Database initialization (configuration handled by config_manager)
 db.init_app(app)
 
 # Create all tables

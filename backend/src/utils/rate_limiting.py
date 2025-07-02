@@ -4,7 +4,7 @@ Provides basic rate limiting to protect API endpoints from abuse
 """
 from functools import wraps
 from flask import request, jsonify, g
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 import hashlib
 
@@ -32,7 +32,7 @@ class RateLimiter:
     
     def is_allowed(self, max_requests: int = 100, window_minutes: int = 15) -> bool:
         """Check if request is allowed based on rate limit"""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         window_start = now - timedelta(minutes=window_minutes)
         client_id = self._get_client_id()
         
@@ -53,7 +53,7 @@ class RateLimiter:
     
     def get_remaining_requests(self, max_requests: int = 100, window_minutes: int = 15) -> int:
         """Get number of remaining requests in current window"""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         window_start = now - timedelta(minutes=window_minutes)
         client_id = self._get_client_id()
         
