@@ -1,416 +1,558 @@
 """
-Analytics and Autonomous Operations API Routes for Biped Platform
-Provides endpoints for platform analytics, monitoring, and autonomous operations
+Analytics API Routes
+Provides endpoints for data pipeline, business intelligence, and advanced analytics
 """
 
-import os
-import json
 from flask import Blueprint, request, jsonify, current_app
+from flask_login import login_required, current_user
+import asyncio
+import json
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional
 import logging
 
-# Import autonomous operations engine
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from autonomous_operations import BipedAutonomousOperations
+from ..services.data_pipeline import BusinessIntelligenceEngine, RealTimeDataProcessor
+from ..utils.security import SecurityEnhancer
+from ..utils.performance import TradingCacheService
 
-# Create blueprint
-analytics_bp = Blueprint('analytics', __name__, url_prefix='/api/analytics')
-
-# Initialize autonomous operations engine
-auto_ops = BipedAutonomousOperations()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@analytics_bp.route('/platform-health', methods=['GET'])
-def get_platform_health():
-    """Get current platform health score and status"""
-    try:
-        health_data = auto_ops.get_platform_health_score()
-        return jsonify(health_data)
-        
-    except Exception as e:
-        logger.error(f"Error getting platform health: {str(e)}")
-        return jsonify({'error': 'Failed to get platform health'}), 500
+# Create blueprint
+analytics_bp = Blueprint('analytics', __name__, url_prefix='/api/v2/analytics')
 
-@analytics_bp.route('/metrics/current', methods=['GET'])
-def get_current_metrics():
-    """Get current platform metrics"""
-    try:
-        metrics = auto_ops.collect_metrics()
-        
-        response = {
-            'timestamp': metrics.timestamp.isoformat(),
-            'active_users': metrics.active_users,
-            'active_providers': metrics.active_providers,
-            'jobs_posted_24h': metrics.jobs_posted_24h,
-            'jobs_completed_24h': metrics.jobs_completed_24h,
-            'average_response_time': round(metrics.average_response_time, 2),
-            'system_load': round(metrics.system_load * 100, 1),
-            'error_rate': round(metrics.error_rate * 100, 3),
-            'revenue_24h': round(metrics.revenue_24h, 2),
-            'user_satisfaction': round(metrics.user_satisfaction, 1),
-            'provider_satisfaction': round(metrics.provider_satisfaction, 1)
-        }
-        
-        return jsonify(response)
-        
-    except Exception as e:
-        logger.error(f"Error getting current metrics: {str(e)}")
-        return jsonify({'error': 'Failed to get current metrics'}), 500
+def get_services():
+    """Get data services from app context"""
+    return current_app.config.get('DATA_SERVICES', {})
 
-@analytics_bp.route('/metrics/historical', methods=['GET'])
-def get_historical_metrics():
-    """Get historical metrics data"""
+@analytics_bp.route('/portfolio/<user_id>', methods=['GET'])
+@login_required
+def get_portfolio_analytics(user_id: str):
+    """Get comprehensive portfolio analytics for a user"""
     try:
-        # Get query parameters
-        hours = request.args.get('hours', 24, type=int)
-        hours = min(hours, 168)  # Limit to 7 days
+        # Security check - users can only access their own analytics
+        if current_user.id != user_id and not current_user.is_admin:
+            return jsonify({'error': 'Unauthorized access'}), 403
         
-        # Get historical data
-        historical_data = []
-        current_time = datetime.now()
+        services = get_services()
+        bi_engine = services.get('bi_engine')
         
-        for i in range(hours):
-            timestamp = current_time - timedelta(hours=i)
-            # Simulate historical metrics (in real implementation, get from database)
-            metrics = auto_ops._generate_realistic_metrics(timestamp)
-            
-            historical_data.append({
-                'timestamp': timestamp.isoformat(),
-                'active_users': metrics['active_users'],
-                'system_load': round(metrics['system_load'] * 100, 1),
-                'response_time': round(metrics['average_response_time'], 2),
-                'error_rate': round(metrics['error_rate'] * 100, 3),
-                'user_satisfaction': round(metrics['user_satisfaction'], 1)
-            })
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
         
-        # Reverse to get chronological order
-        historical_data.reverse()
+        # Get analytics asynchronously
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
         
         return jsonify({
-            'data': historical_data,
-            'period_hours': hours,
-            'data_points': len(historical_data)
+            'status': 'success',
+            'data': analytics,
+            'timestamp': datetime.utcnow().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"Error getting historical metrics: {str(e)}")
-        return jsonify({'error': 'Failed to get historical metrics'}), 500
+        logger.error(f"Error getting portfolio analytics for {user_id}: {e}")
+        return jsonify({'error': 'Failed to generate analytics'}), 500
 
-@analytics_bp.route('/anomalies', methods=['GET'])
-def get_anomalies():
-    """Get recent anomaly alerts"""
+@analytics_bp.route('/market-intelligence', methods=['GET'])
+@login_required
+def get_market_intelligence():
+    """Get comprehensive market intelligence report"""
     try:
-        # Get current metrics and detect anomalies
-        metrics = auto_ops.collect_metrics()
-        alerts = auto_ops.detect_anomalies(metrics)
+        services = get_services()
+        bi_engine = services.get('bi_engine')
         
-        # Format alerts for response
-        formatted_alerts = []
-        for alert in alerts:
-            formatted_alerts.append({
-                'id': alert.id,
-                'timestamp': alert.timestamp.isoformat(),
-                'type': alert.type,
-                'severity': alert.severity,
-                'description': alert.description,
-                'affected_metrics': alert.affected_metrics,
-                'recommended_actions': alert.recommended_actions,
-                'auto_resolved': alert.auto_resolved
-            })
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Get market intelligence
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        intelligence = loop.run_until_complete(
+            bi_engine.generate_market_intelligence()
+        )
         
         return jsonify({
-            'alerts': formatted_alerts,
-            'total_alerts': len(formatted_alerts),
-            'critical_count': len([a for a in alerts if a.severity == 'critical']),
-            'high_count': len([a for a in alerts if a.severity == 'high']),
-            'medium_count': len([a for a in alerts if a.severity == 'medium']),
-            'low_count': len([a for a in alerts if a.severity == 'low'])
+            'status': 'success',
+            'data': intelligence,
+            'timestamp': datetime.utcnow().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"Error getting anomalies: {str(e)}")
-        return jsonify({'error': 'Failed to get anomalies'}), 500
+        logger.error(f"Error generating market intelligence: {e}")
+        return jsonify({'error': 'Failed to generate market intelligence'}), 500
 
-@analytics_bp.route('/predictions', methods=['GET'])
-def get_predictions():
-    """Get predictive insights and forecasts"""
+@analytics_bp.route('/real-time/market-data', methods=['GET'])
+@login_required
+def get_real_time_market_data():
+    """Get real-time market data for multiple symbols"""
     try:
-        insights = auto_ops.generate_predictive_insights()
-        return jsonify(insights)
+        symbols = request.args.get('symbols', '').split(',')
+        if not symbols or symbols == ['']:
+            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
         
-    except Exception as e:
-        logger.error(f"Error getting predictions: {str(e)}")
-        return jsonify({'error': 'Failed to get predictions'}), 500
-
-@analytics_bp.route('/optimizations', methods=['GET'])
-def get_optimizations():
-    """Get recent optimization actions"""
-    try:
-        # Get current metrics and generate optimization recommendations
-        metrics = auto_ops.collect_metrics()
-        alerts = auto_ops.detect_anomalies(metrics)
-        optimizations = auto_ops.auto_optimize(metrics, alerts)
+        # Get cached market data
+        cache_service = current_app.config.get('CACHE_SERVICE')
+        if not cache_service:
+            return jsonify({'error': 'Cache service not available'}), 503
         
-        # Format optimizations for response
-        formatted_optimizations = []
-        for opt in optimizations:
-            formatted_optimizations.append({
-                'id': opt.id,
-                'timestamp': opt.timestamp.isoformat(),
-                'action_type': opt.action_type,
-                'target_system': opt.target_system,
-                'parameters': opt.parameters,
-                'expected_impact': opt.expected_impact,
-                'status': opt.status,
-                'actual_impact': opt.actual_impact
-            })
+        market_data = {}
+        for symbol in symbols:
+            data = cache_service.get_market_data(symbol.strip())
+            if data:
+                market_data[symbol] = data
         
         return jsonify({
-            'optimizations': formatted_optimizations,
-            'total_actions': len(formatted_optimizations),
-            'pending_count': len([o for o in optimizations if o.status == 'pending']),
-            'completed_count': len([o for o in optimizations if o.status == 'completed'])
+            'status': 'success',
+            'data': market_data,
+            'timestamp': datetime.utcnow().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"Error getting optimizations: {str(e)}")
-        return jsonify({'error': 'Failed to get optimizations'}), 500
+        logger.error(f"Error getting real-time market data: {e}")
+        return jsonify({'error': 'Failed to get market data'}), 500
 
-@analytics_bp.route('/dashboard', methods=['GET'])
-def get_dashboard_data():
-    """Get comprehensive dashboard data"""
+@analytics_bp.route('/performance/summary', methods=['GET'])
+@login_required
+def get_performance_summary():
+    """Get performance summary for current user"""
     try:
-        # Collect all dashboard data
-        health = auto_ops.get_platform_health_score()
-        metrics = auto_ops.collect_metrics()
-        alerts = auto_ops.detect_anomalies(metrics)
-        insights = auto_ops.generate_predictive_insights()
-        
-        # Calculate key performance indicators
-        kpis = _calculate_kpis(metrics)
-        
-        # Get trend data (last 24 hours)
-        trend_data = _get_trend_data(24)
-        
-        dashboard = {
-            'timestamp': datetime.now().isoformat(),
-            'platform_health': health,
-            'current_metrics': {
-                'active_users': metrics.active_users,
-                'active_providers': metrics.active_providers,
-                'jobs_posted_24h': metrics.jobs_posted_24h,
-                'jobs_completed_24h': metrics.jobs_completed_24h,
-                'response_time': round(metrics.average_response_time, 2),
-                'system_load': round(metrics.system_load * 100, 1),
-                'error_rate': round(metrics.error_rate * 100, 3),
-                'revenue_24h': round(metrics.revenue_24h, 2)
-            },
-            'kpis': kpis,
-            'alerts_summary': {
-                'total': len(alerts),
-                'critical': len([a for a in alerts if a.severity == 'critical']),
-                'high': len([a for a in alerts if a.severity == 'high']),
-                'recent_alerts': [
-                    {
-                        'type': alert.type,
-                        'severity': alert.severity,
-                        'description': alert.description
-                    } for alert in alerts[:5]  # Last 5 alerts
-                ]
-            },
-            'trends': trend_data,
-            'predictions': insights if insights.get('status') != 'insufficient_data' else None
-        }
-        
-        return jsonify(dashboard)
-        
-    except Exception as e:
-        logger.error(f"Error getting dashboard data: {str(e)}")
-        return jsonify({'error': 'Failed to get dashboard data'}), 500
-
-@analytics_bp.route('/monitoring/start', methods=['POST'])
-def start_monitoring():
-    """Start autonomous monitoring"""
-    try:
-        auto_ops.start_monitoring()
-        return jsonify({
-            'status': 'started',
-            'message': 'Autonomous monitoring started successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error starting monitoring: {str(e)}")
-        return jsonify({'error': 'Failed to start monitoring'}), 500
-
-@analytics_bp.route('/monitoring/stop', methods=['POST'])
-def stop_monitoring():
-    """Stop autonomous monitoring"""
-    try:
-        auto_ops.stop_monitoring()
-        return jsonify({
-            'status': 'stopped',
-            'message': 'Autonomous monitoring stopped successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error stopping monitoring: {str(e)}")
-        return jsonify({'error': 'Failed to stop monitoring'}), 500
-
-@analytics_bp.route('/monitoring/status', methods=['GET'])
-def get_monitoring_status():
-    """Get monitoring status"""
-    try:
-        return jsonify({
-            'running': auto_ops.running,
-            'metrics_collected': len(auto_ops.metrics_history),
-            'last_collection': auto_ops.metrics_history[-1].timestamp.isoformat() if auto_ops.metrics_history else None
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting monitoring status: {str(e)}")
-        return jsonify({'error': 'Failed to get monitoring status'}), 500
-
-@analytics_bp.route('/reports/performance', methods=['GET'])
-def get_performance_report():
-    """Generate performance report"""
-    try:
-        # Get time range
-        days = request.args.get('days', 7, type=int)
-        days = min(days, 30)  # Limit to 30 days
-        
-        # Generate mock performance report
-        report = _generate_performance_report(days)
-        
-        return jsonify(report)
-        
-    except Exception as e:
-        logger.error(f"Error generating performance report: {str(e)}")
-        return jsonify({'error': 'Failed to generate performance report'}), 500
-
-@analytics_bp.route('/reports/business', methods=['GET'])
-def get_business_report():
-    """Generate business analytics report"""
-    try:
-        # Get time range
+        user_id = current_user.id
         days = request.args.get('days', 30, type=int)
-        days = min(days, 90)  # Limit to 90 days
         
-        # Generate mock business report
-        report = _generate_business_report(days)
+        services = get_services()
+        bi_engine = services.get('bi_engine')
         
-        return jsonify(report)
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Get performance data
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        # Get portfolio analytics
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
+        
+        # Extract performance summary
+        performance_summary = {
+            'portfolio_value': analytics.get('portfolio_summary', {}).get('total_value', 0),
+            'total_pnl': analytics.get('portfolio_summary', {}).get('total_pnl', 0),
+            'total_pnl_percent': analytics.get('portfolio_summary', {}).get('total_pnl_percent', 0),
+            'daily_change': analytics.get('portfolio_summary', {}).get('daily_change', 0),
+            'position_count': analytics.get('portfolio_summary', {}).get('position_count', 0),
+            'performance_metrics': analytics.get('performance_metrics', {}),
+            'risk_metrics': analytics.get('risk_metrics', {}),
+            'period_days': days
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': performance_summary,
+            'timestamp': datetime.utcnow().isoformat()
+        })
         
     except Exception as e:
-        logger.error(f"Error generating business report: {str(e)}")
-        return jsonify({'error': 'Failed to generate business report'}), 500
+        logger.error(f"Error getting performance summary: {e}")
+        return jsonify({'error': 'Failed to get performance summary'}), 500
+
+@analytics_bp.route('/risk/assessment', methods=['GET'])
+@login_required
+def get_risk_assessment():
+    """Get comprehensive risk assessment for current user"""
+    try:
+        user_id = current_user.id
+        
+        services = get_services()
+        bi_engine = services.get('bi_engine')
+        
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Get risk assessment
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
+        
+        risk_assessment = {
+            'risk_score': analytics.get('risk_metrics', {}).get('volatility', 0) * 10,  # Scale to 0-100
+            'risk_level': _determine_risk_level(analytics.get('risk_metrics', {})),
+            'risk_metrics': analytics.get('risk_metrics', {}),
+            'risk_factors': _identify_risk_factors(analytics),
+            'recommendations': _generate_risk_recommendations(analytics),
+            'portfolio_diversification': _analyze_diversification(analytics.get('allocation_analysis', {})),
+            'stress_test_results': _perform_stress_test(analytics)
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': risk_assessment,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting risk assessment: {e}")
+        return jsonify({'error': 'Failed to get risk assessment'}), 500
+
+@analytics_bp.route('/trading/patterns', methods=['GET'])
+@login_required
+def get_trading_patterns():
+    """Analyze trading patterns for current user"""
+    try:
+        user_id = current_user.id
+        
+        services = get_services()
+        bi_engine = services.get('bi_engine')
+        
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Get trading patterns
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
+        
+        patterns = analytics.get('trading_patterns', {})
+        
+        # Enhance with additional analysis
+        enhanced_patterns = {
+            **patterns,
+            'trading_style': _determine_trading_style(patterns),
+            'efficiency_score': _calculate_efficiency_score(patterns),
+            'behavioral_insights': _analyze_trading_behavior(patterns),
+            'improvement_suggestions': _suggest_improvements(patterns)
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': enhanced_patterns,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error analyzing trading patterns: {e}")
+        return jsonify({'error': 'Failed to analyze trading patterns'}), 500
+
+@analytics_bp.route('/market/sentiment', methods=['GET'])
+@login_required
+def get_market_sentiment():
+    """Get market sentiment analysis"""
+    try:
+        symbols = request.args.get('symbols', '').split(',')
+        if not symbols or symbols == ['']:
+            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
+        
+        services = get_services()
+        bi_engine = services.get('bi_engine')
+        
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Get market intelligence for sentiment
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        intelligence = loop.run_until_complete(
+            bi_engine.generate_market_intelligence()
+        )
+        
+        # Extract sentiment data
+        sentiment_data = {}
+        symbol_analysis = intelligence.get('symbol_analysis', {})
+        
+        for symbol in symbols:
+            if symbol in symbol_analysis:
+                sentiment_data[symbol] = symbol_analysis[symbol].get('sentiment', {})
+        
+        # Overall market sentiment
+        overall_sentiment = intelligence.get('market_overview', {}).get('market_sentiment', {})
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'overall_sentiment': overall_sentiment,
+                'symbol_sentiment': sentiment_data,
+                'sentiment_trends': _analyze_sentiment_trends(sentiment_data),
+                'sentiment_signals': _generate_sentiment_signals(sentiment_data)
+            },
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting market sentiment: {e}")
+        return jsonify({'error': 'Failed to get market sentiment'}), 500
+
+@analytics_bp.route('/alerts/generate', methods=['POST'])
+@login_required
+def generate_custom_alerts():
+    """Generate custom alerts based on user criteria"""
+    try:
+        alert_config = request.get_json()
+        user_id = current_user.id
+        
+        # Validate alert configuration
+        required_fields = ['alert_type', 'conditions', 'notification_method']
+        if not all(field in alert_config for field in required_fields):
+            return jsonify({'error': 'Missing required alert configuration'}), 400
+        
+        # Create alert
+        alert = {
+            'id': f"ALERT-{user_id}-{int(datetime.utcnow().timestamp())}",
+            'user_id': user_id,
+            'alert_type': alert_config['alert_type'],
+            'conditions': alert_config['conditions'],
+            'notification_method': alert_config['notification_method'],
+            'status': 'active',
+            'created_at': datetime.utcnow().isoformat(),
+            'triggered_count': 0,
+            'last_triggered': None
+        }
+        
+        # Store alert (in production, save to database)
+        cache_service = current_app.config.get('CACHE_SERVICE')
+        if cache_service:
+            cache_service.cache_user_data(f"{user_id}:alerts:{alert['id']}", alert, ttl=86400)
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'alert_id': alert['id'],
+                'message': 'Alert created successfully',
+                'alert': alert
+            },
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating custom alert: {e}")
+        return jsonify({'error': 'Failed to create alert'}), 500
+
+@analytics_bp.route('/reports/generate', methods=['POST'])
+@login_required
+def generate_custom_report():
+    """Generate custom analytics report"""
+    try:
+        report_config = request.get_json()
+        user_id = current_user.id
+        
+        # Validate report configuration
+        if 'report_type' not in report_config:
+            return jsonify({'error': 'Missing report type'}), 400
+        
+        services = get_services()
+        bi_engine = services.get('bi_engine')
+        
+        if not bi_engine:
+            return jsonify({'error': 'Analytics service not available'}), 503
+        
+        # Generate report based on type
+        report_type = report_config['report_type']
+        
+        if report_type == 'portfolio_performance':
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            report_data = loop.run_until_complete(
+                bi_engine.generate_portfolio_analytics(user_id)
+            )
+        elif report_type == 'market_analysis':
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            report_data = loop.run_until_complete(
+                bi_engine.generate_market_intelligence()
+            )
+        else:
+            return jsonify({'error': 'Unknown report type'}), 400
+        
+        # Create report metadata
+        report = {
+            'id': f"REPORT-{user_id}-{int(datetime.utcnow().timestamp())}",
+            'user_id': user_id,
+            'report_type': report_type,
+            'generated_at': datetime.utcnow().isoformat(),
+            'config': report_config,
+            'data': report_data,
+            'format': report_config.get('format', 'json'),
+            'status': 'completed'
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': report,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error generating custom report: {e}")
+        return jsonify({'error': 'Failed to generate report'}), 500
 
 # Helper functions
-
-def _calculate_kpis(metrics):
-    """Calculate key performance indicators"""
-    completion_rate = (metrics.jobs_completed_24h / max(1, metrics.jobs_posted_24h)) * 100
-    provider_utilization = (metrics.active_providers / max(1, metrics.active_users)) * 100
+def _determine_risk_level(risk_metrics: Dict) -> str:
+    """Determine risk level based on metrics"""
+    volatility = risk_metrics.get('volatility', 0)
+    max_drawdown = abs(risk_metrics.get('max_drawdown', 0))
     
+    if volatility > 30 or max_drawdown > 20:
+        return 'high'
+    elif volatility > 15 or max_drawdown > 10:
+        return 'medium'
+    else:
+        return 'low'
+
+def _identify_risk_factors(analytics: Dict) -> List[str]:
+    """Identify key risk factors"""
+    risk_factors = []
+    
+    risk_metrics = analytics.get('risk_metrics', {})
+    portfolio_summary = analytics.get('portfolio_summary', {})
+    
+    # Check various risk factors
+    if risk_metrics.get('volatility', 0) > 25:
+        risk_factors.append('high_volatility')
+    
+    if abs(risk_metrics.get('max_drawdown', 0)) > 15:
+        risk_factors.append('large_drawdowns')
+    
+    if portfolio_summary.get('position_count', 0) < 3:
+        risk_factors.append('concentration_risk')
+    
+    if risk_metrics.get('sharpe_ratio', 0) < 1:
+        risk_factors.append('poor_risk_adjusted_returns')
+    
+    return risk_factors
+
+def _generate_risk_recommendations(analytics: Dict) -> List[str]:
+    """Generate risk management recommendations"""
+    recommendations = []
+    
+    risk_factors = _identify_risk_factors(analytics)
+    
+    if 'high_volatility' in risk_factors:
+        recommendations.append('Consider reducing position sizes to manage volatility')
+    
+    if 'concentration_risk' in risk_factors:
+        recommendations.append('Diversify portfolio across more assets and sectors')
+    
+    if 'large_drawdowns' in risk_factors:
+        recommendations.append('Implement stop-loss orders to limit downside risk')
+    
+    if 'poor_risk_adjusted_returns' in risk_factors:
+        recommendations.append('Review trading strategy and consider risk-adjusted metrics')
+    
+    return recommendations
+
+def _analyze_diversification(allocation: Dict) -> Dict:
+    """Analyze portfolio diversification"""
+    # Simulated diversification analysis
     return {
-        'job_completion_rate': round(completion_rate, 1),
-        'provider_utilization': round(provider_utilization, 1),
-        'average_response_time': round(metrics.average_response_time, 2),
-        'user_satisfaction': round(metrics.user_satisfaction, 1),
-        'provider_satisfaction': round(metrics.provider_satisfaction, 1),
-        'daily_revenue': round(metrics.revenue_24h, 2),
-        'system_uptime': 99.8,  # Mock uptime
-        'error_rate': round(metrics.error_rate * 100, 3)
-    }
-
-def _get_trend_data(hours):
-    """Get trend data for specified hours"""
-    trend_data = []
-    current_time = datetime.now()
-    
-    for i in range(hours):
-        timestamp = current_time - timedelta(hours=i)
-        metrics = auto_ops._generate_realistic_metrics(timestamp)
-        
-        trend_data.append({
-            'timestamp': timestamp.isoformat(),
-            'users': metrics['active_users'],
-            'load': round(metrics['system_load'] * 100, 1),
-            'response_time': round(metrics['average_response_time'], 2)
-        })
-    
-    trend_data.reverse()
-    return trend_data
-
-def _generate_performance_report(days):
-    """Generate performance report for specified days"""
-    import random
-    
-    return {
-        'report_period': f'{days} days',
-        'generated_at': datetime.now().isoformat(),
-        'summary': {
-            'average_response_time': round(random.uniform(1.5, 3.0), 2),
-            'peak_response_time': round(random.uniform(3.0, 6.0), 2),
-            'uptime_percentage': round(random.uniform(99.5, 99.9), 2),
-            'error_rate': round(random.uniform(0.01, 0.05), 3),
-            'total_requests': random.randint(50000, 150000)
-        },
-        'trends': {
-            'response_time_trend': random.choice(['improving', 'stable', 'degrading']),
-            'error_rate_trend': random.choice(['improving', 'stable', 'increasing']),
-            'load_trend': random.choice(['increasing', 'stable', 'decreasing'])
+        'diversification_score': 75,  # 0-100 scale
+        'sector_concentration': 'moderate',
+        'geographic_concentration': 'low',
+        'asset_class_distribution': {
+            'equities': 60,
+            'crypto': 30,
+            'bonds': 10
         },
         'recommendations': [
-            'Optimize database queries for better response times',
-            'Implement caching for frequently accessed data',
-            'Consider horizontal scaling during peak hours'
+            'Consider adding international exposure',
+            'Increase bond allocation for stability'
         ]
     }
 
-def _generate_business_report(days):
-    """Generate business analytics report"""
-    import random
-    
+def _perform_stress_test(analytics: Dict) -> Dict:
+    """Perform portfolio stress test"""
+    # Simulated stress test results
     return {
-        'report_period': f'{days} days',
-        'generated_at': datetime.now().isoformat(),
-        'revenue': {
-            'total_revenue': round(random.uniform(50000, 150000), 2),
-            'average_daily': round(random.uniform(1500, 5000), 2),
-            'growth_rate': round(random.uniform(-5, 25), 1),
-            'top_categories': [
-                {'name': 'Construction', 'revenue': round(random.uniform(15000, 45000), 2)},
-                {'name': 'Electrical', 'revenue': round(random.uniform(10000, 30000), 2)},
-                {'name': 'Plumbing', 'revenue': round(random.uniform(8000, 25000), 2)}
-            ]
+        'market_crash_scenario': {
+            'portfolio_loss': -25.5,
+            'recovery_time_months': 8
         },
-        'users': {
-            'total_active_users': random.randint(800, 2000),
-            'new_registrations': random.randint(50, 200),
-            'user_retention_rate': round(random.uniform(75, 90), 1),
-            'average_session_duration': round(random.uniform(8, 15), 1)
+        'interest_rate_shock': {
+            'portfolio_impact': -5.2,
+            'affected_positions': ['bonds', 'reits']
         },
-        'jobs': {
-            'total_jobs_posted': random.randint(300, 800),
-            'total_jobs_completed': random.randint(250, 700),
-            'completion_rate': round(random.uniform(80, 95), 1),
-            'average_job_value': round(random.uniform(200, 800), 2)
+        'sector_rotation': {
+            'portfolio_impact': -3.1,
+            'beneficiary_sectors': ['technology', 'healthcare']
         },
-        'providers': {
-            'total_active_providers': random.randint(200, 500),
-            'new_provider_registrations': random.randint(10, 50),
-            'average_provider_rating': round(random.uniform(4.0, 4.8), 1),
-            'provider_utilization_rate': round(random.uniform(60, 85), 1)
-        },
-        'insights': [
-            'Construction category shows highest growth potential',
-            'User satisfaction improved by 8% this period',
-            'Provider response times decreased by 15%',
-            'Mobile usage increased by 22%'
-        ]
+        'overall_resilience': 'moderate'
     }
+
+def _determine_trading_style(patterns: Dict) -> str:
+    """Determine user's trading style"""
+    # Analyze patterns to determine style
+    frequency = patterns.get('trading_frequency', 0)
+    
+    if frequency > 5:  # More than 5 trades per day
+        return 'day_trader'
+    elif frequency > 1:  # 1-5 trades per day
+        return 'swing_trader'
+    else:
+        return 'position_trader'
+
+def _calculate_efficiency_score(patterns: Dict) -> float:
+    """Calculate trading efficiency score"""
+    # Simulated efficiency calculation
+    win_rate = patterns.get('win_rate', 50)
+    profit_factor = patterns.get('profit_factor', 1)
+    
+    efficiency = (win_rate / 100) * profit_factor * 50
+    return min(efficiency, 100)
+
+def _analyze_trading_behavior(patterns: Dict) -> Dict:
+    """Analyze behavioral patterns in trading"""
+    return {
+        'risk_tolerance': 'moderate',
+        'emotional_discipline': 'good',
+        'timing_consistency': 'average',
+        'position_sizing': 'conservative',
+        'behavioral_biases': ['confirmation_bias', 'loss_aversion']
+    }
+
+def _suggest_improvements(patterns: Dict) -> List[str]:
+    """Suggest trading improvements"""
+    return [
+        'Consider implementing systematic position sizing',
+        'Review and backtest trading strategies',
+        'Maintain detailed trading journal',
+        'Focus on risk-adjusted returns rather than absolute returns'
+    ]
+
+def _analyze_sentiment_trends(sentiment_data: Dict) -> Dict:
+    """Analyze sentiment trends"""
+    return {
+        'overall_trend': 'neutral',
+        'momentum': 'stable',
+        'divergences': [],
+        'key_drivers': ['economic_data', 'earnings', 'geopolitical_events']
+    }
+
+def _generate_sentiment_signals(sentiment_data: Dict) -> List[Dict]:
+    """Generate trading signals based on sentiment"""
+    signals = []
+    
+    for symbol, sentiment in sentiment_data.items():
+        score = sentiment.get('score', 0)
+        
+        if score > 0.7:
+            signals.append({
+                'symbol': symbol,
+                'signal': 'bullish',
+                'strength': 'strong',
+                'confidence': sentiment.get('confidence', 0)
+            })
+        elif score < -0.7:
+            signals.append({
+                'symbol': symbol,
+                'signal': 'bearish',
+                'strength': 'strong',
+                'confidence': sentiment.get('confidence', 0)
+            })
+    
+    return signals
 
