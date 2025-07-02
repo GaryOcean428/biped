@@ -64,17 +64,26 @@ try:
         f.write('test')
     os.remove(test_file)
     print(f"✅ Data directory accessible: {DATA_DIR}")
-except (PermissionError, OSError):
+except (PermissionError, OSError) as e:
     # Fallback to local directory for development
     DATA_DIR = os.path.join(os.getcwd(), 'data')
-    print(f"⚠️ Cannot access /data, falling back to {DATA_DIR}")
+    print(f"⚠️ Cannot access /data ({e}), falling back to {DATA_DIR}")
     os.makedirs(DATA_DIR, exist_ok=True)
     app.config['DATA_DIR'] = DATA_DIR
 
-# Create additional directories
-os.makedirs(os.path.join(DATA_DIR, 'uploads'), exist_ok=True)
-os.makedirs(os.path.join(DATA_DIR, 'reports'), exist_ok=True)
-os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
+# Create additional directories safely
+try:
+    os.makedirs(os.path.join(DATA_DIR, 'uploads'), exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, 'reports'), exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
+    
+    # Update upload folder configuration to use the working data directory
+    app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
+    print(f"✅ Upload folder configured: {app.config['UPLOAD_FOLDER']}")
+except (PermissionError, OSError) as e:
+    print(f"⚠️ Directory creation warning: {e}")
+    # Ensure upload folder is set to a safe default
+    app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
 
 print(f"🚀 Starting Enhanced Biped Platform v2.0")
 print(f"📊 Environment: {app.config['ENVIRONMENT']}")
@@ -103,16 +112,12 @@ app.config['FORCE_HTTPS'] = os.environ.get('FORCE_HTTPS', 'true').lower() == 'tr
 app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN')
 app.config['ENVIRONMENT'] = os.environ.get('ENVIRONMENT', 'production')
 
-# Create necessary directories
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(os.path.join(DATA_DIR, 'logs'), exist_ok=True)
-os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
-
 # Configure performance optimizations
 configure_performance(app)
 
-# Initialize database with migrations
-db.init_app(app)
+# Initialize database with migrations (only if not already initialized)
+if not hasattr(app, 'extensions') or 'sqlalchemy' not in app.extensions:
+    db.init_app(app)
 migrate = Migrate(app, db)
 
 # Initialize caching

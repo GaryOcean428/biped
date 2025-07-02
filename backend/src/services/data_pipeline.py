@@ -75,13 +75,13 @@ class RealTimeDataProcessor:
     def __init__(self, cache_service: TradingCacheService):
         self.cache_service = cache_service
         self.data_buffer = defaultdict(lambda: deque(maxlen=1000))
-        self.metrics_cache = {}
+        self.is_running = True
+        self.start_time = datetime.utcnow()  # Add missing start_time
         self.processing_stats = {
             'processed_events': 0,
             'processing_errors': 0,
-            'avg_latency_ms': 0
+            'last_update': datetime.utcnow()
         }
-        self.is_running = False
         self.executor = ThreadPoolExecutor(max_workers=4)
         
     async def start_processing(self):
@@ -114,15 +114,23 @@ class RealTimeDataProcessor:
                     metrics = self._calculate_symbol_metrics(symbol, data)
                     
                     # Cache metrics
-                    await self.cache_service.cache_market_data(symbol, {
-                        'price': data.close,
-                        'volume': data.volume,
-                        'bid': data.bid,
-                        'ask': data.ask,
-                        'change': metrics.get('price_change_24h', 0),
-                        'timestamp': data.timestamp.isoformat(),
-                        'metrics': metrics
-                    })
+                    if self.cache_service:
+                        # Use the cache service properly
+                        cache_key = f"market_data:{symbol}"
+                        market_data_dict = {
+                            'price': data.close,
+                            'volume': data.volume,
+                            'bid': data.bid,
+                            'ask': data.ask,
+                            'change': metrics.get('price_change_24h', 0),
+                            'timestamp': data.timestamp.isoformat(),
+                            'metrics': metrics
+                        }
+                        # Store in cache (simplified for compatibility)
+                        try:
+                            self.cache_service.set(cache_key, market_data_dict, timeout=60)
+                        except Exception as cache_error:
+                            logger.debug(f"Cache storage failed: {cache_error}")
                     
                     # Update processing stats
                     self.processing_stats['processed_events'] += 1
@@ -160,6 +168,99 @@ class RealTimeDataProcessor:
                 
             await asyncio.sleep(5)  # Process every 5 seconds
     
+    def _calculate_trade_impact(self, trade) -> float:
+        """Calculate the market impact of a trade"""
+        try:
+            # Simple impact calculation based on trade size and market conditions
+            base_impact = trade.quantity * trade.price / 1000000  # Normalize by $1M
+            
+            # Adjust for market volatility (simulated)
+            volatility_factor = 1.0  # Would be calculated from market data
+            
+            return base_impact * volatility_factor
+        except Exception as e:
+            logger.error(f"Error calculating trade impact: {e}")
+            return 0.0
+    
+    def _detect_trade_anomaly(self, trade) -> float:
+        """Detect if a trade is anomalous (returns score 0-1)"""
+        try:
+            # Simple anomaly detection based on trade size
+            if trade.quantity * trade.price > 100000:  # Large trade threshold
+                return 0.9
+            elif trade.quantity * trade.price > 50000:
+                return 0.6
+            else:
+                return 0.1
+        except Exception as e:
+            logger.error(f"Error detecting trade anomaly: {e}")
+            return 0.0
+    
+    async def _update_user_analytics(self, user_id: str, trade):
+        """Update user analytics with new trade"""
+        try:
+            # Cache user trade data
+            if self.cache_service:
+                user_key = f"user_trades:{user_id}"
+                # In production, this would update user analytics
+                logger.debug(f"Updated analytics for user {user_id}")
+        except Exception as e:
+            logger.error(f"Error updating user analytics: {e}")
+    
+    async def _flag_suspicious_trade(self, trade, anomaly_score: float):
+        """Flag a suspicious trade for review"""
+        try:
+            suspicious_trade = {
+                'trade_id': getattr(trade, 'id', 'unknown'),
+                'user_id': trade.user_id,
+                'symbol': trade.symbol,
+                'quantity': trade.quantity,
+                'price': trade.price,
+                'anomaly_score': anomaly_score,
+                'timestamp': trade.timestamp.isoformat(),
+                'flagged_at': datetime.utcnow().isoformat()
+            }
+            
+            if self.cache_service:
+                try:
+                    self.cache_service.set(f"suspicious_trade:{trade.user_id}", suspicious_trade, timeout=3600)
+                except Exception as cache_error:
+                    logger.debug(f"Cache storage failed: {cache_error}")
+            
+            logger.warning(f"Flagged suspicious trade: {suspicious_trade}")
+        except Exception as e:
+            logger.error(f"Error flagging suspicious trade: {e}")
+    
+    async def _calculate_real_time_metrics(self):
+        """Calculate real-time metrics for all active symbols"""
+        while True:
+            try:
+                # Get all active symbols from data buffer
+                active_symbols = set()
+                for key in self.data_buffer.keys():
+                    if key.startswith('market:'):
+                        symbol = key.replace('market:', '')
+                        active_symbols.add(symbol)
+                
+                # Calculate metrics for each symbol
+                for symbol in active_symbols:
+                    if symbol in self.data_buffer.get(f"market:{symbol}", []):
+                        latest_data = self.data_buffer[f"market:{symbol}"][-1] if self.data_buffer[f"market:{symbol}"] else None
+                        if latest_data:
+                            metrics = self._calculate_symbol_metrics(symbol, latest_data)
+                            
+                            # Store metrics in cache
+                            cache_key = f"metrics:{symbol}"
+                            if self.cache_service:
+                                self.cache_service.set(cache_key, metrics, timeout=60)
+                            
+                            logger.debug(f"Updated metrics for {symbol}: {metrics}")
+                
+            except Exception as e:
+                logger.error(f"Error calculating real-time metrics: {e}")
+                
+            await asyncio.sleep(30)  # Update metrics every 30 seconds
+
     def _calculate_symbol_metrics(self, symbol: str, data: MarketDataPoint) -> Dict:
         """Calculate technical indicators for a symbol"""
         buffer = self.data_buffer[f"market:{symbol}"]
@@ -277,6 +378,125 @@ class RealTimeDataProcessor:
             'MSFT': 350
         }
         return base_prices.get(symbol, 100)
+    
+    async def _fetch_recent_trades(self) -> List:
+        """Fetch recent trades (simulated for demo)"""
+        # In production, this would query the database
+        trades = []
+        symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL']
+        
+        for _ in range(5):  # Simulate 5 recent trades
+            trade = type('Trade', (), {
+                'symbol': np.random.choice(symbols),
+                'side': np.random.choice(['buy', 'sell']),
+                'quantity': np.random.uniform(0.1, 10),
+                'price': np.random.uniform(100, 50000),
+                'timestamp': datetime.utcnow(),
+                'user_id': f"user_{np.random.randint(1, 100)}"
+            })()
+            trades.append(trade)
+        
+        return trades
+    
+    async def _detect_anomalies(self):
+        """Detect anomalies in market data and trading patterns"""
+        while self.is_running:
+            try:
+                # Check for unusual price movements
+                for symbol in ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL']:
+                    buffer_key = f"market:{symbol}"
+                    if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) > 10:
+                        recent_data = self.data_buffer[buffer_key][-10:]
+                        prices = [point.close for point in recent_data]
+                        
+                        # Calculate price volatility
+                        if len(prices) >= 2:
+                            price_changes = [abs((prices[i] - prices[i-1]) / prices[i-1]) for i in range(1, len(prices))]
+                            avg_volatility = np.mean(price_changes)
+                            
+                            # Flag if volatility is unusually high
+                            if avg_volatility > 0.05:  # 5% threshold
+                                logger.warning(f"High volatility detected for {symbol}: {avg_volatility:.2%}")
+                                
+                                # Store anomaly
+                                anomaly = {
+                                    'type': 'high_volatility',
+                                    'symbol': symbol,
+                                    'volatility': avg_volatility,
+                                    'timestamp': datetime.utcnow().isoformat()
+                                }
+                                
+                                if self.cache_service:
+                                    try:
+                                        self.cache_service.set(f"anomaly:{symbol}", anomaly, timeout=300)
+                                    except Exception as cache_error:
+                                        logger.debug(f"Cache storage failed: {cache_error}")
+                
+            except Exception as e:
+                logger.error(f"Error detecting anomalies: {e}")
+                
+            await asyncio.sleep(60)  # Check every minute
+    
+    async def _update_analytics_cache(self):
+        """Update analytics cache with latest data"""
+        while self.is_running:
+            try:
+                # Update market summary
+                market_summary = {
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'active_symbols': len([k for k in self.data_buffer.keys() if k.startswith('market:')]),
+                    'total_events_processed': self.processing_stats['processed_events'],
+                    'processing_errors': self.processing_stats['processing_errors'],
+                    'uptime': (datetime.utcnow() - self.start_time).total_seconds()
+                }
+                
+                if self.cache_service:
+                    try:
+                        self.cache_service.set('market_summary', market_summary, timeout=300)
+                    except Exception as cache_error:
+                        logger.debug(f"Cache storage failed: {cache_error}")
+                
+                # Update top movers
+                top_movers = await self._calculate_top_movers()
+                if self.cache_service:
+                    try:
+                        self.cache_service.set('top_movers', top_movers, timeout=300)
+                    except Exception as cache_error:
+                        logger.debug(f"Cache storage failed: {cache_error}")
+                
+            except Exception as e:
+                logger.error(f"Error updating analytics cache: {e}")
+                
+            await asyncio.sleep(300)  # Update every 5 minutes
+    
+    async def _calculate_top_movers(self) -> Dict:
+        """Calculate top moving symbols"""
+        movers = {'gainers': [], 'losers': []}
+        
+        for symbol in ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA', 'MSFT']:
+            buffer_key = f"market:{symbol}"
+            if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) >= 2:
+                recent_data = self.data_buffer[buffer_key][-2:]
+                if len(recent_data) >= 2:
+                    price_change = ((recent_data[-1].close - recent_data[0].close) / recent_data[0].close) * 100
+                    
+                    mover_data = {
+                        'symbol': symbol,
+                        'price': recent_data[-1].close,
+                        'change_percent': price_change,
+                        'volume': recent_data[-1].volume
+                    }
+                    
+                    if price_change > 0:
+                        movers['gainers'].append(mover_data)
+                    else:
+                        movers['losers'].append(mover_data)
+        
+        # Sort by change percentage
+        movers['gainers'] = sorted(movers['gainers'], key=lambda x: x['change_percent'], reverse=True)[:5]
+        movers['losers'] = sorted(movers['losers'], key=lambda x: x['change_percent'])[:5]
+        
+        return movers
 
 class BusinessIntelligenceEngine:
     """Business Intelligence and Reporting Engine"""
