@@ -26,6 +26,7 @@ from src.routes.ai import ai_bp
 from src.routes.vision import vision_bp
 from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
+from src.routes.health import health_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-secret-key-change-in-production')
@@ -45,6 +46,7 @@ app.register_blueprint(ai_bp)
 app.register_blueprint(vision_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
+app.register_blueprint(health_bp, url_prefix='/api')
 
 # Database configuration - support both PostgreSQL (Railway) and SQLite (local)
 database_url = os.environ.get('DATABASE_URL')
