@@ -1,22 +1,8 @@
 [build]
-builder = "NIXPACKS"
-
-[build.nixpacksPlan]
-providers = ["python"]
-
-[build.nixpacksPlan.phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "python311Packages.virtualenv"]
-
-[build.nixpacksPlan.phases.install]
-dependsOn = ["setup"]
-cmds = [
-  "python -m venv /opt/venv",
-  ". /opt/venv/bin/activate",
-  "pip install -r backend/requirements.txt"
-]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = ". /opt/venv/bin/activate && cd backend && gunicorn --bind 0.0.0.0:$PORT src.main:app"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 
