@@ -298,6 +298,34 @@ def performance_metrics():
         }), 500
 
 
+@health_bp.route('/health/quality', methods=['GET'])
+@api_rate_limit
+def quality_metrics():
+    """Comprehensive quality metrics and scoring endpoint"""
+    try:
+        from src.utils.quality_metrics import quality_metrics as qm
+        
+        # Calculate comprehensive quality score
+        quality_report = qm.calculate_overall_score()
+        
+        return jsonify({
+            'timestamp': datetime.utcnow().isoformat(),
+            'platform': 'TradeHub Platform',
+            'version': '1.0.0',
+            'quality_assessment': quality_report,
+            'status': 'healthy' if quality_report['overall_score'] >= 90 else 'degraded'
+        }), 200
+        
+    except Exception as e:
+        health_metrics['error_count'] += 1
+        health_metrics['last_error'] = str(e)
+        app_logger.error(f"Quality metrics failed: {e}")
+        return jsonify({
+            'error': 'Quality metrics collection failed',
+            'timestamp': datetime.utcnow().isoformat()
+        }), 500
+
+
 @health_bp.route('/health/config', methods=['GET'])
 @api_rate_limit
 def configuration_info():

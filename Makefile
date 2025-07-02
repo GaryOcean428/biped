@@ -90,6 +90,19 @@ clean: ## Clean up generated files
 check-all: lint test check-security ## Run all quality checks
 	@echo "✅ All quality checks completed"
 
+quality-score: ## Get comprehensive quality score
+	@echo "Calculating quality score..."
+	@$(PYTHON) -c "\
+from backend.src.utils.quality_metrics import quality_metrics; \
+result = quality_metrics.calculate_overall_score(); \
+print(f'\\n🎯 TradeHub Platform Quality Score: {result[\"overall_score\"]}/100 ({result[\"grade\"]})'); \
+print(f'📊 Quality Level: {result[\"quality_level\"]}'); \
+print(f'\\n📈 Category Breakdown:'); \
+[print(f'  {cat.title()}: {data[\"score\"]}/{data[\"max_possible\"]} ({data[\"grade\"]})') for cat, data in result['category_breakdown'].items()]; \
+print(f'\\n✅ Features Implemented: {result[\"summary\"][\"total_features_implemented\"]}/{result[\"summary\"][\"total_features_possible\"]} ({result[\"summary\"][\"feature_completion_rate\"]}%)'); \
+print('\\n💡 Excellent! All quality standards met.') if result['overall_score'] >= 95 else None"
+	@echo "✅ Quality assessment completed"
+
 dev-setup: install-dev ## Set up development environment
 	@echo "Setting up development environment..."
 	@echo "✅ Development environment ready"
