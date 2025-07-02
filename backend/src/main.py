@@ -12,6 +12,7 @@ from src.models.service import ServiceCategory, Service, ProviderService, Portfo
 from src.models.job import Job, Quote, JobMilestone, JobMessage
 from src.models.review import Review, Message, Notification
 from src.models.admin import Admin, AdminAction
+from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 
 # Import routes
 from src.routes.user import user_bp
@@ -20,6 +21,7 @@ from src.routes.service import service_bp
 from src.routes.job import job_bp
 from src.routes.review import review_bp
 from src.routes.admin import admin_bp
+from src.routes.payment import payment_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tradehub-secret-key-change-in-production')
@@ -34,6 +36,7 @@ app.register_blueprint(service_bp, url_prefix='/api/services')
 app.register_blueprint(job_bp, url_prefix='/api/jobs')
 app.register_blueprint(review_bp, url_prefix='/api/reviews')
 app.register_blueprint(admin_bp)
+app.register_blueprint(payment_bp, url_prefix='/api/payments')
 
 # Database configuration - support both PostgreSQL (Railway) and SQLite (local)
 database_url = os.environ.get('DATABASE_URL')
