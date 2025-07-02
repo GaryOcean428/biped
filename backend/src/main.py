@@ -101,6 +101,7 @@ with app.app_context():
 @app.route('/admin')
 def admin_dashboard():
     """Serve the admin dashboard"""
+    print("Admin route accessed - serving admin.html")
     return send_from_directory('static', 'admin.html')
 
 @app.route('/', defaults={'path': ''})
