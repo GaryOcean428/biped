@@ -25,9 +25,13 @@ COPY . /app/
 # Change to backend directory
 WORKDIR /app/backend
 
-# Expose port
-EXPOSE $PORT
+# Expose port (Railway will set PORT environment variable)
+EXPOSE 8080
+
+# Create a startup script to handle PORT environment variable
+RUN echo '#!/bin/bash\nPORT=${PORT:-8080}\nexec gunicorn --bind 0.0.0.0:$PORT src.main:app' > /app/start.sh
+RUN chmod +x /app/start.sh
 
 # Command to run the application
-CMD ["python", "src/main.py"]
+CMD ["/app/start.sh"]
 
