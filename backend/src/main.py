@@ -28,6 +28,7 @@ from src.routes.ai import ai_bp
 from src.routes.vision import vision_bp
 from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
+from src.routes.storage import storage_bp
 
 # Create health blueprint
 from flask import Blueprint
@@ -40,10 +41,46 @@ def health_check():
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# Basic configuration
+# Basic configuration with /data volume support
+DATA_DIR = os.environ.get('DATA_DIR', '/data')
+
+# Check if we can access the data directory, fallback to local if not
+try:
+    os.makedirs(DATA_DIR, exist_ok=True)
+    # Test write access
+    test_file = os.path.join(DATA_DIR, '.write_test')
+    with open(test_file, 'w') as f:
+        f.write('test')
+    os.remove(test_file)
+except (PermissionError, OSError):
+    # Fallback to local directory for development
+    DATA_DIR = os.path.join(os.getcwd(), 'data')
+    print(f"Warning: Cannot access /data, falling back to {DATA_DIR}")
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+# Database configuration - use /data volume for persistence
+if os.environ.get('DATABASE_URL'):
+    # Use Railway PostgreSQL if available
+    database_url = os.environ.get('DATABASE_URL')
+    # Fix postgres:// to postgresql:// for SQLAlchemy compatibility
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Use SQLite in /data volume for persistence
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATA_DIR}/biped.db'
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-production-secret-key-2025')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///biped.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# File upload configuration using /data volume
+app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Create necessary directories
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(os.path.join(DATA_DIR, 'logs'), exist_ok=True)
+os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
 
 # Enable CORS for all routes
 CORS(app, origins="*")
@@ -60,6 +97,7 @@ app.register_blueprint(ai_bp)
 app.register_blueprint(vision_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
+app.register_blueprint(storage_bp)
 app.register_blueprint(health_bp, url_prefix='/api')
 
 # Database initialization
