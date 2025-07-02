@@ -168,7 +168,7 @@ class FallbackComputerVision:
             ]
         )
     
-    def compare_progress(self, before_data: bytes, after_data: bytes) -> MockProgressComparison:
+    def compare_progress(self, before_data: bytes, after_data: bytes, category: str = "construction") -> MockProgressComparison:
         """Compare progress with fallback to mock results"""
         import hashlib
         before_id = hashlib.md5(before_data).hexdigest()[:8]
@@ -179,7 +179,7 @@ class FallbackComputerVision:
                 # Try to use real computer vision
                 from computer_vision import BipedComputerVision
                 cv_engine = BipedComputerVision()
-                return cv_engine.compare_progress(before_data, after_data)
+                return cv_engine.compare_progress(before_data, after_data, category)
             except Exception as e:
                 logger.error(f"Progress comparison failed: {e}")
         
