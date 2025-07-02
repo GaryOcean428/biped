@@ -19,14 +19,17 @@ from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 from src.routes.user import user_bp
 from src.routes.auth import auth_bp
 from src.routes.service import service_bp
-from src.routes.job import job_bp
-from src.routes.review import review_bp
+from src.routes.job i# Import routes
+from src.routes.user import user_bp
 from src.routes.admin import admin_bp
 from src.routes.payment import payment_bp
 from src.routes.ai import ai_bp
 from src.routes.vision import vision_bp
 from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
+from src.routes.financial import financial_bp
+from src.routes.integrations import integrations_bp
+from src.routes.real_estate import real_estate_bpp
 from src.routes.health import health_bp
 
 # Import new performance and security utilities
@@ -60,6 +63,9 @@ app.register_blueprint(ai_bp)
 app.register_blueprint(vision_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(business_bp)
+app.register_blueprint(financial_bp)
+app.register_blueprint(integrations_bp)
+app.register_blueprint(real_estate_bp)
 app.register_blueprint(health_bp, url_prefix='/api')
 
 
