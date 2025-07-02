@@ -91,13 +91,46 @@ def health_check():
         cv_status = ComputerVisionChecker.get_cv_status()
         is_available = ComputerVisionChecker.is_cv_available()
         
+        # Test basic OpenCV functionality
+        cv_functional = False
+        opencv_error = None
+        try:
+            import cv2
+            import numpy as np
+            test_img = np.zeros((10, 10, 3), dtype=np.uint8)
+            cv2.cvtColor(test_img, cv2.COLOR_BGR2GRAY)
+            cv_functional = True
+        except Exception as e:
+            opencv_error = str(e)
+        
         health_status['checks']['computer_vision'] = {
-            'status': 'healthy' if is_available else 'degraded',
+            'status': 'healthy' if (is_available and cv_functional) else 'degraded',
             'available': is_available,
-            'libraries': cv_status.get('libraries', {}),
+            'functional': cv_functional,
+            'opencv_version': cv_status.get('libraries', {}).get('opencv', {}).get('version', 'unknown'),
+            'pillow_version': cv_status.get('libraries', {}).get('pillow', {}).get('version', 'unknown'), 
+            'numpy_version': cv_status.get('libraries', {}).get('numpy', {}).get('version', 'unknown'),
             'environment': cv_status.get('environment', 'unknown'),
-            'headless': cv_status.get('headless', False)
+            'headless': cv_status.get('headless', False),
+            'error': opencv_error
         }
+        
+        # Additional CV diagnostics
+        if cv_functional:
+            health_status['checks']['computer_vision']['capabilities'] = {
+                'image_analysis': 'available',
+                'progress_comparison': 'available', 
+                'quality_assessment': 'available',
+                'defect_detection': 'available'
+            }
+        else:
+            health_status['checks']['computer_vision']['capabilities'] = {
+                'image_analysis': 'fallback_mode',
+                'progress_comparison': 'fallback_mode',
+                'quality_assessment': 'fallback_mode', 
+                'defect_detection': 'unavailable'
+            }
+            
     except Exception as e:
         health_status['checks']['computer_vision'] = {
             'status': 'unhealthy',
@@ -138,6 +171,59 @@ def simple_health_check():
         'status': 'healthy',
         'timestamp': datetime.utcnow().isoformat()
     }), 200
+
+@health_bp.route('/health/vision', methods=['GET'])
+def vision_health_check():
+    """Dedicated computer vision health check"""
+    try:
+        from ..utils.cv_fallback import ComputerVisionChecker, FallbackComputerVision
+        
+        # Get detailed CV status
+        cv_status = ComputerVisionChecker.get_cv_status()
+        is_available = ComputerVisionChecker.is_cv_available()
+        
+        # Test CV functionality with real operations
+        cv_engine = FallbackComputerVision()
+        capabilities = cv_engine.get_capabilities()
+        
+        # Test image analysis capability
+        test_analysis_working = False
+        analysis_error = None
+        try:
+            test_data = b"test_image_data_placeholder"
+            analysis = cv_engine.analyze_image(test_data)
+            test_analysis_working = True
+        except Exception as e:
+            analysis_error = str(e)
+        
+        vision_health = {
+            'status': 'healthy' if is_available else 'degraded',
+            'timestamp': datetime.utcnow().isoformat(),
+            'computer_vision': {
+                'available': is_available,
+                'libraries_status': cv_status.get('libraries', {}),
+                'environment': cv_status.get('environment', 'unknown'),
+                'headless_mode': cv_status.get('headless', False)
+            },
+            'functionality': {
+                'analysis_working': test_analysis_working,
+                'analysis_error': analysis_error,
+                'capabilities': capabilities.get('features', {})
+            },
+            'recommendations': capabilities.get('recommendations', []),
+            'deployment_ready': is_available and test_analysis_working
+        }
+        
+        status_code = 200 if vision_health['deployment_ready'] else 503
+        return jsonify(vision_health), status_code
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'timestamp': datetime.utcnow().isoformat(),
+            'error': str(e),
+            'deployment_ready': False
+        }), 503
 
 @health_bp.route('/health/dependencies', methods=['GET'])
 def dependencies_check():
