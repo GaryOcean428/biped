@@ -7,12 +7,6 @@ cmds = [
     ". /opt/venv/bin/activate && cd backend && pip install -r requirements.txt"
 ]
 
-[phases.build]
-cmds = [
-    ". /opt/venv/bin/activate && cd backend && python create_db.py",
-    ". /opt/venv/bin/activate && cd backend && python populate_services.py"
-]
-
 [start]
 cmd = ". /opt/venv/bin/activate && cd backend && python src/main.py"
 
