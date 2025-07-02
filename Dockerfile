@@ -7,16 +7,16 @@ FROM node:20-slim AS frontend-builder
 WORKDIR /app/frontend
 
 # Copy frontend package files
-COPY frontend/package*.json frontend/yarn.lock* ./
+COPY frontend/package*.json ./
 
-# Install frontend dependencies with yarn (already available in node:20-slim)
-RUN yarn install --frozen-lockfile
+# Install frontend dependencies with npm (including dev dependencies for build)
+RUN npm install
 
 # Copy frontend source code
 COPY frontend/ ./
 
 # Build React frontend for production
-RUN yarn build
+RUN npm run build
 
 # Production stage with Python
 FROM python:3.11-slim
