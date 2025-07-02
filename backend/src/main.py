@@ -11,6 +11,9 @@ from flask_migrate import Migrate
 from flask_compress import Compress
 from flask_caching import Cache
 
+# Import Railway-optimized configuration
+from config import get_config
+
 # Import enhanced security and performance modules
 from src.utils.security import SecurityEnhancer, SecurityConfig
 from src.utils.redis_client import redis_client
@@ -42,13 +45,15 @@ from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
 from src.routes.storage import storage_bp
 
-# Import Flask and other dependencies
-import os
-
+# Create Flask app with Railway-optimized configuration
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
+# Load Railway-optimized configuration
+config_class = get_config()
+app.config.from_object(config_class)
+
 # Enhanced configuration with /data volume support
-DATA_DIR = os.environ.get('DATA_DIR', '/data')
+DATA_DIR = app.config['DATA_DIR']
 
 # Check if we can access the data directory, fallback to local if not
 try:
@@ -58,42 +63,38 @@ try:
     with open(test_file, 'w') as f:
         f.write('test')
     os.remove(test_file)
+    print(f"✅ Data directory accessible: {DATA_DIR}")
 except (PermissionError, OSError):
     # Fallback to local directory for development
     DATA_DIR = os.path.join(os.getcwd(), 'data')
-    print(f"Warning: Cannot access /data, falling back to {DATA_DIR}")
+    print(f"⚠️ Cannot access /data, falling back to {DATA_DIR}")
     os.makedirs(DATA_DIR, exist_ok=True)
+    app.config['DATA_DIR'] = DATA_DIR
 
-# Enhanced database configuration
-if os.environ.get('DATABASE_URL'):
-    # Use Railway PostgreSQL if available
-    database_url = os.environ.get('DATABASE_URL')
-    # Fix postgres:// to postgresql:// for SQLAlchemy compatibility
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # Use SQLite in /data volume for persistence
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATA_DIR}/biped.db'
+# Create additional directories
+os.makedirs(os.path.join(DATA_DIR, 'uploads'), exist_ok=True)
+os.makedirs(os.path.join(DATA_DIR, 'reports'), exist_ok=True)
+os.makedirs(os.path.join(DATA_DIR, 'backups'), exist_ok=True)
 
-# Security configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-production-secret-key-2025')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+print(f"🚀 Starting Enhanced Biped Platform v2.0")
+print(f"📊 Environment: {app.config['ENVIRONMENT']}")
+print(f"🗄️ Database: {'PostgreSQL (Railway)' if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgresql') else 'SQLite (Local)'}")
+print(f"🔄 Redis: {'Available (Railway)' if app.config['REDIS_URL'] else 'Not configured'}")
+print(f"💾 Data Directory: {DATA_DIR}")
 
-# JWT Configuration
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False  # Will be set by SecurityEnhancer
+# Initialize Flask extensions with Railway-optimized configuration
+db.init_app(app)
+migrate = Migrate(app, db)
+cache = Cache(app)
+compress = Compress(app)
 
-# Redis configuration
-app.config['REDIS_URL'] = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+# Initialize CORS with configuration
+CORS(app, 
+     origins=app.config['CORS_ORIGINS'],
+     allow_headers=app.config['CORS_ALLOW_HEADERS'],
+     methods=app.config['CORS_METHODS'])
 
-# Cache configuration
-app.config['CACHE_TYPE'] = 'RedisCache'
-app.config['CACHE_REDIS_URL'] = app.config['REDIS_URL']
-
-# File upload configuration using /data volume
-app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+# Initialize security enhancements
 
 # Security headers configuration
 app.config['FORCE_HTTPS'] = os.environ.get('FORCE_HTTPS', 'true').lower() == 'true'
@@ -270,25 +271,42 @@ def security_status():
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def serve_static(path):
-    """Enhanced static file serving"""
+def serve_react_app(path):
+    """Serve React frontend with proper routing support"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
-        return send_from_directory(static_folder_path, path)
-    else:
-        # Check for enhanced dashboard
-        if path.startswith('dashboard'):
-            dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
-            if os.path.exists(dashboard_path):
-                return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
-        
-        # Default to index
-        index_path = os.path.join(static_folder_path, 'index.html')
-        if os.path.exists(index_path):
-            return send_from_directory(static_folder_path, 'index.html')
-        else:
-            return "index.html not found", 404
+    # Handle API routes - don't serve React for these
+    if path.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
+    
+    # Handle static assets (CSS, JS, images, etc.)
+    if path and '.' in path:
+        file_path = os.path.join(static_folder_path, path)
+        if os.path.exists(file_path):
+            return send_from_directory(static_folder_path, path)
+    
+    # Handle React routes - serve index.html for all non-API routes
+    index_path = os.path.join(static_folder_path, 'index.html')
+    if os.path.exists(index_path):
+        return send_from_directory(static_folder_path, 'index.html')
+    
+    # Fallback to enhanced dashboard if React build not available
+    dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+    if os.path.exists(dashboard_path):
+        return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+    
+    # Final fallback
+    return jsonify({
+        'message': 'Biped Platform API',
+        'version': '2.0',
+        'status': 'operational',
+        'endpoints': {
+            'health': '/health',
+            'analytics': '/api/analytics',
+            'vision': '/api/vision',
+            'dashboard': '/analytics-dashboard.html'
+        }
+    }), 200
 
 # Error handlers
 @app.errorhandler(404)

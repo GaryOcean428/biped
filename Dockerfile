@@ -1,6 +1,27 @@
 # Railway-Optimized Dockerfile for Biped Platform
-# Handles system dependencies for computer vision and data science
+# Single service architecture serving Flask backend + React frontend
 
+FROM node:20-slim AS frontend-builder
+
+# Install yarn globally
+RUN npm install -g yarn
+
+# Set working directory for frontend build
+WORKDIR /app/frontend
+
+# Copy frontend package files
+COPY frontend/package*.json frontend/yarn.lock* ./
+
+# Install frontend dependencies with yarn
+RUN yarn install --frozen-lockfile
+
+# Copy frontend source code
+COPY frontend/ ./
+
+# Build React frontend for production
+RUN yarn build
+
+# Production stage with Python
 FROM python:3.11-slim
 
 # Set environment variables
@@ -13,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     # Essential build tools
     build-essential \
     pkg-config \
+    curl \
     # OpenCV system dependencies (headless)
     libglib2.0-0 \
     libsm6 \
@@ -41,14 +63,17 @@ WORKDIR /app
 RUN mkdir -p /data && chmod 755 /data
 
 # Copy requirements first for better layer caching
-COPY backend/requirements.txt ./requirements.txt
+COPY backend/requirements.txt ./backend/requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r backend/requirements.txt
 
-# Copy application code
+# Copy backend application code
 COPY backend/ ./backend/
+
+# Copy built frontend from previous stage
+COPY --from=frontend-builder /app/frontend/build/ ./backend/src/static/
 
 # Set working directory to backend
 WORKDIR /app/backend
@@ -63,11 +88,11 @@ USER app
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8080/health')" || exit 1
+    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
 
-# Expose port
+# Expose port (Railway will set PORT environment variable)
 EXPOSE 8080
 
-# Start command
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "--timeout", "120", "--keep-alive", "2", "--max-requests", "1000", "--max-requests-jitter", "100", "src.main:app"]
+# Start command optimized for Railway
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "--worker-class", "gevent", "--timeout", "120", "--keep-alive", "2", "--max-requests", "1000", "--max-requests-jitter", "100", "--log-level", "info", "--access-logfile", "-", "--error-logfile", "-", "src.main:app"]
 

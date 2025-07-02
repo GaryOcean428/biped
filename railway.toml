@@ -9,13 +9,32 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [env]
+# Railway Volume Configuration
 DATA_DIR = "/data"
+
+# Environment Configuration
 ENVIRONMENT = "production"
 DEBUG = "false"
 FORCE_HTTPS = "true"
+
+# Python Configuration
 PYTHONPATH = "/app/backend"
-# OpenCV headless configuration
+PYTHONUNBUFFERED = "1"
+
+# OpenCV Configuration for Headless Operation
 OPENCV_HEADLESS = "true"
-# Disable GUI features
+CV_FALLBACK_MODE = "true"
 DISPLAY = ""
+
+# Security Configuration
+WTF_CSRF_ENABLED = "true"
+SESSION_COOKIE_SECURE = "true"
+
+# Performance Configuration
+COMPRESS_LEVEL = "6"
+CACHE_DEFAULT_TIMEOUT = "300"
+
+# Service References (Railway will inject these automatically)
+# DATABASE_PRIVATE_URL = "${{Postgres.DATABASE_PRIVATE_URL}}"
+# REDIS_PRIVATE_URL = "${{Redis.REDIS_PRIVATE_URL}}"
 
