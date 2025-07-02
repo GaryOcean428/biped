@@ -1,5 +1,5 @@
-// TradeHub Frontend JavaScript
-class TradeHubApp {
+// Biped Frontend JavaScript
+class BipedApp {
     constructor() {
         this.apiBase = '/api';
         this.currentUser = null;
@@ -541,6 +541,6 @@ class TradeHubApp {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.tradeHubApp = new TradeHubApp();
+    window.bipedApp = new BipedApp();
 });
 

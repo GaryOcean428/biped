@@ -24,7 +24,7 @@ from src.routes.admin import admin_bp
 from src.routes.payment import payment_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tradehub-secret-key-change-in-production')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'biped-secret-key-change-in-production')
 
 # Enable CORS for all routes
 CORS(app, origins="*")
