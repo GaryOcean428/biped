@@ -248,6 +248,16 @@ def profile():
     """Serve the user profile page"""
     return send_from_directory('static', 'profile.html')
 
+@app.route('/billing')
+def billing():
+    """Serve the billing page"""
+    return send_from_directory('static', 'billing.html')
+
+@app.route('/settings')
+def settings():
+    """Serve the settings page"""
+    return send_from_directory('static', 'settings.html')
+
 @app.route('/admin-login')
 def admin_login():
     """Serve the admin login page"""
@@ -263,7 +273,7 @@ def dev_login():
 def serve_static_files(path):
     """Handle static files and other routes"""
     # Handle specific HTML routes
-    if path in ['dashboard', 'admin', 'post-job', 'admin-login', 'dev-login', 'profile']:
+    if path in ['dashboard', 'admin', 'post-job', 'admin-login', 'dev-login', 'profile', 'billing', 'settings']:
         return send_from_directory('static', f'{path}.html')
     # Handle static files (CSS, JS, images)
     elif path.endswith('.js') or path.endswith('.css') or path.endswith('.html') or path.endswith('.png') or path.endswith('.jpg') or path.endswith('.ico'):
