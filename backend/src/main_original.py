@@ -7,13 +7,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, g, send_from_directory
 from flask_cors import CORS
+from src.models.admin import Admin, AdminAction
+from src.models.job import Job, JobMessage, JobMilestone, Quote
+from src.models.payment import Dispute, Payment, StripeAccount, Transfer
+from src.models.review import Message, Notification, Review
+from src.models.service import PortfolioItem, ProviderService, Service, ServiceCategory
 
-# Import only the models that are actually used
-from src.models.service import ServiceCategory
-from src.models.user import db
-from src.models.admin import Admin
-
-# Import routes
+# Import all models
+from src.models.user import CustomerProfile, ProviderProfile, User, db
 from src.routes.admin import admin_bp
 from src.routes.admin_auth import admin_auth_bp
 from src.routes.advanced_search import advanced_search_bp
@@ -26,6 +27,8 @@ from src.routes.dashboard import dashboard_bp
 from src.routes.financial import financial_bp
 from src.routes.health import health_bp
 from src.routes.integrations import integrations_bp
+
+# Import routes
 from src.routes.job import job_bp
 from src.routes.notifications import notifications_bp
 from src.routes.payment import payment_bp
@@ -33,18 +36,20 @@ from src.routes.real_estate import real_estate_bp
 from src.routes.review import review_bp
 from src.routes.service import service_bp
 from src.routes.smart_matching import smart_matching_bp
+
+# Import routes
 from src.routes.user import user_bp
 from src.routes.vision import vision_bp
-
 from src.utils.config import config_manager
-from src.utils.error_boundaries import register_error_handlers
 from src.utils.performance import (
     CompressionMiddleware,
     PerformanceMonitor,
     ResponseCache,
     StaticAssetOptimizer,
 )
-from src.utils.security import SecurityEnhancer
+
+# Import new performance and security utilities
+from src.utils.security import SecurityHeaders
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), "static"))
 
@@ -83,8 +88,9 @@ app.register_blueprint(notifications_bp)
 app.register_blueprint(advanced_search_bp)
 app.register_blueprint(communication_bp, url_prefix="/api/communication")
 
+
 # Initialize utility instances
-security_enhancer = SecurityEnhancer(app)
+security_headers = SecurityHeaders()
 compression_middleware = CompressionMiddleware()
 performance_monitor = PerformanceMonitor()
 
@@ -93,7 +99,7 @@ performance_monitor = PerformanceMonitor()
 @app.after_request
 def apply_security_headers(response):
     """Apply security headers to all responses"""
-    return security_enhancer.apply_security_headers(response)
+    return security_headers.apply_security_headers(response)
 
 
 @app.after_request
@@ -119,9 +125,6 @@ def monitor_request_end(response):
 
 # Database initialization (configuration handled by config_manager)
 db.init_app(app)
-
-# Register global error handlers
-register_error_handlers(app)
 
 # Create all tables
 with app.app_context():
@@ -266,4 +269,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"🚀 Starting Biped Platform on port {port}")
     app.run(host="0.0.0.0", port=port, debug=False)
-
