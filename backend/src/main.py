@@ -26,7 +26,7 @@ def handle_not_found(error):
 # Basic routes
 @app.route('/')
 def index():
-    """Serve the main landing page"""
+    """Serve the PUBLIC landing page - NOT the dashboard"""
     return send_from_directory('static', 'index.html')
 
 @app.route('/health')
@@ -54,18 +54,18 @@ def admin_login():
     """Serve the admin login page"""
     return send_from_directory('static', 'admin-login.html')
 
-# Catch-all route for SPA routing
-@app.route('/', defaults={'path': ''})
+# Static file serving for other paths
 @app.route('/<path:path>')
-def catch_all(path):
-    """Handle SPA routing"""
-    # Handle specific routes
+def serve_static_files(path):
+    """Handle static files and other routes"""
+    # Handle specific HTML routes
     if path in ['dashboard', 'admin', 'post-job', 'admin-login']:
         return send_from_directory('static', f'{path}.html')
-    elif path.endswith('.js') or path.endswith('.css') or path.endswith('.html'):
+    # Handle static files (CSS, JS, images)
+    elif path.endswith('.js') or path.endswith('.css') or path.endswith('.html') or path.endswith('.png') or path.endswith('.jpg') or path.endswith('.ico'):
         return send_from_directory('static', path)
+    # For unknown routes, redirect to landing page
     else:
-        # Default to landing page for unknown routes
         return send_from_directory('static', 'index.html')
 
 if __name__ == '__main__':
