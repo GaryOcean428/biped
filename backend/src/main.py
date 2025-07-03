@@ -47,6 +47,7 @@ from src.routes.storage import storage_bp
 from src.routes.websocket import websocket_bp
 from src.routes.health import health_bp
 from src.routes.dashboard import dashboard_bp
+from src.routes.jobs_api import jobs_api_bp
 
 # Create Flask app with static folder configuration
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
@@ -177,17 +178,14 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(service_bp, url_prefix='/api/services')
 app.register_blueprint(job_bp, url_prefix='/api/jobs')
-app.register_blueprint(review_bp, url_prefix='/api/reviews')
-app.register_blueprint(admin_bp)
-app.register_blueprint(payment_bp, url_prefix='/api/payments')
-app.register_blueprint(ai_bp)
-app.register_blueprint(vision_bp)
-app.register_blueprint(analytics_bp)
-app.register_blueprint(business_bp)
-app.register_blueprint(storage_bp)
-app.register_blueprint(websocket_bp, url_prefix='/api/ws')
-app.register_blueprint(health_bp, url_prefix='/api')
-app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
+app.register_blueprint(ai_bp, url_prefix='/api/ai')
+app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
+app.register_blueprint(business_bp, url_prefix='/api/business')
+app.register_blueprint(storage_bp, url_prefix='/api/storage')
+app.register_blueprint(websocket_bp, url_prefix='/ws')
+app.register_blueprint(health_bp, url_prefix='/health')
+app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+app.register_blueprint(jobs_api_bp)  # No prefix for API routes
 
 # Enhanced database initialization
 with app.app_context():
