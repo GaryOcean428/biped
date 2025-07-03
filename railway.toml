@@ -1,7 +1,7 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
-buildCommand = "docker system prune -af && docker builder prune -af && echo 'Cache cleared at $(date)'"
+buildCommand = "docker system prune -af && docker builder prune -af && echo 'FORCE REBUILD at $(date)'"
 
 [deploy]
 startCommand = "./start.sh"
@@ -11,8 +11,8 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [deploy.env]
-# Cache busting environment variables with unique timestamp
-CACHE_BUST = "20250703-133900"
+# FORCE COMPLETE REBUILD - Cache busting environment variables
+CACHE_BUST = "FORCE_REBUILD_20250703_134300"
 FLASK_STATIC_CACHE_TIMEOUT = "0"
 FLASK_ENV = "production"
 FLASK_APP = "src/main.py"
@@ -22,14 +22,14 @@ PYTHONUNBUFFERED = "1"
 # Force cache clearing headers
 FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
 STATIC_CACHE_TIMEOUT = "0"
-BUILD_TIMESTAMP = "20250703-133900"
+BUILD_TIMESTAMP = "FORCE_REBUILD_20250703_134300"
 
 [deploy.headers]
 # Aggressive cache control headers to prevent caching issues
 "Cache-Control" = "no-cache, no-store, must-revalidate, max-age=0"
 "Pragma" = "no-cache"
 "Expires" = "0"
-"X-Build-Timestamp" = "20250703-133900"
+"X-Build-Timestamp" = "FORCE_REBUILD_20250703_134300"
 
 # Redirects removed - let Flask handle routing properly
 # Root URL should serve the public landing page, not dashboard
