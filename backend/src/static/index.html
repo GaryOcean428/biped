@@ -3,949 +3,632 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Biped Platform</title>
+    <title>Biped Dashboard - AI-Powered Trades Marketplace</title>
     
-    <!-- Design System -->
-    <link href="/css/design-system.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Chart.js for Analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <link href="/css/design-system.css" rel="stylesheet">
     
     <style>
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-            background: var(--bg-secondary);
+        /* Dashboard-specific styles */
+        .dashboard-sidebar {
+            transition: transform 0.3s ease;
+            width: 280px;
         }
         
-        .sidebar {
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-primary);
-            padding: var(--space-6);
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
+        .dashboard-sidebar.collapsed {
+            transform: translateX(-100%);
         }
         
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            margin-bottom: var(--space-8);
-            font-size: var(--text-xl);
-            font-weight: 700;
-            color: var(--color-primary);
+        .dashboard-main {
+            transition: margin-left 0.3s ease;
+            margin-left: 280px;
         }
         
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-nav-item {
-            margin-bottom: var(--space-2);
-        }
-        
-        .sidebar-nav-link {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            padding: var(--space-3) var(--space-4);
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: var(--radius-lg);
-            transition: all var(--transition-fast);
-            font-weight: 500;
-        }
-        
-        .sidebar-nav-link:hover,
-        .sidebar-nav-link.active {
-            background: var(--color-primary-light);
-            color: var(--color-primary);
-        }
-        
-        .main-content {
-            padding: var(--space-6);
-            overflow-x: auto;
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-8);
-            flex-wrap: wrap;
-            gap: var(--space-4);
-        }
-        
-        .dashboard-title {
-            margin: 0;
-            color: var(--text-primary);
-        }
-        
-        .dashboard-actions {
-            display: flex;
-            gap: var(--space-3);
-            align-items: center;
-        }
-        
-        .search-bar {
-            position: relative;
-            min-width: 300px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-lg);
-            background: var(--bg-primary);
-            font-size: var(--text-sm);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: var(--space-4);
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-tertiary);
-        }
-        
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--space-6);
-            margin-bottom: var(--space-8);
+        .dashboard-main.expanded {
+            margin-left: 0;
         }
         
         .widget {
-            background: var(--bg-primary);
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
-            position: relative;
+            box-shadow: var(--shadow-sm);
             transition: all var(--transition-normal);
         }
         
         .widget:hover {
             box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
         
-        .widget-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: var(--space-4);
-        }
-        
-        .widget-title {
-            font-size: var(--text-lg);
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0;
-        }
-        
-        .widget-menu {
-            background: none;
+        .metric-card {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--text-inverse);
             border: none;
-            color: var(--text-tertiary);
-            cursor: pointer;
-            padding: var(--space-2);
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
         }
         
-        .widget-menu:hover {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+        .metric-value {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            line-height: 1;
         }
         
-        .stat-widget {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: var(--text-4xl);
-            font-weight: 800;
-            color: var(--color-primary);
-            display: block;
-            margin-bottom: var(--space-2);
-        }
-        
-        .stat-label {
-            color: var(--text-secondary);
+        .metric-change {
             font-size: var(--text-sm);
-            font-weight: 500;
+            opacity: 0.9;
         }
         
-        .stat-change {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-1);
-            margin-top: var(--space-2);
-            font-size: var(--text-xs);
-            font-weight: 500;
+        .metric-change.positive {
+            color: #10b981;
         }
         
-        .stat-change.positive {
-            color: var(--color-success);
-        }
-        
-        .stat-change.negative {
-            color: var(--color-error);
-        }
-        
-        .chart-widget {
-            height: 300px;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 250px;
-            margin-top: var(--space-4);
-        }
-        
-        .activity-feed {
-            max-height: 400px;
-            overflow-y: auto;
+        .metric-change.negative {
+            color: #ef4444;
         }
         
         .activity-item {
-            display: flex;
-            gap: var(--space-3);
-            padding: var(--space-3) 0;
+            padding: var(--space-4);
             border-bottom: 1px solid var(--border-primary);
+            transition: background-color var(--transition-fast);
+        }
+        
+        .activity-item:hover {
+            background: var(--bg-secondary);
         }
         
         .activity-item:last-child {
             border-bottom: none;
         }
         
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-sm);
-            flex-shrink: 0;
-        }
-        
-        .activity-icon.success {
-            background: var(--color-success-light);
-            color: var(--color-success);
-        }
-        
-        .activity-icon.warning {
-            background: var(--color-warning-light);
-            color: var(--color-warning);
-        }
-        
-        .activity-icon.info {
-            background: var(--color-info-light);
-            color: var(--color-info);
-        }
-        
-        .activity-content {
-            flex: 1;
-        }
-        
-        .activity-title {
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: var(--space-1);
-        }
-        
-        .activity-description {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            margin-bottom: var(--space-1);
-        }
-        
-        .activity-time {
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-        }
-        
-        .data-table {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-        }
-        
-        .table-header {
-            padding: var(--space-6);
-            border-bottom: 1px solid var(--border-primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .table-filters {
-            display: flex;
-            gap: var(--space-3);
-            align-items: center;
-        }
-        
-        .filter-select {
-            padding: var(--space-2) var(--space-3);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-md);
-            background: var(--bg-primary);
-            font-size: var(--text-sm);
-        }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .table th,
-        .table td {
-            padding: var(--space-4);
-            text-align: left;
-            border-bottom: 1px solid var(--border-primary);
-        }
-        
-        .table th {
-            background: var(--bg-secondary);
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: var(--text-sm);
-        }
-        
-        .table td {
-            color: var(--text-secondary);
-            font-size: var(--text-sm);
-        }
-        
-        .table tbody tr:hover {
-            background: var(--bg-secondary);
-        }
-        
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-1);
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-full);
             font-size: var(--text-xs);
             font-weight: 500;
+            text-transform: uppercase;
         }
         
-        .status-badge.active {
+        .status-active {
             background: var(--color-success-light);
-            color: var(--color-success);
+            color: var(--color-success-dark);
         }
         
-        .status-badge.pending {
+        .status-pending {
             background: var(--color-warning-light);
-            color: var(--color-warning);
+            color: var(--color-warning-dark);
         }
         
-        .status-badge.inactive {
-            background: var(--color-error-light);
-            color: var(--color-error);
+        .status-completed {
+            background: var(--color-info-light);
+            color: var(--color-info-dark);
         }
         
-        .notification-panel {
-            position: fixed;
-            top: 0;
-            right: -400px;
-            width: 400px;
-            height: 100vh;
-            background: var(--bg-primary);
-            border-left: 1px solid var(--border-primary);
-            z-index: var(--z-modal);
-            transition: right var(--transition-normal);
-            overflow-y: auto;
+        .chart-container {
+            height: 300px;
+            position: relative;
         }
         
-        .notification-panel.open {
-            right: 0;
+        .quick-action {
+            background: var(--bg-card);
+            border: 2px dashed var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
         }
         
-        .notification-header {
-            padding: var(--space-6);
-            border-bottom: 1px solid var(--border-primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .quick-action:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
         }
         
-        .notification-list {
-            padding: var(--space-4);
-        }
-        
-        .notification-item {
-            padding: var(--space-4);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-3);
-            border: 1px solid var(--border-primary);
-            transition: all var(--transition-fast);
-        }
-        
-        .notification-item:hover {
-            background: var(--bg-secondary);
-        }
-        
-        .notification-item.unread {
-            border-left: 4px solid var(--color-primary);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .dashboard-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                z-index: var(--z-modal);
-                transition: left var(--transition-normal);
-            }
-            
-            .sidebar.open {
-                left: 0;
-            }
-            
-            .widget-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-bar {
-                min-width: 200px;
-            }
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-error);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
         
         @media (max-width: 768px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: stretch;
+            .dashboard-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(-100%);
             }
             
-            .dashboard-actions {
-                flex-direction: column;
+            .dashboard-sidebar.show {
+                transform: translateX(0);
             }
             
-            .search-bar {
-                min-width: auto;
+            .dashboard-main {
+                margin-left: 0;
             }
             
-            .notification-panel {
+            .dashboard-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
                 width: 100%;
-                right: -100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .dashboard-overlay.show {
+                display: block;
             }
         }
     </style>
 </head>
-<body>
-    <!-- Dashboard Layout -->
-    <div class="dashboard-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-robot"></i>
-                Biped
+<body class="bg-secondary">
+    <!-- Mobile Overlay -->
+    <div class="dashboard-overlay" id="dashboardOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar bg-primary fixed top-0 left-0 h-full z-50" id="dashboardSidebar">
+        <div class="p-6 border-b border-white border-opacity-20">
+            <div class="flex items-center space-x-3">
+                <img src="/static/biped-logo.png" alt="Biped" class="h-8 w-8">
+                <span class="text-xl font-bold text-white">Biped</span>
+                <span class="badge bg-white bg-opacity-20 text-white text-xs">Pro</span>
             </div>
-            
-            <nav>
-                <ul class="sidebar-nav">
-                    <li class="sidebar-nav-item">
-                        <a href="#overview" class="sidebar-nav-link active" data-section="overview">
-                            <i class="fas fa-chart-pie"></i>
-                            Overview
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="#projects" class="sidebar-nav-link" data-section="projects">
-                            <i class="fas fa-project-diagram"></i>
-                            Projects
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="#providers" class="sidebar-nav-link" data-section="providers">
-                            <i class="fas fa-users"></i>
-                            Providers
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="#analytics" class="sidebar-nav-link" data-section="analytics">
-                            <i class="fas fa-chart-line"></i>
-                            Analytics
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="#messages" class="sidebar-nav-link" data-section="messages">
-                            <i class="fas fa-comments"></i>
-                            Messages
-                            <span class="badge badge-info" style="margin-left: auto;">3</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a href="#settings" class="sidebar-nav-link" data-section="settings">
-                            <i class="fas fa-cog"></i>
-                            Settings
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <div style="margin-top: auto; padding-top: var(--space-8);">
-                <div style="padding: var(--space-4); background: var(--bg-secondary); border-radius: var(--radius-lg); text-align: center;">
-                    <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2);">
-                        AI Assistant
-                    </div>
-                    <button class="btn btn-primary btn-sm" style="width: 100%;">
-                        <i class="fas fa-robot"></i>
-                        Ask Biped AI
-                    </button>
+        </div>
+        
+        <!-- User Profile -->
+        <div class="p-6 border-b border-white border-opacity-20">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <div>
+                    <div class="text-white font-medium">John Smith</div>
+                    <div class="text-white text-sm opacity-75">Trade Professional</div>
                 </div>
             </div>
-        </aside>
+        </div>
         
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Dashboard Header -->
-            <header class="dashboard-header">
-                <div>
-                    <button class="btn btn-ghost mobile-menu-toggle" id="mobile-menu-toggle" style="display: none;">
+        <!-- Navigation -->
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#dashboard" class="nav-link active flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#jobs" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Jobs</span>
+                        <span class="notification-dot"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#messages" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-comments"></i>
+                        <span>Messages</span>
+                        <span class="badge bg-error text-white ml-auto">3</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#calendar" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#analytics" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#portfolio" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-images"></i>
+                        <span>Portfolio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#payments" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#settings" class="nav-link flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- AI Assistant -->
+        <div class="p-4 mt-auto">
+            <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="flex items-center space-x-2 mb-2">
+                    <i class="fas fa-robot text-white"></i>
+                    <span class="text-white font-medium">AI Assistant</span>
+                </div>
+                <p class="text-white text-sm opacity-75 mb-3">Need help? Ask me anything!</p>
+                <button class="btn btn-secondary btn-sm w-full">
+                    <i class="fas fa-comment mr-2"></i>
+                    Start Chat
+                </button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="dashboard-main" id="dashboardMain">
+        <!-- Top Bar -->
+        <header class="bg-primary shadow-lg sticky top-0 z-40">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="btn btn-ghost text-white lg:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1 class="dashboard-title">Dashboard Overview</h1>
+                    <h1 class="text-xl font-bold text-white">Dashboard</h1>
                 </div>
                 
-                <div class="dashboard-actions">
-                    <div class="search-bar">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Search projects, providers, or tasks...">
+                <div class="flex items-center space-x-4">
+                    <!-- Search -->
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search..." class="form-input bg-white bg-opacity-20 border-white border-opacity-30 text-white placeholder-white placeholder-opacity-75 w-64">
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-white opacity-75"></i>
                     </div>
                     
-                    <button id="theme-toggle" class="btn btn-ghost" data-tooltip="Toggle theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    
-                    <button class="btn btn-ghost" id="notifications-toggle" data-tooltip="Notifications">
+                    <!-- Notifications -->
+                    <button class="btn btn-ghost text-white relative">
                         <i class="fas fa-bell"></i>
-                        <span class="badge badge-error" style="position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px;">5</span>
+                        <span class="notification-dot"></span>
                     </button>
                     
-                    <div style="display: flex; align-items: center; gap: var(--space-3);">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" 
-                             alt="Profile" 
-                             style="width: 40px; height: 40px; border-radius: var(--radius-full); object-fit: cover;">
-                        <div style="display: flex; flex-direction: column;">
-                            <span style="font-size: var(--text-sm); font-weight: 500; color: var(--text-primary);">John Doe</span>
-                            <span style="font-size: var(--text-xs); color: var(--text-tertiary);">Admin</span>
+                    <!-- Theme Toggle (will be added by JS) -->
+                    
+                    <!-- Profile Menu -->
+                    <div class="relative" data-component="dropdown">
+                        <button data-dropdown-trigger class="flex items-center space-x-2 text-white hover:bg-white hover:bg-opacity-10 rounded-lg px-3 py-2 transition-colors">
+                            <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        <div data-dropdown-menu class="absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-xl border border-primary hidden">
+                            <a href="#profile" class="block px-4 py-2 text-primary hover:bg-secondary rounded-t-lg">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#settings" class="block px-4 py-2 text-primary hover:bg-secondary">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="#help" class="block px-4 py-2 text-primary hover:bg-secondary">
+                                <i class="fas fa-question-circle mr-2"></i>Help
+                            </a>
+                            <hr class="border-primary">
+                            <a href="#logout" class="block px-4 py-2 text-error hover:bg-secondary rounded-b-lg">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
                         </div>
                     </div>
                 </div>
-            </header>
-            
-            <!-- Dashboard Content -->
-            <div id="dashboard-content">
-                <!-- Overview Section -->
-                <section id="overview-section" class="dashboard-section">
-                    <!-- Stats Widgets -->
-                    <div class="widget-grid">
-                        <div class="widget stat-widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Active Projects</h3>
-                                <button class="widget-menu">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                            <span class="stat-value">247</span>
-                            <div class="stat-label">Currently in progress</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                +12% from last month
-                            </div>
-                        </div>
-                        
-                        <div class="widget stat-widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Total Revenue</h3>
-                                <button class="widget-menu">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                            <span class="stat-value">$89.2K</span>
-                            <div class="stat-label">This month</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                +8.5% from last month
-                            </div>
-                        </div>
-                        
-                        <div class="widget stat-widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Customer Satisfaction</h3>
-                                <button class="widget-menu">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                            <span class="stat-value">98.2%</span>
-                            <div class="stat-label">Average rating</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                +0.3% from last month
-                            </div>
-                        </div>
-                        
-                        <div class="widget stat-widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">AI Efficiency</h3>
-                                <button class="widget-menu">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                            <span class="stat-value">94.7%</span>
-                            <div class="stat-label">Automation success rate</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                +2.1% from last month
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Charts and Activity -->
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); margin-bottom: var(--space-8);">
-                        <div class="widget chart-widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Revenue Trends</h3>
-                                <div style="display: flex; gap: var(--space-2);">
-                                    <button class="btn btn-sm btn-ghost">7D</button>
-                                    <button class="btn btn-sm btn-primary">30D</button>
-                                    <button class="btn btn-sm btn-ghost">90D</button>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="widget">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Recent Activity</h3>
-                                <button class="widget-menu">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                            <div class="activity-feed">
-                                <div class="activity-item">
-                                    <div class="activity-icon success">
-                                        <i class="fas fa-check"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Project Completed</div>
-                                        <div class="activity-description">Kitchen renovation by Mike's Plumbing</div>
-                                        <div class="activity-time">2 hours ago</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="activity-item">
-                                    <div class="activity-icon info">
-                                        <i class="fas fa-user-plus"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">New Provider Joined</div>
-                                        <div class="activity-description">Elite Electrical Services verified</div>
-                                        <div class="activity-time">4 hours ago</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="activity-item">
-                                    <div class="activity-icon warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Quality Alert</div>
-                                        <div class="activity-description">AI detected potential issue in Project #1247</div>
-                                        <div class="activity-time">6 hours ago</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="activity-item">
-                                    <div class="activity-icon success">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">5-Star Review</div>
-                                        <div class="activity-description">Customer rated Sarah's Carpentry</div>
-                                        <div class="activity-time">8 hours ago</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Projects Table -->
-                    <div class="data-table">
-                        <div class="table-header">
-                            <h3 style="margin: 0;">Recent Projects</h3>
-                            <div class="table-filters">
-                                <select class="filter-select">
-                                    <option>All Status</option>
-                                    <option>Active</option>
-                                    <option>Completed</option>
-                                    <option>Pending</option>
-                                </select>
-                                <select class="filter-select">
-                                    <option>All Categories</option>
-                                    <option>Plumbing</option>
-                                    <option>Electrical</option>
-                                    <option>Carpentry</option>
-                                </select>
-                                <button class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                    New Project
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Customer</th>
-                                        <th>Provider</th>
-                                        <th>Status</th>
-                                        <th>Value</th>
-                                        <th>Progress</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight: 500; color: var(--text-primary);">Kitchen Renovation</div>
-                                            <div style="font-size: var(--text-xs); color: var(--text-tertiary);">#PRJ-1247</div>
-                                        </td>
-                                        <td>Sarah Johnson</td>
-                                        <td>Mike's Plumbing</td>
-                                        <td><span class="status-badge active">Active</span></td>
-                                        <td>$3,200</td>
-                                        <td>
-                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
-                                                <div style="flex: 1; height: 6px; background: var(--bg-secondary); border-radius: var(--radius-full); overflow: hidden;">
-                                                    <div style="width: 75%; height: 100%; background: var(--color-success);"></div>
-                                                </div>
-                                                <span style="font-size: var(--text-xs); color: var(--text-tertiary);">75%</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-ghost">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight: 500; color: var(--text-primary);">Electrical Upgrade</div>
-                                            <div style="font-size: var(--text-xs); color: var(--text-tertiary);">#PRJ-1246</div>
-                                        </td>
-                                        <td>David Chen</td>
-                                        <td>Elite Electrical</td>
-                                        <td><span class="status-badge pending">Pending</span></td>
-                                        <td>$1,800</td>
-                                        <td>
-                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
-                                                <div style="flex: 1; height: 6px; background: var(--bg-secondary); border-radius: var(--radius-full); overflow: hidden;">
-                                                    <div style="width: 25%; height: 100%; background: var(--color-warning);"></div>
-                                                </div>
-                                                <span style="font-size: var(--text-xs); color: var(--text-tertiary);">25%</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-ghost">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight: 500; color: var(--text-primary);">Deck Construction</div>
-                                            <div style="font-size: var(--text-xs); color: var(--text-tertiary);">#PRJ-1245</div>
-                                        </td>
-                                        <td>Emily Rodriguez</td>
-                                        <td>Sarah's Carpentry</td>
-                                        <td><span class="status-badge active">Active</span></td>
-                                        <td>$5,500</td>
-                                        <td>
-                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
-                                                <div style="flex: 1; height: 6px; background: var(--bg-secondary); border-radius: var(--radius-full); overflow: hidden;">
-                                                    <div style="width: 60%; height: 100%; background: var(--color-success);"></div>
-                                                </div>
-                                                <span style="font-size: var(--text-xs); color: var(--text-tertiary);">60%</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-ghost">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
             </div>
-        </main>
-    </div>
-    
-    <!-- Notification Panel -->
-    <div class="notification-panel" id="notification-panel">
-        <div class="notification-header">
-            <h3 style="margin: 0;">Notifications</h3>
-            <button class="btn btn-ghost btn-sm" id="close-notifications">
-                <i class="fas fa-times"></i>
-            </button>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="p-6">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-primary mb-2">Welcome back, John!</h2>
+                <p class="text-secondary">Here's what's happening with your business today.</p>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="widget metric-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-medium opacity-90">Active Jobs</h3>
+                            <div class="metric-value">12</div>
+                        </div>
+                        <i class="fas fa-briefcase text-3xl opacity-75"></i>
+                    </div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        +2 from last week
+                    </div>
+                </div>
+                
+                <div class="widget metric-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-medium opacity-90">Revenue</h3>
+                            <div class="metric-value">$8,450</div>
+                        </div>
+                        <i class="fas fa-dollar-sign text-3xl opacity-75"></i>
+                    </div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        +15% from last month
+                    </div>
+                </div>
+                
+                <div class="widget metric-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-medium opacity-90">Rating</h3>
+                            <div class="metric-value">4.9</div>
+                        </div>
+                        <i class="fas fa-star text-3xl opacity-75"></i>
+                    </div>
+                    <div class="metric-change">
+                        <i class="fas fa-minus mr-1"></i>
+                        No change
+                    </div>
+                </div>
+                
+                <div class="widget metric-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-medium opacity-90">Completion Rate</h3>
+                            <div class="metric-value">98%</div>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl opacity-75"></i>
+                    </div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        +3% from last month
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Activity -->
+                <div class="lg:col-span-2">
+                    <div class="widget">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-primary">Recent Activity</h3>
+                            <button class="btn btn-outline btn-sm">View All</button>
+                        </div>
+                        
+                        <div class="space-y-0">
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-success-light rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-success"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-medium text-primary">Job Completed</h4>
+                                            <span class="text-sm text-tertiary">2 hours ago</span>
+                                        </div>
+                                        <p class="text-secondary text-sm">Kitchen renovation at 123 Main St completed successfully</p>
+                                        <span class="status-badge status-completed">Completed</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-info-light rounded-full flex items-center justify-center">
+                                        <i class="fas fa-message text-info"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-medium text-primary">New Message</h4>
+                                            <span class="text-sm text-tertiary">4 hours ago</span>
+                                        </div>
+                                        <p class="text-secondary text-sm">Sarah Johnson sent you a message about bathroom tiles</p>
+                                        <span class="status-badge status-pending">Unread</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 bg-warning-light rounded-full flex items-center justify-center">
+                                        <i class="fas fa-clock text-warning"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-medium text-primary">Job Reminder</h4>
+                                            <span class="text-sm text-tertiary">6 hours ago</span>
+                                        </div>
+                                        <p class="text-secondary text-sm">Plumbing repair scheduled for tomorrow at 9:00 AM</p>
+                                        <span class="status-badge status-pending">Upcoming</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="space-y-6">
+                    <div class="widget">
+                        <h3 class="text-xl font-bold text-primary mb-6">Quick Actions</h3>
+                        
+                        <div class="space-y-4">
+                            <button class="quick-action w-full" onclick="showModal('newJobModal')">
+                                <i class="fas fa-plus text-2xl text-primary mb-2"></i>
+                                <div class="font-medium text-primary">Create New Job</div>
+                                <div class="text-sm text-secondary">Start a new project</div>
+                            </button>
+                            
+                            <button class="quick-action w-full" onclick="showModal('scheduleModal')">
+                                <i class="fas fa-calendar-plus text-2xl text-primary mb-2"></i>
+                                <div class="font-medium text-primary">Schedule Appointment</div>
+                                <div class="text-sm text-secondary">Book a time slot</div>
+                            </button>
+                            
+                            <button class="quick-action w-full" onclick="showModal('invoiceModal')">
+                                <i class="fas fa-file-invoice text-2xl text-primary mb-2"></i>
+                                <div class="font-medium text-primary">Send Invoice</div>
+                                <div class="text-sm text-secondary">Create and send bill</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Insights -->
+                    <div class="widget">
+                        <h3 class="text-xl font-bold text-primary mb-4">AI Insights</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="p-4 bg-info-light rounded-lg">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-lightbulb text-info"></i>
+                                    <div>
+                                        <h4 class="font-medium text-info-dark">Optimization Tip</h4>
+                                        <p class="text-sm text-info-dark opacity-75">Consider raising your hourly rate by 10% based on your excellent reviews and completion rate.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-success-light rounded-lg">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-trending-up text-success"></i>
+                                    <div>
+                                        <h4 class="font-medium text-success-dark">Growth Opportunity</h4>
+                                        <p class="text-sm text-success-dark opacity-75">Kitchen renovations are trending in your area. Consider highlighting this service.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                <div class="widget">
+                    <h3 class="text-xl font-bold text-primary mb-6">Revenue Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <h3 class="text-xl font-bold text-primary mb-6">Job Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="jobChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="notification-list">
-            <div class="notification-item unread">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-2);">
-                    <div style="font-weight: 500; color: var(--text-primary);">New Project Request</div>
-                    <div style="font-size: var(--text-xs); color: var(--text-tertiary);">5m ago</div>
-                </div>
-                <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2);">
-                    Kitchen renovation request from Sarah Johnson in Downtown area.
-                </div>
-                <div style="display: flex; gap: var(--space-2);">
-                    <button class="btn btn-sm btn-primary">View</button>
-                    <button class="btn btn-sm btn-ghost">Dismiss</button>
-                </div>
+    </main>
+    
+    <!-- Modals -->
+    <div id="newJobModal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Job</h3>
+                <button class="modal-close" data-modal-close>
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            
-            <div class="notification-item unread">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-2);">
-                    <div style="font-weight: 500; color: var(--text-primary);">Quality Alert</div>
-                    <div style="font-size: var(--text-xs); color: var(--text-tertiary);">15m ago</div>
-                </div>
-                <div style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-2);">
-                    AI detected potential quality issue in Project #1247. Review required.
-                </div>
-                <div style="display: flex; gap: var(--space-2);">
-                    <button class="btn btn-sm btn-warning">Review</button>
-                    <button class="btn btn-sm btn-ghost">Dismiss</button>
-                </div>
+            <div class="modal-body">
+                <form id="newJobForm">
+                    <div class="form-group">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" class="form-input" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" name="description" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="plumbing">Plumbing</option>
+                                    <option value="electrical">Electrical</option>
+                                    <option value="carpentry">Carpentry</option>
+                                    <option value="painting">Painting</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label">Budget</label>
+                                <input type="number" class="form-input" name="budget" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" name="location" required>
+                    </div>
+                </form>
             </div>
-            
-            <div class="notification-item">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-2);">
-                    <div style="font-weight: 500; color: var(--text-primary);">Payment Received</div>
-                    <div style="font-size: var(--text-xs); color: var(--text-tertiary);">1h ago</div>
-                </div>
-                <div style="font-size: var(--text-sm); color: var(--text-secondary);">
-                    $3,200 payment received for Project #1246.
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+                <button type="submit" form="newJobForm" class="btn btn-primary">Create Job</button>
             </div>
         </div>
     </div>
     
     <!-- Scripts -->
-    <script src="/js/design-system.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/design-system.js"></script>
+    
     <script>
-        // Dashboard initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDashboard();
-            initializeCharts();
-            setupEventListeners();
-        });
-        
-        function initializeDashboard() {
-            // Mobile menu toggle
-            const mobileToggle = document.getElementById('mobile-menu-toggle');
-            const sidebar = document.getElementById('sidebar');
+        // Dashboard-specific JavaScript
+        function toggleSidebar() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboardMain');
+            const overlay = document.getElementById('dashboardOverlay');
             
-            if (window.innerWidth <= 1024) {
-                mobileToggle.style.display = 'block';
+            if (window.innerWidth <= 768) {
+                // Mobile behavior
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            } else {
+                // Desktop behavior
+                sidebar.classList.toggle('collapsed');
+                main.classList.toggle('expanded');
             }
-            
-            mobileToggle?.addEventListener('click', () => {
-                sidebar.classList.toggle('open');
-            });
-            
-            // Notification panel toggle
-            const notificationsToggle = document.getElementById('notifications-toggle');
-            const notificationPanel = document.getElementById('notification-panel');
-            const closeNotifications = document.getElementById('close-notifications');
-            
-            notificationsToggle?.addEventListener('click', () => {
-                notificationPanel.classList.toggle('open');
-            });
-            
-            closeNotifications?.addEventListener('click', () => {
-                notificationPanel.classList.remove('open');
-            });
-            
-            // Sidebar navigation
-            const navLinks = document.querySelectorAll('.sidebar-nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    // Update active state
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                    
-                    // Update dashboard title
-                    const section = link.getAttribute('data-section');
-                    const title = document.querySelector('.dashboard-title');
-                    title.textContent = `Dashboard ${section.charAt(0).toUpperCase() + section.slice(1)}`;
-                    
-                    // Show notification for demo
-                    bipedDS.showNotification(`Switched to ${section} section`, 'info');
-                });
-            });
-            
-            // Search functionality
-            const searchInput = document.querySelector('.search-input');
-            searchInput?.addEventListener('input', debounce((e) => {
-                const query = e.target.value;
-                if (query.length > 2) {
-                    // Simulate search
-                    bipedDS.showNotification(`Searching for "${query}"...`, 'info', 2000);
-                }
-            }, 300));
-            
-            // Real-time updates simulation
-            setInterval(() => {
-                updateRealTimeData();
-            }, 30000); // Update every 30 seconds
         }
         
-        function initializeCharts() {
+        // Initialize charts
+        function initCharts() {
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart');
             if (revenueCtx) {
                 new Chart(revenueCtx, {
                     type: 'line',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                         datasets: [{
                             label: 'Revenue',
-                            data: [65000, 72000, 68000, 78000, 82000, 85000, 89200],
+                            data: [3000, 4500, 3800, 5200, 6100, 8450],
                             borderColor: '#1e40af',
                             backgroundColor: 'rgba(30, 64, 175, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
+                            tension: 0.4,
+                            fill: true
                         }]
                     },
                     options: {
@@ -961,15 +644,38 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return '$' + (value / 1000) + 'K';
+                                        return '$' + value.toLocaleString();
                                     }
                                 }
                             }
-                        },
-                        elements: {
-                            point: {
-                                radius: 6,
-                                hoverRadius: 8
+                        }
+                    }
+                });
+            }
+            
+            // Job Distribution Chart
+            const jobCtx = document.getElementById('jobChart');
+            if (jobCtx) {
+                new Chart(jobCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Plumbing', 'Electrical', 'Carpentry', 'Painting'],
+                        datasets: [{
+                            data: [35, 25, 25, 15],
+                            backgroundColor: [
+                                '#1e40af',
+                                '#0d9488',
+                                '#8b5cf6',
+                                '#f59e0b'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
                             }
                         }
                     }
@@ -977,82 +683,86 @@
             }
         }
         
-        function setupEventListeners() {
-            // Widget menu interactions
-            document.querySelectorAll('.widget-menu').forEach(menu => {
-                menu.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    bipedDS.showNotification('Widget menu clicked', 'info', 2000);
+        // Navigation handling
+        function handleNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    link.classList.add('active');
+                    
+                    // Handle navigation logic here
+                    const href = link.getAttribute('href');
+                    console.log('Navigate to:', href);
                 });
             });
-            
-            // Table row interactions
-            document.querySelectorAll('.table tbody tr').forEach(row => {
-                row.addEventListener('click', () => {
-                    const projectName = row.querySelector('td:first-child div').textContent;
-                    bipedDS.showNotification(`Viewing ${projectName}`, 'info', 2000);
+        }
+        
+        // Form handling
+        function handleForms() {
+            const newJobForm = document.getElementById('newJobForm');
+            if (newJobForm) {
+                newJobForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(newJobForm);
+                    const jobData = Object.fromEntries(formData);
+                    
+                    console.log('Creating job:', jobData);
+                    
+                    // Show success notification
+                    designSystem.showNotification('Job created successfully!', 'success');
+                    
+                    // Close modal
+                    designSystem.closeModal('newJobModal');
+                    
+                    // Reset form
+                    newJobForm.reset();
                 });
-            });
-            
-            // Filter changes
-            document.querySelectorAll('.filter-select').forEach(select => {
-                select.addEventListener('change', (e) => {
-                    bipedDS.showNotification(`Filter applied: ${e.target.value}`, 'info', 2000);
-                });
-            });
-            
-            // Responsive handling
-            window.addEventListener('resize', () => {
-                const mobileToggle = document.getElementById('mobile-menu-toggle');
-                if (window.innerWidth <= 1024) {
-                    mobileToggle.style.display = 'block';
-                } else {
-                    mobileToggle.style.display = 'none';
-                    document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+        
+        // Real-time updates simulation
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                const notifications = [
+                    { message: 'New job inquiry received', type: 'info' },
+                    { message: 'Payment received for Job #1234', type: 'success' },
+                    { message: 'Reminder: Meeting in 30 minutes', type: 'warning' }
+                ];
+                
+                const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+                
+                if (Math.random() > 0.8) { // 20% chance every interval
+                    designSystem.showNotification(randomNotification.message, randomNotification.type);
                 }
-            });
+            }, 10000); // Every 10 seconds
         }
         
-        function updateRealTimeData() {
-            // Simulate real-time data updates
-            const statValues = document.querySelectorAll('.stat-value');
-            statValues.forEach(stat => {
-                // Add subtle animation to indicate update
-                stat.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    stat.style.transform = 'scale(1)';
-                }, 200);
-            });
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            handleNavigation();
+            handleForms();
+            simulateRealTimeUpdates();
             
-            // Show update notification
-            bipedDS.showNotification('Dashboard data updated', 'success', 3000);
-        }
+            console.log('🚀 Dashboard initialized');
+        });
         
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 'k':
-                        e.preventDefault();
-                        document.querySelector('.search-input').focus();
-                        break;
-                    case 'n':
-                        e.preventDefault();
-                        document.getElementById('notifications-toggle').click();
-                        break;
-                }
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboardMain');
+            const overlay = document.getElementById('dashboardOverlay');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
             }
         });
     </script>
