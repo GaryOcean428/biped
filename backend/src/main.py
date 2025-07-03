@@ -257,8 +257,8 @@ def admin_dashboard():
 
 @app.route('/dashboard')
 def enhanced_dashboard():
-    """Serve the enhanced dashboard"""
-    return send_from_directory('static', 'dashboard-enhanced.html')
+    """Serve the trades marketplace dashboard"""
+    return send_from_directory('static', 'dashboard.html')
 
 @app.route('/api/metrics')
 @security_enhancer.api_rate_limit

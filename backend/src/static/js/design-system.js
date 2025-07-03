@@ -121,8 +121,13 @@ class BipedDesignSystem {
         });
     }
 
-    // Real-time Features
+    // Real-time Features (Disabled for now to prevent connection errors)
     initWebSocket() {
+        // WebSocket functionality disabled to prevent connection errors
+        // TODO: Implement proper WebSocket server endpoint
+        console.log('🔌 WebSocket functionality disabled');
+        return;
+        
         if (!window.WebSocket) return;
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
