@@ -818,6 +818,230 @@ class TabsComponent {
     }
 }
 
+// Accordion Component
+class AccordionComponent {
+    constructor(element) {
+        this.element = element;
+        this.init();
+    }
+
+    init() {
+        const headers = this.element.querySelectorAll('[data-accordion-header]');
+        headers.forEach(header => {
+            header.addEventListener('click', (e) => {
+                this.toggle(e.target.closest('[data-accordion-item]'));
+            });
+        });
+    }
+
+    toggle(item) {
+        const content = item.querySelector('[data-accordion-content]');
+        const isOpen = item.classList.contains('open');
+        
+        if (isOpen) {
+            item.classList.remove('open');
+            content.style.maxHeight = null;
+        } else {
+            item.classList.add('open');
+            content.style.maxHeight = content.scrollHeight + 'px';
+        }
+    }
+}
+
+// Carousel Component
+class CarouselComponent {
+    constructor(element) {
+        this.element = element;
+        this.currentSlide = 0;
+        this.slides = this.element.querySelectorAll('[data-slide]');
+        this.init();
+    }
+
+    init() {
+        const prevBtn = this.element.querySelector('[data-carousel-prev]');
+        const nextBtn = this.element.querySelector('[data-carousel-next]');
+        
+        if (prevBtn) prevBtn.addEventListener('click', () => this.prev());
+        if (nextBtn) nextBtn.addEventListener('click', () => this.next());
+        
+        this.updateSlides();
+    }
+
+    next() {
+        this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+        this.updateSlides();
+    }
+
+    prev() {
+        this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+        this.updateSlides();
+    }
+
+    updateSlides() {
+        this.slides.forEach((slide, index) => {
+            slide.classList.toggle('active', index === this.currentSlide);
+        });
+    }
+}
+
+// DatePicker Component
+class DatePickerComponent {
+    constructor(element) {
+        this.element = element;
+        this.input = element.querySelector('input[type="date"]') || element;
+        this.init();
+    }
+
+    init() {
+        if (!this.input.type || this.input.type !== 'date') {
+            this.input.type = 'date';
+        }
+        
+        this.input.addEventListener('change', (e) => {
+            this.onDateChange(e.target.value);
+        });
+    }
+
+    onDateChange(value) {
+        this.element.dispatchEvent(new CustomEvent('datechange', {
+            detail: { value }
+        }));
+    }
+
+    setValue(date) {
+        this.input.value = date;
+    }
+
+    getValue() {
+        return this.input.value;
+    }
+}
+
+// FileUpload Component
+class FileUploadComponent {
+    constructor(element) {
+        this.element = element;
+        this.input = element.querySelector('input[type="file"]');
+        this.dropZone = element.querySelector('[data-drop-zone]');
+        this.init();
+    }
+
+    init() {
+        if (this.input) {
+            this.input.addEventListener('change', (e) => this.handleFiles(e.target.files));
+        }
+
+        if (this.dropZone) {
+            this.dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                this.dropZone.classList.add('drag-over');
+            });
+
+            this.dropZone.addEventListener('dragleave', () => {
+                this.dropZone.classList.remove('drag-over');
+            });
+
+            this.dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                this.dropZone.classList.remove('drag-over');
+                this.handleFiles(e.dataTransfer.files);
+            });
+        }
+    }
+
+    handleFiles(files) {
+        Array.from(files).forEach(file => {
+            this.element.dispatchEvent(new CustomEvent('fileselected', {
+                detail: { file }
+            }));
+        });
+    }
+}
+
+// Chart Component
+class ChartComponent {
+    constructor(element) {
+        this.element = element;
+        this.canvas = element.querySelector('canvas');
+        this.data = JSON.parse(element.dataset.chartData || '{}');
+        this.type = element.dataset.chartType || 'line';
+        this.init();
+    }
+
+    init() {
+        if (this.canvas) {
+            this.renderChart();
+        }
+    }
+
+    renderChart() {
+        // Basic chart rendering - in a real implementation, you'd use Chart.js or similar
+        const ctx = this.canvas.getContext('2d');
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Simple line chart implementation
+        if (this.type === 'line' && this.data.datasets) {
+            this.drawLineChart(ctx, width, height);
+        }
+    }
+
+    drawLineChart(ctx, width, height) {
+        const padding = 40;
+        const chartWidth = width - 2 * padding;
+        const chartHeight = height - 2 * padding;
+        
+        // Draw axes
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        
+        // Y-axis
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.stroke();
+        
+        // X-axis
+        ctx.beginPath();
+        ctx.moveTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.stroke();
+        
+        // Draw data if available
+        if (this.data.datasets && this.data.datasets.length > 0) {
+            const dataset = this.data.datasets[0];
+            const points = dataset.data || [];
+            
+            if (points.length > 1) {
+                ctx.strokeStyle = dataset.borderColor || '#3b82f6';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                points.forEach((point, index) => {
+                    const x = padding + (index / (points.length - 1)) * chartWidth;
+                    const y = height - padding - (point / 100) * chartHeight; // Assuming 0-100 scale
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+            }
+        }
+    }
+
+    updateData(newData) {
+        this.data = newData;
+        this.renderChart();
+    }
+}
+
 // Initialize the design system
 const designSystem = new BipedDesignSystem();
 
