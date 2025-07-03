@@ -27,7 +27,14 @@ def handle_not_found(error):
 @app.route('/')
 def index():
     """Serve the PUBLIC landing page - NOT the dashboard"""
-    return send_from_directory('static', 'index.html')
+    # EXPLICIT OVERRIDE - Force serving the correct landing page
+    # This ensures the root URL always shows the public landing page
+    return send_from_directory('static', 'landing.html')
+
+@app.route('/landing')
+def landing():
+    """Explicit landing page route"""
+    return send_from_directory('static', 'landing.html')
 
 @app.route('/health')
 def health_check():
