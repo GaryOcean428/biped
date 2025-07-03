@@ -281,10 +281,10 @@ def security_status():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
-    """Serve React frontend with proper routing support and MIME types"""
+    """Serve trades marketplace interface with proper routing support"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
-    # Handle API routes - don't serve React for these
+    # Handle API routes - don't serve HTML for these
     if path.startswith('api/'):
         return jsonify({'error': 'API endpoint not found'}), 404
     
@@ -324,26 +324,45 @@ def serve_react_app(path):
                 response.headers['Content-Type'] = mimetype
             return response
     
-    # Handle React routes - serve index.html for all non-API routes
-    index_path = os.path.join(static_folder_path, 'index.html')
-    if os.path.exists(index_path):
-        return send_from_directory(static_folder_path, 'index.html')
+    # Serve the correct trades marketplace interface
+    # Route specific pages to their corresponding HTML files
+    if path == 'jobs' or path == 'post-job':
+        return send_from_directory(static_folder_path, 'enhanced-job-posting.html')
+    elif path == 'providers' or path == 'provider-dashboard':
+        return send_from_directory(static_folder_path, 'provider-dashboard.html')
+    elif path == 'admin':
+        return send_from_directory(static_folder_path, 'admin.html')
+    elif path == 'mobile':
+        return send_from_directory(static_folder_path, 'mobile.html')
     
-    # Fallback to enhanced dashboard if React build not available
-    dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+    # Serve the main trades marketplace dashboard for all other routes
+    dashboard_path = os.path.join(static_folder_path, 'dashboard.html')
     if os.path.exists(dashboard_path):
+        return send_from_directory(static_folder_path, 'dashboard.html')
+    
+    # Fallback to enhanced dashboard
+    enhanced_dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+    if os.path.exists(enhanced_dashboard_path):
         return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
     
     # Final fallback
     return jsonify({
-        'message': 'Biped Platform API',
+        'message': 'Biped Trades Marketplace',
         'version': '2.0',
         'status': 'operational',
+        'description': 'Connecting customers with trusted service providers',
+        'features': [
+            'Job posting and management',
+            'Provider profiles and verification', 
+            'Instant price estimates',
+            'Secure payment processing',
+            'Mobile-first design'
+        ],
         'endpoints': {
             'health': '/health',
-            'analytics': '/api/analytics',
-            'vision': '/api/vision',
-            'dashboard': '/analytics-dashboard.html'
+            'jobs': '/jobs',
+            'providers': '/providers',
+            'services': '/api/services'
         }
     }), 200
 
