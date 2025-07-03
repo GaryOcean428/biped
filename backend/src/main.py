@@ -347,11 +347,10 @@ def serve_react_app(path):
         return send_from_directory(static_folder_path, 'mobile.html')
     
     # Serve the main trades marketplace dashboard for all other routes
-    # For homepage, serve the enhanced dashboard which has the correct trades marketplace interface
+    # For homepage, redirect to the working dashboard route
     if path == '' or path == 'home':
-        enhanced_dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
-        if os.path.exists(enhanced_dashboard_path):
-            return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+        from flask import redirect
+        return redirect('/dashboard')
     
     # For other routes, serve the regular dashboard
     dashboard_path = os.path.join(static_folder_path, 'dashboard.html')
