@@ -292,6 +292,15 @@ def serve_react_app(path):
     if path and '.' in path:
         # Check if file exists in the static directory
         file_path = os.path.join(static_folder_path, path)
+        
+        # Handle legacy /css/ paths by redirecting to /static/css/
+        if path.startswith('css/') and not os.path.exists(file_path):
+            # Try the /static/css/ path instead
+            static_path = 'static/' + path
+            file_path = os.path.join(static_folder_path, static_path)
+            if os.path.exists(file_path):
+                path = static_path
+        
         if os.path.exists(file_path):
             # Determine MIME type based on file extension
             mimetype = None
