@@ -26,32 +26,43 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class MarketDataPoint:
-    """Market data point structure"""
-    symbol: str
+    """Service market data point structure"""
+    service_category: str
     timestamp: datetime
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: float
-    vwap: float
-    bid: float
-    ask: float
-    spread: float
+    avg_price: float
+    high_price: float
+    low_price: float
+    total_jobs: int
+    active_providers: int
+    demand_index: float
+    quote_response_rate: float
+    avg_completion_time: float
+    customer_satisfaction: float
 
 @dataclass
-class TradeEvent:
-    """Trade event structure"""
-    trade_id: str
-    user_id: str
-    symbol: str
-    side: str  # 'buy' or 'sell'
-    quantity: float
-    price: float
+class JobEvent:
+    """Job event structure"""
+    job_id: str
+    customer_id: str
+    provider_id: str
+    service_category: str
+    job_type: str  # 'quote_requested', 'quote_provided', 'job_started', 'job_completed'
+    job_value: float
     timestamp: datetime
-    order_type: str
-    commission: float
+    location: str
     metadata: Dict[str, Any]
+
+@dataclass  
+class ServiceDataPoint:
+    """Service data point structure"""
+    service_category: str
+    timestamp: datetime
+    avg_quote_price: float
+    job_count: int
+    completion_rate: float
+    avg_rating: float
+    provider_count: int
+    demand_score: float
 
 @dataclass
 class AnalyticsMetrics:
@@ -168,68 +179,68 @@ class RealTimeDataProcessor:
                 
             await asyncio.sleep(5)  # Process every 5 seconds
     
-    def _calculate_trade_impact(self, trade) -> float:
-        """Calculate the market impact of a trade"""
+    def _calculate_job_impact(self, job) -> float:
+        """Calculate the market impact of a job"""
         try:
-            # Simple impact calculation based on trade size and market conditions
-            base_impact = trade.quantity * trade.price / 1000000  # Normalize by $1M
+            # Simple impact calculation based on job value and market conditions
+            base_impact = job.job_value / 100000  # Normalize by $100K for services
             
-            # Adjust for market volatility (simulated)
-            volatility_factor = 1.0  # Would be calculated from market data
+            # Adjust for service category volatility (simulated)
+            volatility_factor = 1.0  # Would be calculated from service market data
             
             return base_impact * volatility_factor
         except Exception as e:
-            logger.error(f"Error calculating trade impact: {e}")
+            logger.error(f"Error calculating job impact: {e}")
             return 0.0
     
-    def _detect_trade_anomaly(self, trade) -> float:
-        """Detect if a trade is anomalous (returns score 0-1)"""
+    def _detect_job_anomaly(self, job) -> float:
+        """Detect if a job is anomalous (returns score 0-1)"""
         try:
-            # Simple anomaly detection based on trade size
-            if trade.quantity * trade.price > 100000:  # Large trade threshold
+            # Simple anomaly detection based on job value
+            if hasattr(job, 'job_value') and job.job_value > 10000:  # Large job threshold
                 return 0.9
-            elif trade.quantity * trade.price > 50000:
+            elif hasattr(job, 'job_value') and job.job_value > 5000:
                 return 0.6
             else:
                 return 0.1
         except Exception as e:
-            logger.error(f"Error detecting trade anomaly: {e}")
+            logger.error(f"Error detecting job anomaly: {e}")
             return 0.0
     
-    async def _update_user_analytics(self, user_id: str, trade):
-        """Update user analytics with new trade"""
+    async def _update_provider_analytics(self, provider_id: str, job):
+        """Update provider analytics with new job"""
         try:
-            # Cache user trade data
+            # Cache provider job data
             if self.cache_service:
-                user_key = f"user_trades:{user_id}"
-                # In production, this would update user analytics
-                logger.debug(f"Updated analytics for user {user_id}")
+                provider_key = f"provider_jobs:{provider_id}"
+                # In production, this would update provider analytics
+                logger.debug(f"Updated analytics for provider {provider_id}")
         except Exception as e:
-            logger.error(f"Error updating user analytics: {e}")
+            logger.error(f"Error updating provider analytics: {e}")
     
-    async def _flag_suspicious_trade(self, trade, anomaly_score: float):
-        """Flag a suspicious trade for review"""
+    async def _flag_suspicious_job(self, job, anomaly_score: float):
+        """Flag a suspicious job for review"""
         try:
-            suspicious_trade = {
-                'trade_id': getattr(trade, 'id', 'unknown'),
-                'user_id': trade.user_id,
-                'symbol': trade.symbol,
-                'quantity': trade.quantity,
-                'price': trade.price,
+            suspicious_job = {
+                'job_id': getattr(job, 'job_id', 'unknown'),
+                'customer_id': getattr(job, 'customer_id', 'unknown'),
+                'provider_id': getattr(job, 'provider_id', 'unknown'),
+                'service_category': getattr(job, 'service_category', 'unknown'),
+                'job_value': getattr(job, 'job_value', 0),
                 'anomaly_score': anomaly_score,
-                'timestamp': trade.timestamp.isoformat(),
+                'timestamp': getattr(job, 'timestamp', datetime.utcnow()).isoformat() if hasattr(getattr(job, 'timestamp', datetime.utcnow()), 'isoformat') else str(getattr(job, 'timestamp', datetime.utcnow())),
                 'flagged_at': datetime.utcnow().isoformat()
             }
             
             if self.cache_service:
                 try:
-                    self.cache_service.set(f"suspicious_trade:{trade.user_id}", suspicious_trade, timeout=3600)
+                    self.cache_service.set(f"suspicious_job:{getattr(job, 'provider_id', 'unknown')}", suspicious_job, timeout=3600)
                 except Exception as cache_error:
                     logger.debug(f"Cache storage failed: {cache_error}")
             
-            logger.warning(f"Flagged suspicious trade: {suspicious_trade}")
+            logger.warning(f"Flagged suspicious job: {suspicious_job}")
         except Exception as e:
-            logger.error(f"Error flagging suspicious trade: {e}")
+            logger.error(f"Error flagging suspicious job: {e}")
     
     async def _calculate_real_time_metrics(self):
         """Calculate real-time metrics for all active symbols"""
@@ -342,7 +353,7 @@ class RealTimeDataProcessor:
     
     async def _fetch_market_data(self) -> Dict[str, MarketDataPoint]:
         """Fetch market data (simulated for demo)"""
-        symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA', 'MSFT']
+        service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping', 'Cleaning']
         market_data = {}
         
         for symbol in symbols:
@@ -367,68 +378,69 @@ class RealTimeDataProcessor:
             
         return market_data
     
-    def _get_base_price(self, symbol: str) -> float:
-        """Get base price for symbol (simulated)"""
+    def _get_base_price(self, service_category: str) -> float:
+        """Get base price for service category (simulated)"""
         base_prices = {
-            'BTC/USD': 45000,
-            'ETH/USD': 3000,
-            'AAPL': 150,
-            'GOOGL': 2800,
-            'TSLA': 250,
-            'MSFT': 350
+            'Plumbing': 250,
+            'Electrical': 350,
+            'Carpentry': 400,
+            'Painting': 45,
+            'Landscaping': 800,
+            'Cleaning': 40
         }
-        return base_prices.get(symbol, 100)
+        return base_prices.get(service_category, 200)
     
-    async def _fetch_recent_trades(self) -> List:
-        """Fetch recent trades (simulated for demo)"""
-        # In production, this would query the database
-        trades = []
-        symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL']
+    async def _fetch_recent_jobs(self) -> List:
+        """Fetch recent job completions (simulated for demo)"""
+        # In production, this would query the database for completed jobs
+        jobs = []
+        service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping', 'Cleaning']
         
-        for _ in range(5):  # Simulate 5 recent trades
-            trade = type('Trade', (), {
-                'symbol': np.random.choice(symbols),
-                'side': np.random.choice(['buy', 'sell']),
-                'quantity': np.random.uniform(0.1, 10),
-                'price': np.random.uniform(100, 50000),
+        for _ in range(5):  # Simulate 5 recent job completions
+            job = type('Job', (), {
+                'service_category': np.random.choice(service_categories),
+                'job_type': np.random.choice(['quoted', 'completed']),
+                'job_value': np.random.uniform(100, 5000),
+                'quote_price': np.random.uniform(100, 5000),
                 'timestamp': datetime.utcnow(),
-                'user_id': f"user_{np.random.randint(1, 100)}"
+                'customer_id': f"customer_{np.random.randint(1, 100)}",
+                'provider_id': f"provider_{np.random.randint(1, 50)}"
             })()
-            trades.append(trade)
+            jobs.append(job)
         
-        return trades
+        return jobs
     
     async def _detect_anomalies(self):
-        """Detect anomalies in market data and trading patterns"""
+        """Detect anomalies in job pricing and service patterns"""
         while self.is_running:
             try:
-                # Check for unusual price movements
-                for symbol in ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL']:
-                    buffer_key = f"market:{symbol}"
+                # Check for unusual pricing patterns
+                for service_category in ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping', 'Cleaning']:
+                    buffer_key = f"service:{service_category}"
                     if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) > 10:
                         recent_data = self.data_buffer[buffer_key][-10:]
-                        prices = [point.close for point in recent_data]
+                        prices = [job.quote_price for job in recent_data if hasattr(job, 'quote_price')]
                         
-                        # Calculate price volatility
+                        # Calculate price volatility for service quotes
                         if len(prices) >= 2:
                             price_changes = [abs((prices[i] - prices[i-1]) / prices[i-1]) for i in range(1, len(prices))]
                             avg_volatility = np.mean(price_changes)
                             
-                            # Flag if volatility is unusually high
-                            if avg_volatility > 0.05:  # 5% threshold
-                                logger.warning(f"High volatility detected for {symbol}: {avg_volatility:.2%}")
+                            # Flag if pricing volatility is unusually high (could indicate price manipulation)
+                            if avg_volatility > 0.25:  # 25% threshold for service pricing
+                                logger.warning(f"High pricing volatility detected for {service_category}: {avg_volatility:.2%}")
                                 
                                 # Store anomaly
                                 anomaly = {
-                                    'type': 'high_volatility',
-                                    'symbol': symbol,
+                                    'type': 'high_pricing_volatility',
+                                    'service_category': service_category,
                                     'volatility': avg_volatility,
                                     'timestamp': datetime.utcnow().isoformat()
                                 }
                                 
                                 if self.cache_service:
                                     try:
-                                        self.cache_service.set(f"anomaly:{symbol}", anomaly, timeout=300)
+                                        self.cache_service.set(f"anomaly:{service_category}", anomaly, timeout=300)
                                     except Exception as cache_error:
                                         logger.debug(f"Cache storage failed: {cache_error}")
                 
@@ -470,72 +482,72 @@ class RealTimeDataProcessor:
             await asyncio.sleep(300)  # Update every 5 minutes
     
     async def _calculate_top_movers(self) -> Dict:
-        """Calculate top moving symbols"""
-        movers = {'gainers': [], 'losers': []}
+        """Calculate top moving service categories"""
+        movers = {'price_increases': [], 'price_decreases': []}
         
-        for symbol in ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA', 'MSFT']:
-            buffer_key = f"market:{symbol}"
+        for service_category in ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping', 'Cleaning']:
+            buffer_key = f"service:{service_category}"
             if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) >= 2:
                 recent_data = self.data_buffer[buffer_key][-2:]
                 if len(recent_data) >= 2:
-                    price_change = ((recent_data[-1].close - recent_data[0].close) / recent_data[0].close) * 100
+                    price_change = ((recent_data[-1].avg_price - recent_data[0].avg_price) / recent_data[0].avg_price) * 100
                     
                     mover_data = {
-                        'symbol': symbol,
-                        'price': recent_data[-1].close,
+                        'service_category': service_category,
+                        'avg_price': recent_data[-1].avg_price,
                         'change_percent': price_change,
-                        'volume': recent_data[-1].volume
+                        'job_count': recent_data[-1].total_jobs
                     }
                     
                     if price_change > 0:
-                        movers['gainers'].append(mover_data)
+                        movers['price_increases'].append(mover_data)
                     else:
-                        movers['losers'].append(mover_data)
+                        movers['price_decreases'].append(mover_data)
         
         # Sort by change percentage
-        movers['gainers'] = sorted(movers['gainers'], key=lambda x: x['change_percent'], reverse=True)[:5]
-        movers['losers'] = sorted(movers['losers'], key=lambda x: x['change_percent'])[:5]
+        movers['price_increases'] = sorted(movers['price_increases'], key=lambda x: x['change_percent'], reverse=True)[:5]
+        movers['price_decreases'] = sorted(movers['price_decreases'], key=lambda x: x['change_percent'])[:5]
         
         return movers
 
 class BusinessIntelligenceEngine:
-    """Business Intelligence and Reporting Engine"""
+    """Business Intelligence and Reporting Engine for Trade Services"""
     
     def __init__(self, cache_service: TradingCacheService):
         self.cache_service = cache_service
         self.report_cache = {}
         
-    async def generate_portfolio_analytics(self, user_id: str) -> Dict:
-        """Generate comprehensive portfolio analytics"""
+    async def generate_provider_analytics(self, provider_id: str) -> Dict:
+        """Generate comprehensive provider analytics"""
         try:
-            # Get user positions and trades
-            positions = await self._get_user_positions(user_id)
-            trades = await self._get_user_trades(user_id, days=30)
+            # Get provider jobs and performance data
+            jobs = await self._get_provider_jobs(provider_id)
+            quotes = await self._get_provider_quotes(provider_id, days=30)
             
             analytics = {
-                'user_id': user_id,
+                'provider_id': provider_id,
                 'timestamp': datetime.utcnow().isoformat(),
-                'portfolio_summary': self._calculate_portfolio_summary(positions),
-                'performance_metrics': self._calculate_performance_metrics(trades),
-                'risk_metrics': self._calculate_risk_metrics(positions, trades),
-                'allocation_analysis': self._analyze_allocation(positions),
-                'trading_patterns': self._analyze_trading_patterns(trades),
-                'recommendations': self._generate_recommendations(positions, trades)
+                'business_summary': self._calculate_business_summary(jobs),
+                'performance_metrics': self._calculate_performance_metrics(jobs),
+                'pricing_analysis': self._calculate_pricing_metrics(quotes),
+                'service_analysis': self._analyze_service_distribution(jobs),
+                'customer_patterns': self._analyze_customer_patterns(jobs),
+                'recommendations': self._generate_business_recommendations(jobs, quotes)
             }
             
             # Cache analytics
             await self.cache_service.cache_user_data(
-                f"{user_id}:analytics", analytics, ttl=3600
+                f"{provider_id}:analytics", analytics, ttl=3600
             )
             
             return analytics
             
         except Exception as e:
-            logger.error(f"Error generating portfolio analytics for {user_id}: {e}")
+            logger.error(f"Error generating provider analytics for {provider_id}: {e}")
             return {'error': str(e)}
     
-    def _calculate_portfolio_summary(self, positions: List[Dict]) -> Dict:
-        """Calculate portfolio summary metrics"""
+    def _calculate_business_summary(self, jobs: List[Dict]) -> Dict:
+        """Calculate business summary metrics"""
         if not positions:
             return {
                 'total_value': 0,
@@ -635,30 +647,30 @@ class BusinessIntelligenceEngine:
     async def generate_market_intelligence(self) -> Dict:
         """Generate market intelligence report"""
         try:
-            # Get market data for analysis
-            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
+            # Get service market data for analysis
+            service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping']
             market_analysis = {}
             
-            for symbol in symbols:
-                cached_data = await self.cache_service.get_market_data(symbol)
+            for service_category in service_categories:
+                cached_data = await self.cache_service.get_market_data(service_category)
                 if cached_data:
-                    market_analysis[symbol] = {
-                        'current_price': cached_data.get('price', 0),
+                    market_analysis[service_category] = {
+                        'avg_price': cached_data.get('price', 0),
                         'change_24h': cached_data.get('change', 0),
-                        'volume': cached_data.get('volume', 0),
+                        'job_volume': cached_data.get('volume', 0),
                         'metrics': cached_data.get('metrics', {}),
-                        'sentiment': self._analyze_sentiment(symbol),
-                        'technical_signals': self._get_technical_signals(symbol, cached_data)
+                        'demand_sentiment': self._analyze_demand_sentiment(service_category),
+                        'market_signals': self._get_market_signals(service_category, cached_data)
                     }
             
-            # Market overview
+            # Service market overview
             market_overview = {
                 'timestamp': datetime.utcnow().isoformat(),
                 'market_sentiment': self._calculate_market_sentiment(market_analysis),
-                'top_movers': self._get_top_movers(market_analysis),
-                'sector_performance': self._analyze_sector_performance(market_analysis),
-                'volatility_index': self._calculate_volatility_index(market_analysis),
-                'market_breadth': self._calculate_market_breadth(market_analysis)
+                'top_demand_categories': self._get_top_demand_categories(market_analysis),
+                'category_performance': self._analyze_category_performance(market_analysis),
+                'pricing_volatility_index': self._calculate_pricing_volatility_index(market_analysis),
+                'market_health': self._calculate_market_health(market_analysis)
             }
             
             return {
@@ -722,40 +734,41 @@ class BusinessIntelligenceEngine:
             'confidence': len(signals) / 5  # Normalize by max possible signals
         }
     
-    async def _get_user_positions(self, user_id: str) -> List[Dict]:
-        """Get user positions (simulated)"""
+    async def _get_provider_jobs(self, provider_id: str) -> List[Dict]:
+        """Get provider completed jobs (simulated)"""
         # In production, this would query the database
         return [
             {
-                'symbol': 'BTC/USD',
-                'quantity': 0.5,
-                'cost_basis': 22500,
-                'current_value': 22750,
-                'unrealized_pnl': 250,
-                'daily_change': 50
+                'service_category': 'Plumbing',
+                'job_count': 15,
+                'total_revenue': 3750,
+                'avg_job_value': 250,
+                'avg_rating': 4.8,
+                'completion_rate': 0.95
             },
             {
-                'symbol': 'AAPL',
-                'quantity': 100,
-                'cost_basis': 14500,
-                'current_value': 15000,
-                'unrealized_pnl': 500,
-                'daily_change': -25
+                'service_category': 'Electrical',
+                'job_count': 8,
+                'total_revenue': 2800,
+                'avg_job_value': 350,
+                'avg_rating': 4.9,
+                'completion_rate': 1.0
             }
         ]
     
-    async def _get_user_trades(self, user_id: str, days: int = 30) -> List[Dict]:
-        """Get user trades (simulated)"""
+    async def _get_provider_quotes(self, provider_id: str, days: int = 30) -> List[Dict]:
+        """Get provider quotes (simulated)"""
         # In production, this would query the database
-        trades = []
-        for i in range(20):  # Simulate 20 trades
-            trades.append({
-                'symbol': np.random.choice(['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL']),
-                'side': np.random.choice(['buy', 'sell']),
-                'quantity': np.random.uniform(0.1, 10),
-                'price': np.random.uniform(100, 50000),
+        quotes = []
+        service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping', 'Cleaning']
+        for i in range(20):  # Simulate 20 quotes
+            quotes.append({
+                'service_category': np.random.choice(service_categories),
+                'quote_type': np.random.choice(['fixed_price', 'hourly_rate']),
+                'quote_amount': np.random.uniform(100, 2000),
+                'job_value': np.random.uniform(150, 2500),
                 'timestamp': datetime.utcnow() - timedelta(days=np.random.randint(0, days)),
-                'commission': np.random.uniform(1, 50)
+                'accepted': np.random.choice([True, False], p=[0.3, 0.7])
             })
         return trades
 

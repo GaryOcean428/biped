@@ -87,11 +87,11 @@ def get_market_intelligence():
 @analytics_bp.route('/real-time/market-data', methods=['GET'])
 @login_required
 def get_real_time_market_data():
-    """Get real-time market data for multiple symbols"""
+    """Get real-time market data for multiple service categories"""
     try:
-        symbols = request.args.get('symbols', '').split(',')
-        if not symbols or symbols == ['']:
-            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
+        service_categories = request.args.get('categories', '').split(',')
+        if not service_categories or service_categories == ['']:
+            service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping']
         
         # Get cached market data
         cache_service = current_app.config.get('CACHE_SERVICE')
@@ -99,10 +99,10 @@ def get_real_time_market_data():
             return jsonify({'error': 'Cache service not available'}), 503
         
         market_data = {}
-        for symbol in symbols:
-            data = cache_service.get_market_data(symbol.strip())
+        for service_category in service_categories:
+            data = cache_service.get_market_data(service_category.strip())
             if data:
-                market_data[symbol] = data
+                market_data[service_category] = data
         
         return jsonify({
             'status': 'success',
@@ -245,9 +245,9 @@ def get_trading_patterns():
 def get_market_sentiment():
     """Get market sentiment analysis"""
     try:
-        symbols = request.args.get('symbols', '').split(',')
-        if not symbols or symbols == ['']:
-            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
+        service_categories = request.args.get('categories', '').split(',')
+        if not service_categories or service_categories == ['']:
+            service_categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping']
         
         services = get_services()
         bi_engine = services.get('bi_engine')
@@ -453,14 +453,17 @@ def _analyze_diversification(allocation: Dict) -> Dict:
         'diversification_score': 75,  # 0-100 scale
         'sector_concentration': 'moderate',
         'geographic_concentration': 'low',
-        'asset_class_distribution': {
-            'equities': 60,
-            'crypto': 30,
-            'bonds': 10
+        'service_category_distribution': {
+            'plumbing': 30,
+            'electrical': 25,
+            'carpentry': 20,
+            'painting': 15,
+            'landscaping': 10
         },
         'recommendations': [
-            'Consider adding international exposure',
-            'Increase bond allocation for stability'
+            'Consider expanding into additional service categories',
+            'Increase pricing for high-demand services',
+            'Focus on customer retention and repeat business'
         ]
     }
 
