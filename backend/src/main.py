@@ -347,6 +347,13 @@ def serve_react_app(path):
         return send_from_directory(static_folder_path, 'mobile.html')
     
     # Serve the main trades marketplace dashboard for all other routes
+    # For homepage, serve the enhanced dashboard which has the correct trades marketplace interface
+    if path == '' or path == 'home':
+        enhanced_dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+        if os.path.exists(enhanced_dashboard_path):
+            return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+    
+    # For other routes, serve the regular dashboard
     dashboard_path = os.path.join(static_folder_path, 'dashboard.html')
     if os.path.exists(dashboard_path):
         return send_from_directory(static_folder_path, 'dashboard.html')
