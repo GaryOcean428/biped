@@ -43,7 +43,7 @@ class ErrorBoundary:
             "error_message": error_message,
             "request_method": getattr(request, "method", "Unknown"),
             "request_url": getattr(request, "url", "Unknown"),
-            "user_agent": getattr(request, "user_agent", {}).get("string", "Unknown"),
+            "user_agent": str(getattr(request, "user_agent", "Unknown")),
             "remote_addr": getattr(request, "remote_addr", "Unknown"),
         }
 
