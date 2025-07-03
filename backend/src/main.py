@@ -31,9 +31,9 @@ from src.models.review import Review, Message, Notification
 from src.models.admin import Admin, AdminAction
 from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 
-# Import enhanced routes
-from src.routes.user import user_bp
+# Import route blueprints
 from src.routes.auth import auth_bp
+from src.routes.user import user_bp
 from src.routes.service import service_bp
 from src.routes.job import job_bp
 from src.routes.review import review_bp
@@ -44,8 +44,11 @@ from src.routes.vision import vision_bp
 from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
 from src.routes.storage import storage_bp
+from src.routes.websocket import websocket_bp
+from src.routes.health import health_bp
+from src.routes.dashboard import dashboard_bp
 
-# Create Flask app with Railway-optimized configuration
+# Create Flask app with static folder configuration
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
 # Load Railway-optimized configuration
@@ -184,6 +187,7 @@ app.register_blueprint(business_bp)
 app.register_blueprint(storage_bp)
 app.register_blueprint(websocket_bp, url_prefix='/api/ws')
 app.register_blueprint(health_bp, url_prefix='/api')
+app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 
 # Enhanced database initialization
 with app.app_context():
