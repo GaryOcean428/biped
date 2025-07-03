@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Biped</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 4rem;
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 4px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .stat-card.purple {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading show fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading your dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="mainContainer" class="loading flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-white shadow-lg w-64 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <img src="biped-logo.png" alt="Biped" class="h-8 w-8">
+                    <span class="text-xl font-bold text-gray-900">Biped</span>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div id="userInfo" class="p-6 border-b border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-blue-600"></i>
+                    </div>
+                    <div>
+                        <div id="userName" class="font-medium text-gray-900">Loading...</div>
+                        <div id="userType" class="text-sm text-gray-500">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4">
+                <ul id="navigationMenu" class="space-y-2">
+                    <!-- Navigation items will be populated by JavaScript -->
+                </ul>
+            </nav>
+
+            <!-- Logout -->
+            <div class="p-4 border-t border-gray-200">
+                <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 id="pageTitle" class="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <button class="relative text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                        </button>
+                        
+                        <!-- Profile Menu -->
+                        <div class="relative">
+                            <button onclick="toggleProfileMenu()" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600 text-sm"></i>
+                                </div>
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </button>
+                            
+                            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                                <a href="#" onclick="showProfile()" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile Settings</a>
+                                <a href="#" onclick="showNotifications()" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Notifications</a>
+                                <a href="#" onclick="showHelp()" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Help & Support</a>
+                                <hr class="my-1">
+                                <a href="#" onclick="logout()" class="block px-4 py-2 text-red-600 hover:bg-red-50">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <div id="contentArea">
+                    <!-- Content will be loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Job Posting Modal -->
+    <div id="jobPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Post a New Job</h3>
+                <button onclick="hideJobPostModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="jobPostForm">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+                    <input type="text" name="title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Kitchen Renovation">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea name="description" rows="4" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe your project in detail..."></textarea>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <select name="category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select a category</option>
+                            <option value="plumbing">Plumbing</option>
+                            <option value="electrical">Electrical</option>
+                            <option value="carpentry">Carpentry</option>
+                            <option value="painting">Painting</option>
+                            <option value="landscaping">Landscaping</option>
+                            <option value="cleaning">Cleaning</option>
+                            <option value="roofing">Roofing</option>
+                            <option value="flooring">Flooring</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
+                        <select name="budget_range" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select budget</option>
+                            <option value="under-500">Under $500</option>
+                            <option value="500-1000">$500 - $1,000</option>
+                            <option value="1000-5000">$1,000 - $5,000</option>
+                            <option value="5000-10000">$5,000 - $10,000</option>
+                            <option value="10000-plus">$10,000+</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <input type="text" name="location" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your location">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
+                    <select name="timeline" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">When do you need this done?</option>
+                        <option value="asap">ASAP</option>
+                        <option value="within-week">Within a week</option>
+                        <option value="within-month">Within a month</option>
+                        <option value="flexible">Flexible</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-magic mr-2"></i>
+                    Post Job & Find Providers
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentView = 'dashboard';
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadDashboard();
+        });
+
+        // Authentication check
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/me', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    updateUserInfo();
+                    setupNavigation();
+                } else {
+                    // Redirect to landing page if not authenticated
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Update user info in sidebar
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+                document.getElementById('userType').textContent = currentUser.user_type === 'customer' ? 'Customer' : 'Service Provider';
+            }
+        }
+
+        // Setup navigation based on user type
+        function setupNavigation() {
+            const menu = document.getElementById('navigationMenu');
+            let menuItems = [];
+
+            if (currentUser.user_type === 'customer') {
+                menuItems = [
+                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', view: 'dashboard' },
+                    { icon: 'fas fa-plus-circle', text: 'Post Job', action: 'showJobPostModal' },
+                    { icon: 'fas fa-briefcase', text: 'My Jobs', view: 'jobs' },
+                    { icon: 'fas fa-star', text: 'Reviews', view: 'reviews' },
+                    { icon: 'fas fa-credit-card', text: 'Payments', view: 'payments' },
+                    { icon: 'fas fa-user-cog', text: 'Profile', view: 'profile' }
+                ];
+            } else {
+                menuItems = [
+                    { icon: 'fas fa-tachometer-alt', text: 'Dashboard', view: 'dashboard' },
+                    { icon: 'fas fa-search', text: 'Find Jobs', view: 'find-jobs' },
+                    { icon: 'fas fa-briefcase', text: 'My Jobs', view: 'jobs' },
+                    { icon: 'fas fa-tools', text: 'Services', view: 'services' },
+                    { icon: 'fas fa-star', text: 'Reviews', view: 'reviews' },
+                    { icon: 'fas fa-chart-line', text: 'Analytics', view: 'analytics' },
+                    { icon: 'fas fa-credit-card', text: 'Earnings', view: 'earnings' },
+                    { icon: 'fas fa-user-cog', text: 'Profile', view: 'profile' }
+                ];
+            }
+
+            menu.innerHTML = menuItems.map(item => `
+                <li>
+                    <a href="#" onclick="${item.action || `loadView('${item.view}')`}" 
+                       class="sidebar-item flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg ${item.view === 'dashboard' ? 'active' : ''}">
+                        <i class="${item.icon}"></i>
+                        <span>${item.text}</span>
+                    </a>
+                </li>
+            `).join('');
+        }
+
+        // Load dashboard content
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard/stats', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderDashboard(data);
+                } else {
+                    console.error('Failed to load dashboard data');
+                    renderDashboard({});
+                }
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+                renderDashboard({});
+            } finally {
+                // Hide loading screen
+                document.getElementById('loadingScreen').classList.remove('show');
+                document.getElementById('mainContainer').classList.remove('loading');
+            }
+        }
+
+        // Render dashboard content
+        function renderDashboard(data) {
+            const contentArea = document.getElementById('contentArea');
+            
+            if (currentUser.user_type === 'customer') {
+                contentArea.innerHTML = renderCustomerDashboard(data);
+            } else {
+                contentArea.innerHTML = renderProviderDashboard(data);
+            }
+        }
+
+        // Render customer dashboard
+        function renderCustomerDashboard(data) {
+            return `
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, ${currentUser.first_name}!</h2>
+                    <p class="text-gray-600">Manage your projects and find trusted professionals.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card stat-card p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Active Jobs</p>
+                                <p class="text-3xl font-bold">${data.active_jobs || 0}</p>
+                            </div>
+                            <i class="fas fa-briefcase text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card green p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Completed Jobs</p>
+                                <p class="text-3xl font-bold">${data.completed_jobs || 0}</p>
+                            </div>
+                            <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card orange p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Total Spent</p>
+                                <p class="text-3xl font-bold">$${data.total_spent || '0'}</p>
+                            </div>
+                            <i class="fas fa-dollar-sign text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card purple p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Avg Rating</p>
+                                <p class="text-3xl font-bold">${data.avg_rating || '5.0'}</p>
+                            </div>
+                            <i class="fas fa-star text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="showJobPostModal()" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Post a New Job
+                            </button>
+                            <button onclick="loadView('jobs')" class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-briefcase mr-2"></i>
+                                View My Jobs
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-briefcase text-blue-600"></i>
+                                <div>
+                                    <p class="font-medium">No recent activity</p>
+                                    <p class="text-sm text-gray-500">Post your first job to get started</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render provider dashboard
+        function renderProviderDashboard(data) {
+            return `
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, ${currentUser.first_name}!</h2>
+                    <p class="text-gray-600">Manage your services and grow your business.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card stat-card p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Active Jobs</p>
+                                <p class="text-3xl font-bold">${data.active_jobs || 0}</p>
+                            </div>
+                            <i class="fas fa-briefcase text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card green p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Completed Jobs</p>
+                                <p class="text-3xl font-bold">${data.completed_jobs || 0}</p>
+                            </div>
+                            <i class="fas fa-check-circle text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card orange p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Total Earned</p>
+                                <p class="text-3xl font-bold">$${data.total_earned || '0'}</p>
+                            </div>
+                            <i class="fas fa-dollar-sign text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <div class="card stat-card purple p-6 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-80">Rating</p>
+                                <p class="text-3xl font-bold">${data.rating || '5.0'}</p>
+                            </div>
+                            <i class="fas fa-star text-2xl opacity-80"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="loadView('find-jobs')" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-search mr-2"></i>
+                                Find New Jobs
+                            </button>
+                            <button onclick="loadView('services')" class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-tools mr-2"></i>
+                                Manage Services
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-briefcase text-blue-600"></i>
+                                <div>
+                                    <p class="font-medium">No recent activity</p>
+                                    <p class="text-sm text-gray-500">Start browsing jobs to get started</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Navigation functions
+        function loadView(view) {
+            // Update active navigation item
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.target.closest('.sidebar-item').classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'jobs': 'My Jobs',
+                'find-jobs': 'Find Jobs',
+                'services': 'My Services',
+                'reviews': 'Reviews',
+                'analytics': 'Analytics',
+                'earnings': 'Earnings',
+                'payments': 'Payments',
+                'profile': 'Profile Settings'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[view] || 'Dashboard';
+            
+            // Load view content
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-cog fa-spin text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600">Loading ${titles[view]}...</p>
+                </div>
+            `;
+            
+            // Simulate loading (replace with actual API calls)
+            setTimeout(() => {
+                contentArea.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-tools text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${titles[view]} Coming Soon</h3>
+                        <p class="text-gray-600">This feature is currently under development.</p>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // Modal functions
+        function showJobPostModal() {
+            document.getElementById('jobPostModal').classList.remove('hidden');
+        }
+
+        function hideJobPostModal() {
+            document.getElementById('jobPostModal').classList.add('hidden');
+        }
+
+        // Job posting form handler
+        document.getElementById('jobPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const jobData = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(jobData)
+                });
+
+                if (response.ok) {
+                    hideJobPostModal();
+                    showNotification('Job posted successfully!', 'success');
+                    loadDashboard(); // Refresh dashboard
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Failed to post job', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        });
+
+        // Utility functions
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function toggleProfileMenu() {
+            document.getElementById('profileMenu').classList.toggle('hidden');
+        }
+
+        function showProfile() {
+            loadView('profile');
+            document.getElementById('profileMenu').classList.add('hidden');
+        }
+
+        function showNotifications() {
+            // Implement notifications view
+            document.getElementById('profileMenu').classList.add('hidden');
+        }
+
+        function showHelp() {
+            // Implement help view
+            document.getElementById('profileMenu').classList.add('hidden');
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.parentElement.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const profileMenu = document.getElementById('profileMenu');
+            const profileButton = e.target.closest('button[onclick="toggleProfileMenu()"]');
+            
+            if (!profileButton && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -207,32 +207,39 @@ class AdminDashboard {
         }
     }
 
-    async loadDashboardData() {
+      async loadDashboardData() {
         try {
-            const response = await this.apiCall('/api/admin/analytics/dashboard');
-            const data = response;
-
+            const response = await this.apiCall('/api/dashboard/stats');
+            const data = response.data; // API returns {success: true, data: {...}}
+            
             // Update stats cards
             document.getElementById('totalUsers').textContent = data.total_users || 0;
             document.getElementById('activeJobs').textContent = data.active_jobs || 0;
             document.getElementById('totalRevenue').textContent = `$${(data.total_revenue || 0).toLocaleString()}`;
-            document.getElementById('platformFee').textContent = `$${(data.platform_fees || 0).toLocaleString()}`;
-
+            document.getElementById('platformFee').textContent = `$${(data.monthly_revenue || 0).toLocaleString()}`;
+            
+            // Calculate growth percentages (simplified for now)
+            const userGrowthPercent = data.recent_users > 0 ? Math.round((data.recent_users / data.total_users) * 100) : 0;
+            const jobGrowthPercent = data.recent_jobs > 0 ? Math.round((data.recent_jobs / data.total_jobs) * 100) : 0;
+            const revenueGrowthPercent = data.monthly_revenue > 0 && data.total_revenue > 0 ? 
+                Math.round((data.monthly_revenue / data.total_revenue) * 100) : 0;
+            
             // Update growth percentages
-            document.getElementById('userGrowth').textContent = `${data.user_growth || 0}%`;
-            document.getElementById('jobGrowth').textContent = `${data.job_growth || 0}%`;
-            document.getElementById('revenueGrowth').textContent = `${data.revenue_growth || 0}%`;
-            document.getElementById('feeGrowth').textContent = `${data.fee_growth || 0}%`;
-
+            document.getElementById('userGrowth').textContent = `${userGrowthPercent}%`;
+            document.getElementById('jobGrowth').textContent = `${jobGrowthPercent}%`;
+            document.getElementById('revenueGrowth').textContent = `${revenueGrowthPercent}%`;
+            document.getElementById('feeGrowth').textContent = `${revenueGrowthPercent}%`;
+            
             // Update sidebar counts
             document.getElementById('userCount').textContent = data.total_users || 0;
-            document.getElementById('serviceCount').textContent = data.total_services || 0;
+            document.getElementById('serviceCount').textContent = data.total_jobs || 0; // Using jobs as services for now
             document.getElementById('jobCount').textContent = data.active_jobs || 0;
-            document.getElementById('paymentCount').textContent = data.total_payments || 0;
-
-            // Load recent activity
-            this.loadRecentActivity(data.recent_activity || []);
-
+            document.getElementById('paymentCount').textContent = data.completed_jobs || 0;
+            
+            // Load recent activity (we'll implement this later)
+            this.loadRecentActivity([]);
+            
+            console.log('Dashboard data loaded successfully:', data);
         } catch (error) {
             console.error('Failed to load dashboard data:', error);
             this.showNotification('Failed to load dashboard data', 'error');
@@ -673,21 +680,25 @@ class AdminDashboard {
             }
         }
     }
-
+    
     // Utility Functions
     async apiCall(endpoint, method = 'GET', data = null) {
         const options = {
             method,
             headers: {
-                'Authorization': `Bearer ${this.adminToken}`,
                 'Content-Type': 'application/json'
             }
         };
-
+        
+        // Add authorization header only if we have a token and it's not a public endpoint
+        if (this.adminToken && !endpoint.includes('/api/dashboard/')) {
+            options.headers['Authorization'] = `Bearer ${this.adminToken}`;
+        }
+        
         if (data) {
             options.body = JSON.stringify(data);
         }
-
+        
         const response = await fetch(endpoint, options);
         
         if (!response.ok) {
@@ -697,7 +708,7 @@ class AdminDashboard {
             }
             throw new Error(`API call failed: ${response.statusText}`);
         }
-
+        
         return await response.json();
     }
 

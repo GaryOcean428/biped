@@ -228,10 +228,10 @@
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-                    <button onclick="showJobModal()" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center">
+                    <a href="/post-job" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center hover:transform hover:scale-105 transition-all">
                         <i class="fas fa-plus-circle mr-3"></i>
                         Post a Job
-                    </button>
+                    </a>
                     <button onclick="showProviderSignup()" class="btn-secondary px-8 py-4 rounded-xl font-semibold text-lg flex items-center">
                         <i class="fas fa-user-tie mr-3"></i>
                         Join as Provider
@@ -626,10 +626,10 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button onclick="showJobModal()" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center">
+                <a href="/post-job" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center hover:transform hover:scale-105 transition-all">
                     <i class="fas fa-rocket mr-3"></i>
                     Post Your First Job
-                </button>
+                </a>
                 <button onclick="showProviderSignup()" class="btn-secondary px-8 py-4 rounded-xl font-semibold text-lg flex items-center">
                     <i class="fas fa-handshake mr-3"></i>
                     Become a Provider
@@ -965,6 +965,7 @@
     <!-- Load validation and loading utilities -->
     <script src="/validation.js"></script>
     <script src="/loading.js"></script>
+    <script src="/auth.js"></script>
 </body>
 </html>
 

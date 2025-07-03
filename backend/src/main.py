@@ -4,7 +4,7 @@ import time
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, g
 from flask_cors import CORS
 
 # Import all models
@@ -19,9 +19,11 @@ from src.models.payment import Payment, Transfer, StripeAccount, Dispute
 from src.routes.user import user_bp
 from src.routes.auth import auth_bp
 from src.routes.service import service_bp
-from src.routes.job i# Import routes
-from src.routes.user import user_bp
+# Import routes
+from src.routes.job import job_bp
+from src.routes.review import review_bp
 from src.routes.admin import admin_bp
+from src.routes.admin_auth import admin_auth_bp
 from src.routes.payment import payment_bp
 from src.routes.ai import ai_bp
 from src.routes.vision import vision_bp
@@ -29,12 +31,17 @@ from src.routes.analytics import analytics_bp
 from src.routes.business import business_bp
 from src.routes.financial import financial_bp
 from src.routes.integrations import integrations_bp
-from src.routes.real_estate import real_estate_bpp
+from src.routes.real_estate import real_estate_bp
 from src.routes.health import health_bp
+from src.routes.dashboard import dashboard_bp
+from src.routes.smart_matching import smart_matching_bp
+from src.routes.notifications import notifications_bp
+from src.routes.advanced_search import advanced_search_bp
+from src.routes.communication import communication_bp
 
 # Import new performance and security utilities
-from src.utils.security import security_headers, performance_monitor
-from src.utils.performance import response_cache, compression_middleware, static_optimizer
+from src.utils.security import SecurityHeaders
+from src.utils.performance import ResponseCache, CompressionMiddleware, StaticAssetOptimizer, PerformanceMonitor
 from src.utils.config import config_manager
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
@@ -58,6 +65,7 @@ app.register_blueprint(service_bp, url_prefix='/api/services')
 app.register_blueprint(job_bp, url_prefix='/api/jobs')
 app.register_blueprint(review_bp, url_prefix='/api/reviews')
 app.register_blueprint(admin_bp)
+app.register_blueprint(admin_auth_bp, url_prefix='/api/admin')
 app.register_blueprint(payment_bp, url_prefix='/api/payments')
 app.register_blueprint(ai_bp)
 app.register_blueprint(vision_bp)
@@ -67,7 +75,17 @@ app.register_blueprint(financial_bp)
 app.register_blueprint(integrations_bp)
 app.register_blueprint(real_estate_bp)
 app.register_blueprint(health_bp, url_prefix='/api')
+app.register_blueprint(dashboard_bp)
+app.register_blueprint(smart_matching_bp)
+app.register_blueprint(notifications_bp)
+app.register_blueprint(advanced_search_bp)
+app.register_blueprint(communication_bp, url_prefix='/api/communication')
 
+
+# Initialize utility instances
+security_headers = SecurityHeaders()
+compression_middleware = CompressionMiddleware()
+performance_monitor = PerformanceMonitor()
 
 # Security and Performance Middleware
 @app.after_request
@@ -151,25 +169,45 @@ def admin_dashboard():
     print("Admin route accessed - serving admin.html")
     return send_from_directory('static', 'admin.html')
 
+@app.route('/dashboard')
+def dashboard():
+    """Serve the user dashboard"""
+    return send_from_directory('static', 'dashboard.html')
+
+@app.route('/post-job')
+def post_job():
+    """Serve the job posting form"""
+    return send_from_directory('static', 'job-posting.html')
+
+@app.route('/admin-login')
+def admin_login_page():
+    """Serve the admin login page"""
+    return send_from_directory('static', 'admin-login.html')
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_static(path):
-    """Serve static files"""
+    """Serve static files with proper routing"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
+    # Handle specific routes
+    if path == "dashboard":
+        return send_from_directory(static_folder_path, 'dashboard.html')
+    elif path == "admin":
+        return send_from_directory(static_folder_path, 'admin.html')
+    elif path == "admin-login":
+        return send_from_directory(static_folder_path, 'admin-login.html')
+    elif path == "post-job":
+        return send_from_directory(static_folder_path, 'job-posting.html')
+    elif path != "" and os.path.exists(os.path.join(static_folder_path, path)):
         return send_from_directory(static_folder_path, path)
     else:
+        # Always serve landing page for root and unknown paths
         index_path = os.path.join(static_folder_path, 'index.html')
         if os.path.exists(index_path):
             return send_from_directory(static_folder_path, 'index.html')
         else:
             return "index.html not found", 404
-
-@app.route('/api/health')
-def health_check():
-    """Health check endpoint"""
-    return {'status': 'healthy', 'message': 'Biped Platform API is running', 'version': '1.0.0'}
 
 if __name__ == '__main__':
     # Get port from environment variable, default to 8080

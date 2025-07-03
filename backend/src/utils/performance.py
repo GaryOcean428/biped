@@ -84,19 +84,24 @@ class CompressionMiddleware:
     @staticmethod
     def compress_response(response, min_size: int = 1000):
         """Compress response if it's large enough and client supports it"""
-        if (response.status_code == 200 and 
-            len(response.data) > min_size and
-            'gzip' in request.headers.get('Accept-Encoding', '')):
-            
-            # Compress the response data
-            buffer = io.BytesIO()
-            with gzip.GzipFile(fileobj=buffer, mode='wb') as f:
-                f.write(response.data)
-            
-            response.data = buffer.getvalue()
-            response.headers['Content-Encoding'] = 'gzip'
-            response.headers['Vary'] = 'Accept-Encoding'
-            response.headers['Content-Length'] = len(response.data)
+        try:
+            if (response.status_code == 200 and 
+                hasattr(response, 'data') and
+                len(response.data) > min_size and
+                'gzip' in request.headers.get('Accept-Encoding', '')):
+                
+                # Compress the response data
+                buffer = io.BytesIO()
+                with gzip.GzipFile(fileobj=buffer, mode='wb') as f:
+                    f.write(response.data)
+                
+                response.data = buffer.getvalue()
+                response.headers['Content-Encoding'] = 'gzip'
+                response.headers['Vary'] = 'Accept-Encoding'
+                response.headers['Content-Length'] = len(response.data)
+        except (RuntimeError, AttributeError):
+            # Skip compression if response is in passthrough mode or has no data
+            pass
         
         return response
 

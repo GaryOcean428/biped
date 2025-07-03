@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biped Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="admin-gradient min-h-screen flex items-center justify-center">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="floating-element absolute top-20 left-20 w-32 h-32 bg-white bg-opacity-10 rounded-full"></div>
+        <div class="floating-element absolute top-40 right-32 w-24 h-24 bg-white bg-opacity-10 rounded-full" style="animation-delay: -2s;"></div>
+        <div class="floating-element absolute bottom-32 left-1/3 w-40 h-40 bg-white bg-opacity-10 rounded-full" style="animation-delay: -4s;"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="relative z-10 w-full max-w-md mx-4">
+        <div class="glass-effect rounded-2xl p-8 shadow-2xl">
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-full mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Admin Access</h1>
+                <p class="text-white text-opacity-80">Platform Owner Dashboard</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="adminLoginForm" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-white text-sm font-medium mb-2">
+                        <i class="fas fa-envelope mr-2"></i>Email Address
+                    </label>
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                           placeholder="admin@biped.com">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-white text-sm font-medium mb-2">
+                        <i class="fas fa-lock mr-2"></i>Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required
+                               class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                               placeholder="Enter your password">
+                        <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white text-opacity-70 hover:text-opacity-100">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center text-white text-sm">
+                        <input type="checkbox" id="rememberMe" class="mr-2 rounded border-white border-opacity-30 bg-white bg-opacity-20 text-white focus:ring-white focus:ring-opacity-50">
+                        Remember me
+                    </label>
+                    <a href="#" class="text-white text-opacity-80 hover:text-opacity-100 text-sm">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit" id="loginBtn" 
+                        class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    <span id="loginBtnText">Access Dashboard</span>
+                </button>
+            </form>
+
+            <!-- Security Notice -->
+            <div class="mt-6 p-4 bg-white bg-opacity-10 rounded-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-white text-opacity-80 mr-3 mt-1"></i>
+                    <div class="text-white text-opacity-80 text-sm">
+                        <p class="font-medium mb-1">Secure Access</p>
+                        <p>This is a restricted area for platform administrators only. All access attempts are logged and monitored.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Site -->
+            <div class="mt-6 text-center">
+                <a href="/" class="text-white text-opacity-80 hover:text-opacity-100 text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Biped
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700">Authenticating...</span>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-gray-900">Authentication Failed</h3>
+                </div>
+            </div>
+            <div class="mb-4">
+                <p id="errorMessage" class="text-sm text-gray-500">Invalid credentials. Please try again.</p>
+            </div>
+            <div class="flex justify-end">
+                <button onclick="closeErrorModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Admin login form submission
+        document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Show loading
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        remember_me: rememberMe
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Successful login - redirect to admin dashboard
+                    window.location.href = '/admin';
+                } else {
+                    // Show error
+                    showError(result.error || 'Authentication failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('loginBtn').disabled = true;
+            document.getElementById('loginBtnText').textContent = 'Authenticating...';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginBtnText').textContent = 'Access Dashboard';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').classList.remove('hidden');
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+
+        // Auto-focus email field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email').focus();
+        });
+
+        // Handle Enter key in form
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('errorModal').classList.contains('hidden')) {
+                closeErrorModal();
+            }
+        });
+    </script>
+</body>
+</html>
+

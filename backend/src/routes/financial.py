@@ -17,9 +17,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
-from src.models.financial import Invoice, Quote, Expense, PlatformRevenue, FinancialReport
-from src.models.base import db
-from src.ai_engine import BipedAI
+from src.models.financial import Invoice, FinancialQuote, Expense, PlatformRevenue, FinancialReport
+from src.models.user import db
+from ai_engine import BipedAIEngine
 
 financial_bp = Blueprint('financial', __name__, url_prefix='/api/financial')
 
@@ -257,12 +257,12 @@ def get_quotes():
         per_page = request.args.get('per_page', 20, type=int)
         status = request.args.get('status')
         
-        query = Quote.query.filter_by(user_id=current_user.id)
+        query = FinancialQuote.query.filter_by(user_id=current_user.id)
         
         if status:
             query = query.filter_by(status=status)
         
-        quotes = query.order_by(Quote.created_at.desc()).paginate(
+        quotes = query.order_by(FinancialQuote.created_at.desc()).paginate(
             page=page, per_page=per_page, error_out=False
         )
         
@@ -291,7 +291,7 @@ def ai_generate_quote():
         ai_analysis = generate_ai_quote(data)
         
         # Create quote with AI suggestions
-        quote = Quote(
+        quote = FinancialQuote(
             user_id=current_user.id,
             job_id=data.get('job_id'),
             client_name=data['client_name'],

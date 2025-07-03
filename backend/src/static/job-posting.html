@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - Biped</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Biped</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/dashboard" class="text-gray-600 hover:text-blue-600">Dashboard</a>
+                    <button onclick="logout()" class="text-gray-600 hover:text-blue-600">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Post a Job</h1>
+                <p class="text-gray-600">Tell us about your project and get matched with qualified professionals.</p>
+            </div>
+
+            <form id="jobPostingForm" class="space-y-8">
+                <!-- Service Selection -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">What service do you need?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="1">
+                            <div class="text-center">
+                                <i class="fas fa-hammer text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Construction & Renovation</h3>
+                                <p class="text-sm text-gray-500">General contractors, carpenters, painters</p>
+                            </div>
+                        </div>
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="2">
+                            <div class="text-center">
+                                <i class="fas fa-wrench text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Plumbing & Electrical</h3>
+                                <p class="text-sm text-gray-500">Licensed plumbers, electricians, HVAC</p>
+                            </div>
+                        </div>
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="3">
+                            <div class="text-center">
+                                <i class="fas fa-laptop text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Tech & Digital</h3>
+                                <p class="text-sm text-gray-500">Web developers, designers, IT support</p>
+                            </div>
+                        </div>
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="4">
+                            <div class="text-center">
+                                <i class="fas fa-car text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Automotive</h3>
+                                <p class="text-sm text-gray-500">Mechanics, auto electricians</p>
+                            </div>
+                        </div>
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="5">
+                            <div class="text-center">
+                                <i class="fas fa-seedling text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Landscaping</h3>
+                                <p class="text-sm text-gray-500">Gardeners, landscapers, maintenance</p>
+                            </div>
+                        </div>
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="6">
+                            <div class="text-center">
+                                <i class="fas fa-broom text-2xl text-blue-600 mb-2"></i>
+                                <h3 class="font-medium">Cleaning & Maintenance</h3>
+                                <p class="text-sm text-gray-500">Professional cleaners, facility management</p>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="service_id" name="service_id" required>
+                </div>
+
+                <!-- Job Details -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Job Details</h2>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+                            <input type="text" id="title" name="title" required 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="e.g., Kitchen renovation, Plumbing repair, Website development">
+                        </div>
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="description" name="description" rows="4" required
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Describe your project in detail. Include what needs to be done, any specific requirements, and expected outcomes."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Location</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="street_address" class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                            <input type="text" id="street_address" name="street_address" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="123 Main Street">
+                        </div>
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <input type="text" id="city" name="city" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Sydney">
+                        </div>
+                        <div>
+                            <label for="state" class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                            <select id="state" name="state" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select State</option>
+                                <option value="NSW">New South Wales</option>
+                                <option value="VIC">Victoria</option>
+                                <option value="QLD">Queensland</option>
+                                <option value="WA">Western Australia</option>
+                                <option value="SA">South Australia</option>
+                                <option value="TAS">Tasmania</option>
+                                <option value="ACT">Australian Capital Territory</option>
+                                <option value="NT">Northern Territory</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="postcode" class="block text-sm font-medium text-gray-700 mb-2">Postcode</label>
+                            <input type="text" id="postcode" name="postcode" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="2000">
+                        </div>
+                        <div>
+                            <label for="property_type" class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                            <select id="property_type" name="property_type" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Budget</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="budget_type" class="block text-sm font-medium text-gray-700 mb-2">Budget Type</label>
+                            <select id="budget_type" name="budget_type"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="negotiable">Negotiable</option>
+                                <option value="fixed">Fixed Price</option>
+                                <option value="hourly">Hourly Rate</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="budget_min" class="block text-sm font-medium text-gray-700 mb-2">Minimum Budget ($)</label>
+                            <input type="number" id="budget_min" name="budget_min" min="0" step="0.01"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="1000">
+                        </div>
+                        <div>
+                            <label for="budget_max" class="block text-sm font-medium text-gray-700 mb-2">Maximum Budget ($)</label>
+                            <input type="number" id="budget_max" name="budget_max" min="0" step="0.01"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="5000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Timeline</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="preferred_start_date" class="block text-sm font-medium text-gray-700 mb-2">Preferred Start Date</label>
+                            <input type="date" id="preferred_start_date" name="preferred_start_date"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="preferred_end_date" class="block text-sm font-medium text-gray-700 mb-2">Preferred End Date</label>
+                            <input type="date" id="preferred_end_date" name="preferred_end_date"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="is_urgent" name="is_urgent" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">This is urgent</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="is_flexible_timing" name="is_flexible_timing" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">I'm flexible with timing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Requirements -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Additional Information</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="access_requirements" class="block text-sm font-medium text-gray-700 mb-2">Access Requirements</label>
+                            <textarea id="access_requirements" name="access_requirements" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Any special access requirements, parking restrictions, or site conditions..."></textarea>
+                        </div>
+                        <div>
+                            <label for="special_requirements" class="block text-sm font-medium text-gray-700 mb-2">Special Requirements</label>
+                            <textarea id="special_requirements" name="special_requirements" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Any special requirements, certifications needed, or specific materials..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                    <button type="button" onclick="saveDraft()" 
+                            class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-save mr-2"></i>Save as Draft
+                    </button>
+                    <button type="submit" id="submitBtn"
+                            class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-paper-plane mr-2"></i>Post Job
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                    <i class="fas fa-check text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Job Posted Successfully!</h3>
+                <p class="text-sm text-gray-500 mb-4">Your job has been posted and providers will start submitting quotes soon.</p>
+                <div class="flex space-x-3">
+                    <button onclick="goToDashboard()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        View Dashboard
+                    </button>
+                    <button onclick="postAnother()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                        Post Another
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/auth.js"></script>
+    <script src="/validation.js"></script>
+    <script src="/loading.js"></script>
+    
+    <script>
+        // Job posting functionality
+        let selectedServiceId = null;
+        const validator = new FormValidator();
+
+        // Service selection
+        document.querySelectorAll('.service-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('.service-option').forEach(opt => {
+                    opt.classList.remove('border-blue-500', 'bg-blue-50');
+                });
+                
+                // Add selection to clicked option
+                this.classList.add('border-blue-500', 'bg-blue-50');
+                selectedServiceId = this.dataset.serviceId;
+                document.getElementById('service_id').value = selectedServiceId;
+            });
+        });
+
+        // Form submission
+        document.getElementById('jobPostingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedServiceId) {
+                alert('Please select a service type');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const jobData = Object.fromEntries(formData.entries());
+            
+            // Convert checkboxes to boolean
+            jobData.is_urgent = document.getElementById('is_urgent').checked;
+            jobData.is_flexible_timing = document.getElementById('is_flexible_timing').checked;
+            
+            // Convert numbers
+            if (jobData.budget_min) jobData.budget_min = parseFloat(jobData.budget_min);
+            if (jobData.budget_max) jobData.budget_max = parseFloat(jobData.budget_max);
+            
+            try {
+                loadingManager.showButtonLoading('submitBtn', 'Posting Job...');
+                
+                const response = await fetch('/api/jobs/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(jobData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('successModal').classList.remove('hidden');
+                } else {
+                    alert(result.error || 'Failed to post job');
+                }
+            } catch (error) {
+                console.error('Error posting job:', error);
+                alert('Failed to post job. Please try again.');
+            } finally {
+                loadingManager.hideButtonLoading('submitBtn');
+            }
+        });
+
+        // Save draft function
+        async function saveDraft() {
+            if (!selectedServiceId) {
+                alert('Please select a service type');
+                return;
+            }
+
+            const formData = new FormData(document.getElementById('jobPostingForm'));
+            const jobData = Object.fromEntries(formData.entries());
+            jobData.save_draft = true;
+            
+            // Convert checkboxes to boolean
+            jobData.is_urgent = document.getElementById('is_urgent').checked;
+            jobData.is_flexible_timing = document.getElementById('is_flexible_timing').checked;
+            
+            try {
+                const response = await fetch('/api/jobs/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(jobData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Draft saved successfully!');
+                } else {
+                    alert(result.error || 'Failed to save draft');
+                }
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                alert('Failed to save draft. Please try again.');
+            }
+        }
+
+        // Modal functions
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function postAnother() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('jobPostingForm').reset();
+            selectedServiceId = null;
+            document.querySelectorAll('.service-option').forEach(opt => {
+                opt.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+        }
+
+        // Logout function
+        function logout() {
+            if (window.authManager) {
+                window.authManager.logout();
+            }
+        }
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.authManager) {
+                window.authManager.checkAuthStatus();
+            }
+        });
+    </script>
+</body>
+</html>
+

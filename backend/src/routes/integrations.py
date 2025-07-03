@@ -12,7 +12,7 @@ import hmac
 import hashlib
 from functools import wraps
 
-from src.models.base import db
+from src.models.user import db
 from src.models.user import User
 from src.models.financial import PlatformRevenue
 
