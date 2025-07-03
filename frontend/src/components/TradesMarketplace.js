@@ -1,5 +1,88 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './TradesMarketplace.css';
+
+const sampleJobs = [
+  {
+    id: 1,
+    title: "Kitchen Renovation - Full Remodel",
+    description: "Looking for experienced tradies to completely renovate my kitchen. Includes plumbing, electrical, tiling, and carpentry work.",
+    location: "Sydney, NSW",
+    budget: "$15,000 - $25,000",
+    category: "Renovation",
+    postedDate: "2 hours ago",
+    quotes: 8,
+    urgent: true
+  },
+  {
+    id: 2,
+    title: "Bathroom Leak Repair",
+    description: "Urgent repair needed for bathroom leak. Water damage visible on ceiling below.",
+    location: "Melbourne, VIC",
+    budget: "$500 - $1,500",
+    category: "Plumbing",
+    postedDate: "4 hours ago",
+    quotes: 12,
+    urgent: true
+  },
+  {
+    id: 3,
+    title: "Deck Construction - Outdoor Entertainment Area",
+    description: "Build new timber deck 6m x 4m with pergola. Materials to be quoted separately.",
+    location: "Brisbane, QLD",
+    budget: "$8,000 - $12,000",
+    category: "Carpentry",
+    postedDate: "1 day ago",
+    quotes: 5,
+    urgent: false
+  },
+  {
+    id: 4,
+    title: "Electrical Safety Inspection",
+    description: "Annual electrical safety inspection for rental property. Certificate required.",
+    location: "Perth, WA",
+    budget: "$200 - $400",
+    category: "Electrical",
+    postedDate: "2 days ago",
+    quotes: 15,
+    urgent: false
+  }
+];
+
+const sampleProviders = [
+  {
+    id: 1,
+    name: "Mike's Premium Plumbing",
+    rating: 4.9,
+    reviews: 127,
+    specialties: ["Plumbing", "Gas Fitting", "Drainage"],
+    location: "Sydney, NSW",
+    verified: true,
+    responseTime: "Usually responds within 2 hours",
+    completedJobs: 340
+  },
+  {
+    id: 2,
+    name: "Elite Electrical Services",
+    rating: 4.8,
+    reviews: 89,
+    specialties: ["Electrical", "Solar Installation", "Home Automation"],
+    location: "Melbourne, VIC",
+    verified: true,
+    responseTime: "Usually responds within 1 hour",
+    completedJobs: 256
+  },
+  {
+    id: 3,
+    name: "Precision Carpentry Co.",
+    rating: 4.7,
+    reviews: 156,
+    specialties: ["Carpentry", "Renovation", "Custom Furniture"],
+    location: "Brisbane, QLD",
+    verified: true,
+    responseTime: "Usually responds within 4 hours",
+    completedJobs: 423
+  }
+];
 
 const TradesMarketplace = () => {
   const [activeTab, setActiveTab] = useState('browse');
@@ -7,13 +90,7 @@ const TradesMarketplace = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch jobs and providers from API
-    fetchJobs();
-    fetchProviders();
-  }, []);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const response = await fetch('/api/jobs');
       if (response.ok) {
@@ -26,9 +103,9 @@ const TradesMarketplace = () => {
       setJobs(sampleJobs);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const fetchProviders = async () => {
+  const fetchProviders = useCallback(async () => {
     try {
       const response = await fetch('/api/providers');
       if (response.ok) {
@@ -40,90 +117,13 @@ const TradesMarketplace = () => {
       // Fallback to sample data
       setProviders(sampleProviders);
     }
-  };
+  }, []);
 
-  const sampleJobs = [
-    {
-      id: 1,
-      title: "Kitchen Renovation - Full Remodel",
-      description: "Looking for experienced tradies to completely renovate my kitchen. Includes plumbing, electrical, tiling, and carpentry work.",
-      location: "Sydney, NSW",
-      budget: "$15,000 - $25,000",
-      category: "Renovation",
-      postedDate: "2 hours ago",
-      quotes: 8,
-      urgent: true
-    },
-    {
-      id: 2,
-      title: "Bathroom Leak Repair",
-      description: "Urgent repair needed for bathroom leak. Water damage visible on ceiling below.",
-      location: "Melbourne, VIC",
-      budget: "$500 - $1,500",
-      category: "Plumbing",
-      postedDate: "4 hours ago",
-      quotes: 12,
-      urgent: true
-    },
-    {
-      id: 3,
-      title: "Deck Construction - Outdoor Entertainment Area",
-      description: "Build new timber deck 6m x 4m with pergola. Materials to be quoted separately.",
-      location: "Brisbane, QLD",
-      budget: "$8,000 - $12,000",
-      category: "Carpentry",
-      postedDate: "1 day ago",
-      quotes: 5,
-      urgent: false
-    },
-    {
-      id: 4,
-      title: "Electrical Safety Inspection",
-      description: "Annual electrical safety inspection for rental property. Certificate required.",
-      location: "Perth, WA",
-      budget: "$200 - $400",
-      category: "Electrical",
-      postedDate: "2 days ago",
-      quotes: 15,
-      urgent: false
-    }
-  ];
-
-  const sampleProviders = [
-    {
-      id: 1,
-      name: "Mike's Premium Plumbing",
-      rating: 4.9,
-      reviews: 127,
-      specialties: ["Plumbing", "Gas Fitting", "Drainage"],
-      location: "Sydney, NSW",
-      verified: true,
-      responseTime: "Usually responds within 2 hours",
-      completedJobs: 340
-    },
-    {
-      id: 2,
-      name: "Elite Electrical Services",
-      rating: 4.8,
-      reviews: 89,
-      specialties: ["Electrical", "Solar Installation", "Home Automation"],
-      location: "Melbourne, VIC",
-      verified: true,
-      responseTime: "Usually responds within 1 hour",
-      completedJobs: 256
-    },
-    {
-      id: 3,
-      name: "Precision Carpentry Co.",
-      rating: 4.7,
-      reviews: 156,
-      specialties: ["Carpentry", "Renovation", "Custom Furniture"],
-      location: "Brisbane, QLD",
-      verified: true,
-      responseTime: "Usually responds within 4 hours",
-      completedJobs: 423
-    }
-  ];
+  useEffect(() => {
+    // Fetch jobs and providers from API
+    fetchJobs();
+    fetchProviders();
+  }, [fetchJobs, fetchProviders]);
 
   const serviceCategories = [
     { name: "Plumbing", icon: "🔧", jobs: 247 },
@@ -138,6 +138,8 @@ const TradesMarketplace = () => {
 
   return (
     <div className="trades-marketplace">
+      {/* Loading state can be used for UI feedback */}
+      {loading && console.log('Loading state:', loading)}
       {/* Header */}
       <header className="marketplace-header">
         <div className="header-content">
