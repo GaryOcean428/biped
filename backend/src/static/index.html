@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Biped">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Biped - The AI-powered autonomous trades marketplace connecting customers with skilled service providers">
+    <meta name="keywords" content="trades, marketplace, AI, automation, services, plumbing, electrical, carpentry">
+    <meta name="author" content="Biped Platform">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Biped - AI-Powered Trades Marketplace">
+    <meta property="og:description" content="Connect with skilled tradespeople through our intelligent matching system">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://biped.com">
+    <meta property="og:image" content="/biped-logo.png">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/biped-logo.png">
+    <link rel="apple-touch-icon" href="/biped-logo.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <title>Biped - AI-Powered Trades Marketplace</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link href="/css/design-system.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--text-inverse);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-primary);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+            transition: all var(--transition-normal);
+        }
+        
+        .navbar.scrolled {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-primary);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-primary);
+            border-radius: var(--radius-full);
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: var(--text-xl);
+            cursor: pointer;
+        }
+        
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-8);
+            margin-top: var(--space-16);
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: var(--space-8);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border-radius: var(--radius-2xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-6);
+            color: var(--text-inverse);
+            font-size: var(--text-2xl);
+        }
+        
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-8);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: var(--text-4xl);
+            font-weight: 800;
+            color: var(--color-primary);
+            display: block;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: var(--space-2);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--text-inverse);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-16) var(--space-6) var(--space-8);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-8);
+        }
+        
+        .footer-section h4 {
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: var(--space-2);
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        
+        .footer-links a:hover {
+            color: var(--color-primary);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid var(--border-primary);
+            padding: var(--space-6);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                border-top: 1px solid var(--border-primary);
+                flex-direction: column;
+                padding: var(--space-4);
+                gap: var(--space-4);
+            }
+            
+            .nav-menu.show {
+                display: flex;
+            }
+            
+            .hero {
+                padding: var(--space-16) 0;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-6);
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-6);
+            }
+        }
+        
+        /* Accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--color-primary);
+            color: var(--text-inverse);
+            padding: 8px;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            z-index: 1000;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        /* Loading Animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .page-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--color-gray-300);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Page Loader -->
+    <div class="page-loader" id="page-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="fas fa-robot"></i>
+                Biped
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button id="theme-toggle" class="btn btn-ghost" data-tooltip="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="/login" class="btn btn-outline">Login</a>
+                <a href="/register" class="btn btn-primary">Get Started</a>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="hero-content" style="max-width: 1200px; margin: 0 auto; padding: var(--space-20) var(--space-6);">
+                <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                    <h1 style="font-size: var(--text-5xl); font-weight: 800; margin-bottom: var(--space-6); line-height: 1.1;">
+                        The Future of Trades is
+                        <span style="background: linear-gradient(45deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Autonomous</span>
+                    </h1>
+                    <p style="font-size: var(--text-xl); margin-bottom: var(--space-8); opacity: 0.9; line-height: var(--leading-relaxed);">
+                        Connect with skilled tradespeople through our AI-powered marketplace. 
+                        Smart matching, automated workflows, and seamless project management.
+                    </p>
+                    <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+                        <a href="/register" class="btn btn-primary btn-lg">
+                            <i class="fas fa-rocket"></i>
+                            Start Your Project
+                        </a>
+                        <a href="/providers" class="btn btn-outline btn-lg" style="color: var(--text-inverse); border-color: rgba(255,255,255,0.3);">
+                            <i class="fas fa-tools"></i>
+                            Join as Provider
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section id="services" style="padding: var(--space-20) var(--space-6); max-width: 1200px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: var(--space-16);">
+                <h2 style="font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-4);">
+                    Why Choose Biped?
+                </h2>
+                <p style="font-size: var(--text-lg); color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+                    Experience the next generation of trades marketplace with AI-powered features designed for efficiency and quality.
+                </p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">AI-Powered Matching</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Our intelligent system matches you with the perfect tradesperson based on your specific needs, location, and project requirements.
+                    </p>
+                </div>
+                
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">Computer Vision QC</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Advanced computer vision technology ensures quality control and progress tracking throughout your project.
+                    </p>
+                </div>
+                
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">Autonomous Operations</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Automated workflows handle scheduling, payments, and project management, so you can focus on what matters.
+                    </p>
+                </div>
+                
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">Mobile-First Design</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Manage your projects on the go with our responsive, mobile-optimized platform that works everywhere.
+                    </p>
+                </div>
+                
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">Secure & Reliable</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Enterprise-grade security, verified professionals, and comprehensive insurance coverage for peace of mind.
+                    </p>
+                </div>
+                
+                <div class="feature-card card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-4);">Advanced Analytics</h3>
+                    <p style="color: var(--text-secondary); line-height: var(--leading-relaxed);">
+                        Detailed insights and reporting help you track performance, costs, and project outcomes.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stats Section -->
+        <section style="background: var(--bg-secondary); padding: var(--space-20) var(--space-6);">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: var(--space-16);">
+                    <h2 style="font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-4);">
+                        Trusted by Thousands
+                    </h2>
+                    <p style="font-size: var(--text-lg); color: var(--text-secondary);">
+                        Join the growing community of satisfied customers and skilled professionals.
+                    </p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div>
+                        <span class="stat-number">10,000+</span>
+                        <div class="stat-label">Projects Completed</div>
+                    </div>
+                    <div>
+                        <span class="stat-number">5,000+</span>
+                        <div class="stat-label">Verified Professionals</div>
+                    </div>
+                    <div>
+                        <span class="stat-number">98%</span>
+                        <div class="stat-label">Customer Satisfaction</div>
+                    </div>
+                    <div>
+                        <span class="stat-number">24/7</span>
+                        <div class="stat-label">AI Support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- How It Works Section -->
+        <section id="how-it-works" style="padding: var(--space-20) var(--space-6); max-width: 1200px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: var(--space-16);">
+                <h2 style="font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-4);">
+                    How It Works
+                </h2>
+                <p style="font-size: var(--text-lg); color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+                    Get your project done in three simple steps with our intelligent platform.
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-8);">
+                <div style="text-align: center; padding: var(--space-6);">
+                    <div style="width: 60px; height: 60px; background: var(--color-primary-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); color: var(--color-primary); font-size: var(--text-xl); font-weight: 700;">1</div>
+                    <h3 style="margin-bottom: var(--space-3);">Describe Your Project</h3>
+                    <p style="color: var(--text-secondary);">Tell us what you need done. Our AI analyzes your requirements and suggests the best approach.</p>
+                </div>
+                
+                <div style="text-align: center; padding: var(--space-6);">
+                    <div style="width: 60px; height: 60px; background: var(--color-primary-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); color: var(--color-primary); font-size: var(--text-xl); font-weight: 700;">2</div>
+                    <h3 style="margin-bottom: var(--space-3);">Get Matched</h3>
+                    <p style="color: var(--text-secondary);">Receive quotes from verified professionals who are perfect for your specific project needs.</p>
+                </div>
+                
+                <div style="text-align: center; padding: var(--space-6);">
+                    <div style="width: 60px; height: 60px; background: var(--color-primary-light); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); color: var(--color-primary); font-size: var(--text-xl); font-weight: 700;">3</div>
+                    <h3 style="margin-bottom: var(--space-3);">Project Complete</h3>
+                    <p style="color: var(--text-secondary);">Enjoy automated project management, quality monitoring, and seamless completion.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div style="max-width: 800px; margin: 0 auto; padding: var(--space-20) var(--space-6); position: relative; z-index: 1;">
+                <h2 style="font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-6);">
+                    Ready to Transform Your Projects?
+                </h2>
+                <p style="font-size: var(--text-xl); margin-bottom: var(--space-8); opacity: 0.9;">
+                    Join thousands of satisfied customers who have discovered the future of trades.
+                </p>
+                <div style="display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;">
+                    <a href="/register" class="btn btn-primary btn-lg" style="background: var(--color-white); color: var(--color-primary);">
+                        <i class="fas fa-rocket"></i>
+                        Get Started Today
+                    </a>
+                    <a href="/demo" class="btn btn-outline btn-lg" style="color: var(--text-inverse); border-color: rgba(255,255,255,0.3);">
+                        <i class="fas fa-play"></i>
+                        Watch Demo
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul class="footer-links">
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/providers">For Providers</a></li>
+                    <li><a href="/customers">For Customers</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/careers">Careers</a></li>
+                    <li><a href="/press">Press</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="/help">Help Center</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/safety">Safety</a></li>
+                    <li><a href="/insurance">Insurance</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Service</a></li>
+                    <li><a href="/cookies">Cookie Policy</a></li>
+                    <li><a href="/accessibility">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Biped Platform. All rights reserved. Built with ❤️ for the trades community.</p>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="/js/design-system.js"></script>
+    <script>
+        // Page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide page loader
+            setTimeout(() => {
+                document.getElementById('page-loader').classList.add('hidden');
+            }, 500);
+            
+            // Mobile menu toggle
+            const mobileToggle = document.getElementById('mobile-menu-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            
+            mobileToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                const icon = mobileToggle.querySelector('i');
+                icon.className = navMenu.classList.contains('show') ? 'fas fa-times' : 'fas fa-bars';
+            });
+            
+            // Navbar scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        
+                        // Update active nav link
+                        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Close mobile menu
+                        navMenu.classList.remove('show');
+                        mobileToggle.querySelector('i').className = 'fas fa-bars';
+                    }
+                });
+            });
+            
+            // Intersection Observer for nav link highlighting
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            sections.forEach(section => observer.observe(section));
+            
+            // Animate stats on scroll
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const statNumbers = entry.target.querySelectorAll('.stat-number');
+                        statNumbers.forEach(stat => {
+                            const finalValue = stat.textContent;
+                            const numericValue = parseInt(finalValue.replace(/[^0-9]/g, ''));
+                            if (!isNaN(numericValue)) {
+                                animateNumber(stat, 0, numericValue, finalValue);
+                            }
+                        });
+                        statsObserver.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            const statsSection = document.querySelector('.stats-grid');
+            if (statsSection) {
+                statsObserver.observe(statsSection.parentElement);
+            }
+            
+            // Number animation function
+            function animateNumber(element, start, end, suffix) {
+                const duration = 2000;
+                const startTime = performance.now();
+                
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const current = Math.floor(start + (end - start) * progress);
+                    
+                    element.textContent = suffix.replace(/[0-9,]+/, current.toLocaleString());
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    }
+                }
+                
+                requestAnimationFrame(update);
+            }
+            
+            // Show welcome notification
+            setTimeout(() => {
+                bipedDS.showNotification('Welcome to Biped! 🚀 The future of trades is here.', 'info', 8000);
+            }, 2000);
+        });
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
+
