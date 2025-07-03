@@ -1,10 +1,7 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
-
-[build.buildCommand]
-# Clear all caches before build with unique timestamp
-command = "docker system prune -af && docker builder prune -af && echo 'Cache cleared at $(date)'"
+buildCommand = "docker system prune -af && docker builder prune -af && echo 'Cache cleared at $(date)'"
 
 [deploy]
 startCommand = "./start.sh"
