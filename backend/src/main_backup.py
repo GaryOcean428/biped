@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from flask import Flask, send_from_directory, g, request, jsonify, redirect, url_for, render_template_string
+from flask import Flask, send_from_directory, g, request, jsonify, redirect
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -107,6 +107,15 @@ CORS(app,
      allow_headers=app.config['CORS_ALLOW_HEADERS'],
      methods=app.config['CORS_METHODS'])
 
+# Initialize security enhancements
+
+# Security headers configuration
+app.config['FORCE_HTTPS'] = os.environ.get('FORCE_HTTPS', 'true').lower() == 'true'
+
+# Monitoring configuration
+app.config['SENTRY_DSN'] = os.environ.get('SENTRY_DSN')
+app.config['ENVIRONMENT'] = os.environ.get('ENVIRONMENT', 'production')
+
 # Configure performance optimizations
 configure_performance(app)
 
@@ -140,16 +149,12 @@ CORS(app,
      allow_headers=['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'])
 
-# Cache busting configuration
-CACHE_BUST = os.environ.get('CACHE_BUST', str(int(time.time())))
-
 # Make security enhancer available in request context
 @app.before_request
 def before_request():
     g.security_enhancer = security_enhancer
     g.cache_service = trading_cache
     g.start_time = time.time()
-    g.cache_bust = CACHE_BUST
     
     # Log request for monitoring
     if not request.path.startswith('/static'):
@@ -157,13 +162,6 @@ def before_request():
 
 @app.after_request
 def after_request(response):
-    # Add cache busting headers for static files
-    if request.path.startswith('/static') or request.path.endswith(('.css', '.js', '.png', '.jpg', '.ico')):
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        response.headers['ETag'] = f'"{CACHE_BUST}"'
-    
     # Add security headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
@@ -251,158 +249,21 @@ with app.app_context():
     except Exception as e:
         print(f"❌ Database initialization error: {e}")
 
-# MAIN APPLICATION ROUTES - FIXED ROUTING SYSTEM
+# Enhanced route handlers
+@app.route('/admin')
+def admin_dashboard():
+    """Serve the admin dashboard"""
+    return send_from_directory('static', 'admin.html')
 
 @app.route('/')
 def root():
-    """Serve the main trades marketplace application"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    # Try to serve the main application interface
-    main_app_files = [
-        'dashboard-enhanced.html',
-        'index.html', 
-        'dashboard.html'
-    ]
-    
-    for filename in main_app_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            print(f"✅ Serving main app from: {filename}")
-            response = send_from_directory(static_folder_path, filename)
-            # Add cache busting headers
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
-            return response
-    
-    # Fallback: Create a simple redirect to dashboard
-    print("⚠️ No main app file found, redirecting to dashboard")
+    """Redirect to the working trades marketplace dashboard"""
     return redirect('/dashboard')
 
 @app.route('/dashboard')
-def dashboard():
-    """Serve the provider dashboard"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    dashboard_files = [
-        'dashboard-enhanced.html',
-        'dashboard.html'
-    ]
-    
-    for filename in dashboard_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            print(f"✅ Serving dashboard from: {filename}")
-            response = send_from_directory(static_folder_path, filename)
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            return response
-    
-    return jsonify({'error': 'Dashboard not found'}), 404
-
-@app.route('/jobs')
-def jobs():
-    """Serve the job posting interface"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    job_files = [
-        'enhanced-job-posting.html',
-        'jobs.html'
-    ]
-    
-    for filename in job_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            response = send_from_directory(static_folder_path, filename)
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            return response
-    
-    return jsonify({'error': 'Jobs interface not found'}), 404
-
-@app.route('/providers')
-def providers():
-    """Serve the provider interface"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    provider_files = [
-        'provider-dashboard.html',
-        'providers.html'
-    ]
-    
-    for filename in provider_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            response = send_from_directory(static_folder_path, filename)
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            return response
-    
-    return jsonify({'error': 'Provider interface not found'}), 404
-
-@app.route('/admin')
-def admin():
-    """Serve the admin dashboard"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    admin_files = [
-        'admin.html'
-    ]
-    
-    for filename in admin_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            response = send_from_directory(static_folder_path, filename)
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            return response
-    
-    return jsonify({'error': 'Admin interface not found'}), 404
-
-# Static file serving with cache busting
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    """Serve static files with cache busting"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    try:
-        response = send_from_directory(static_folder_path, filename)
-        
-        # Add cache busting headers
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        response.headers['ETag'] = f'"{CACHE_BUST}"'
-        
-        # Set proper MIME types
-        if filename.endswith('.js'):
-            response.headers['Content-Type'] = 'text/javascript'
-        elif filename.endswith('.css'):
-            response.headers['Content-Type'] = 'text/css'
-        elif filename.endswith('.json'):
-            response.headers['Content-Type'] = 'application/json'
-        elif filename.endswith('.ico'):
-            response.headers['Content-Type'] = 'image/x-icon'
-        elif filename.endswith('.png'):
-            response.headers['Content-Type'] = 'image/png'
-        elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
-            response.headers['Content-Type'] = 'image/jpeg'
-        elif filename.endswith('.svg'):
-            response.headers['Content-Type'] = 'image/svg+xml'
-        
-        return response
-        
-    except FileNotFoundError:
-        return jsonify({'error': 'File not found'}), 404
-
-# API status endpoint
-@app.route('/api/status')
-def api_status():
-    """API status endpoint"""
-    return jsonify({
-        'status': 'operational',
-        'version': '2.0',
-        'platform': 'Biped Trades Marketplace',
-        'cache_bust': CACHE_BUST,
-        'timestamp': int(time.time())
-    })
+def enhanced_dashboard():
+    """Serve the trades marketplace dashboard"""
+    return send_from_directory('static', 'dashboard-enhanced.html')
 
 @app.route('/api/metrics')
 @security_enhancer.api_rate_limit
@@ -424,16 +285,82 @@ def security_status():
         'input_validation': True
     }
 
+# Specific route handlers for different pages
+@app.route('/jobs')
+def jobs_page():
+    """Serve the job posting interface"""
+    return send_from_directory('static', 'enhanced-job-posting.html')
+
+@app.route('/providers')
+def providers_page():
+    """Serve the provider dashboard"""
+    return send_from_directory('static', 'provider-dashboard.html')
+
+@app.route('/mobile')
+def mobile_page():
+    """Serve the mobile interface"""
+    return send_from_directory('static', 'mobile.html')
+
+# Static file handler for assets
+@app.route('/<path:filename>')
+def serve_static_files(filename):
+    """Serve static files (CSS, JS, images, etc.)"""
+    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
+    
+    # Handle API routes - don't serve HTML for these
+    if filename.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
+    
+    # Handle static assets (CSS, JS, images, etc.)
+    if '.' in filename:
+        file_path = os.path.join(static_folder_path, filename)
+        
+        # Handle legacy /css/ paths by redirecting to /static/css/
+        if filename.startswith('css/') and not os.path.exists(file_path):
+            static_path = 'static/' + filename
+            file_path = os.path.join(static_folder_path, static_path)
+            if os.path.exists(file_path):
+                filename = static_path
+        
+        if os.path.exists(file_path):
+            # Determine MIME type based on file extension
+            mimetype = None
+            if filename.endswith('.js'):
+                mimetype = 'text/javascript'
+            elif filename.endswith('.css'):
+                mimetype = 'text/css'
+            elif filename.endswith('.json'):
+                mimetype = 'application/json'
+            elif filename.endswith('.ico'):
+                mimetype = 'image/x-icon'
+            elif filename.endswith('.png'):
+                mimetype = 'image/png'
+            elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
+                mimetype = 'image/jpeg'
+            elif filename.endswith('.svg'):
+                mimetype = 'image/svg+xml'
+            elif filename.endswith('.woff'):
+                mimetype = 'font/woff'
+            elif filename.endswith('.woff2'):
+                mimetype = 'font/woff2'
+            elif filename.endswith('.ttf'):
+                mimetype = 'font/ttf'
+            elif filename.endswith('.eot'):
+                mimetype = 'application/vnd.ms-fontobject'
+            
+            # Send file with proper MIME type
+            response = send_from_directory(static_folder_path, filename)
+            if mimetype:
+                response.headers['Content-Type'] = mimetype
+            return response
+    
+    # For any other route, serve the dashboard (trades marketplace)
+    return send_from_directory('static', 'dashboard.html')
+
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
-    """Handle 404 errors by redirecting to main app"""
-    # For API routes, return JSON error
-    if request.path.startswith('/api/'):
-        return jsonify({'error': 'API endpoint not found'}), 404
-    
-    # For other routes, redirect to main app
-    return redirect('/')
+    return jsonify({'error': 'Not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(error):
@@ -447,5 +374,57 @@ def rate_limit_exceeded(error):
     }), 429
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=False)
+    # Railway deployment best practices
+    # Get port from environment variable with proper error handling
+    try:
+        port = int(os.environ.get('PORT', 8080))
+        if port <= 0 or port > 65535:
+            raise ValueError(f"Invalid port number: {port}")
+    except (ValueError, TypeError) as e:
+        print(f"❌ Port configuration error: {e}")
+        print("   Using default port 8080")
+        port = 8080
+    
+    # Environment configuration
+    debug = os.environ.get('DEBUG', 'false').lower() == 'true'
+    environment = os.environ.get('ENVIRONMENT', 'production')
+    
+    print(f"🚀 Starting Enhanced Biped Platform v2.0")
+    print(f"   Environment: {environment}")
+    print(f"   Port: {port}")
+    print(f"   Debug: {debug}")
+    print(f"   Data Directory: {DATA_DIR}")
+    print(f"   Redis Connected: {redis_client.is_connected()}")
+    print(f"   Database: {'PostgreSQL' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'SQLite'}")
+    print(f"   Security Enhanced: ✅")
+    print(f"   Performance Optimized: ✅")
+    print(f"   Real-time Features: ✅")
+    print(f"   Analytics Engine: ✅")
+    
+    # Railway-specific optimizations
+    if environment == 'production':
+        print(f"   Production Mode: ✅")
+        print(f"   HTTPS Enforced: {app.config.get('FORCE_HTTPS', False)}")
+        print(f"   Health Check: /api/health")
+        
+        # Use Gunicorn for production (handled by Railway)
+        # This will only run if not using Gunicorn
+        app.run(
+            host='0.0.0.0', 
+            port=port, 
+            debug=False,
+            threaded=True,
+            use_reloader=False
+        )
+    else:
+        # Development mode with SocketIO
+        print(f"   Development Mode: ✅")
+        socketio.run(
+            app, 
+            host='0.0.0.0', 
+            port=port, 
+            debug=debug,
+            use_reloader=debug,
+            log_output=True
+        )
 

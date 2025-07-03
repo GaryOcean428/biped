@@ -1,32 +1,37 @@
-# Git
-.git
-.gitignore
-README.md
-
-# Documentation
-*.md
-docs/
-
-# Development files
-.env
-.env.local
-.env.development
-.env.test
-.env.production
-
-# Node modules (will be installed in container)
+# Node modules and build artifacts
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Python cache
+# Python cache and build artifacts
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.py[cod]
+*$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # IDE files
 .vscode/
@@ -37,17 +42,21 @@ __pycache__/
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
+# Git
+.git/
+.gitignore
 
-# Test coverage
-coverage/
-.nyc_output/
-.coverage
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
 
 # Logs
 logs/
@@ -59,15 +68,62 @@ pids/
 *.seed
 *.pid.lock
 
-# Temporary files
-tmp/
-temp/
+# Coverage directory used by tools like istanbul
+coverage/
 
-# Railway specific
-.railway/
+# nyc test coverage
+.nyc_output
 
-# Local development
-data/
-uploads/
-backups/
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Backup files
+*.backup
+*_backup.*
+main_backup.py
+
+# System status files (to prevent conflicts)
+*system-status*
+index-system-status*
+
+# Cache files
+*.cache
+.cache/
 

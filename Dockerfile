@@ -1,83 +1,84 @@
-# Railway-Optimized Dockerfile for Biped Platform
-# Single service architecture serving Flask backend + React frontend
+# Multi-stage Dockerfile for Biped Platform with cache clearing
+FROM node:18-alpine AS frontend-builder
 
-FROM node:20-slim AS frontend-builder
-
-# Set working directory for frontend build
+# Set working directory for frontend
 WORKDIR /app/frontend
 
 # Copy frontend package files
 COPY frontend/package*.json ./
+COPY frontend/yarn.lock ./
 
-# Install frontend dependencies with npm (including dev dependencies for build)
-RUN npm install
+# Install frontend dependencies with cache clearing
+RUN yarn install --frozen-lockfile --network-timeout 300000
 
 # Copy frontend source code
 COPY frontend/ ./
 
-# Build React frontend for production
-RUN npm run build
+# Build frontend with cache busting
+ENV GENERATE_SOURCEMAP=false
+ENV REACT_APP_CACHE_BUST=$(date +%s)
+RUN yarn build
 
-# Production stage with Python
-FROM python:3.11-slim
+# Python backend stage
+FROM python:3.11-slim AS backend-builder
 
 # Set environment variables
-ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=production
+ENV FLASK_APP=src/main.py
 
-# Install essential system dependencies only
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    # Essential build tools
-    build-essential \
-    pkg-config \
-    curl \
-    # PostgreSQL client
+    gcc \
+    g++ \
     libpq-dev \
-    # OpenCV headless dependencies (minimal)
-    libglib2.0-0 \
-    libgomp1 \
-    # Cleanup
-    && apt-get clean \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Create data directory for Railway volume
-RUN mkdir -p /data && chmod 755 /data
-
-# Copy requirements first for better layer caching
-COPY backend/requirements.txt ./backend/requirements.txt
+# Copy backend requirements
+COPY backend/requirements.txt ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r backend/requirements.txt
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application code
-COPY backend/ ./backend/
+# Copy backend source code
+COPY backend/ ./
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /app/frontend/build/ ./backend/src/static/
+# Copy frontend build from previous stage
+COPY --from=frontend-builder /app/frontend/build ./src/static/
 
-# Set working directory to backend
-WORKDIR /app/backend
+# Create cache-busting index.html with timestamp
+RUN CACHE_BUST=$(date +%s) && \
+    sed -i "s/\(href=\"[^\"]*\.\(css\|js\)\)/\1?v=${CACHE_BUST}/g" ./src/static/index.html && \
+    sed -i "s/\(src=\"[^\"]*\.\(css\|js\)\)/\1?v=${CACHE_BUST}/g" ./src/static/index.html
 
-# Create non-root user for security
-RUN useradd --create-home --shell /bin/bash app && \
-    chown -R app:app /app && \
-    chown -R app:app /data
+# Remove any conflicting files that might cause routing issues
+RUN find ./src/static/ -name "index-system-status*" -delete || true && \
+    find ./src/static/ -name "main.*.css" -delete || true && \
+    find ./src/static/ -name "main.*.js" -delete || true
 
-# Switch to non-root user
-USER app
+# Ensure proper file permissions
+RUN chmod -R 755 ./src/static/
+
+# Create a startup script with cache headers
+RUN echo '#!/bin/bash\n\
+export CACHE_BUST=$(date +%s)\n\
+export FLASK_STATIC_CACHE_TIMEOUT=0\n\
+python -m flask run --host=0.0.0.0 --port=${PORT:-8000}\n\
+' > start.sh && chmod +x start.sh
+
+# Expose port
+EXPOSE 8000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
-# Expose port (Railway will set PORT environment variable)
-EXPOSE 8080
-
-# Start command optimized for Railway
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "--worker-class", "gevent", "--timeout", "120", "--keep-alive", "2", "--max-requests", "1000", "--max-requests-jitter", "100", "--log-level", "info", "--access-logfile", "-", "--error-logfile", "-", "src.main:app"]
+# Start the application
+CMD ["./start.sh"]
 

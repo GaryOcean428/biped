@@ -2,39 +2,65 @@
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
+[build.buildCommand]
+# Clear all caches before build
+command = "docker system prune -af && docker builder prune -af"
+
 [deploy]
+startCommand = "./start.sh"
 healthcheckPath = "/health"
-healthcheckTimeout = 60
+healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
-[env]
-# Railway Volume Configuration
-DATA_DIR = "/data"
-
-# Environment Configuration
-ENVIRONMENT = "production"
-DEBUG = "false"
-FORCE_HTTPS = "true"
-
-# Python Configuration
-PYTHONPATH = "/app/backend"
+[deploy.env]
+# Cache busting environment variables
+CACHE_BUST = "${{timestamp}}"
+FLASK_STATIC_CACHE_TIMEOUT = "0"
+FLASK_ENV = "production"
+FLASK_APP = "src/main.py"
+PYTHONDONTWRITEBYTECODE = "1"
 PYTHONUNBUFFERED = "1"
 
-# OpenCV Configuration for Headless Operation
-OPENCV_HEADLESS = "true"
-CV_FALLBACK_MODE = "true"
-DISPLAY = ""
+# Force cache clearing headers
+FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
+STATIC_CACHE_TIMEOUT = "0"
 
-# Security Configuration
-WTF_CSRF_ENABLED = "true"
-SESSION_COOKIE_SECURE = "true"
+[deploy.headers]
+# Cache control headers to prevent caching issues
+"Cache-Control" = "no-cache, no-store, must-revalidate"
+"Pragma" = "no-cache"
+"Expires" = "0"
 
-# Performance Configuration
-COMPRESS_LEVEL = "6"
-CACHE_DEFAULT_TIMEOUT = "300"
+[deploy.redirects]
+# Ensure root redirects to main app
+"/" = "/dashboard"
 
-# Service References (Railway will inject these automatically)
-# DATABASE_PRIVATE_URL = "${{Postgres.DATABASE_PRIVATE_URL}}"
-# REDIS_PRIVATE_URL = "${{Redis.REDIS_PRIVATE_URL}}"
+[services.biped]
+source = "."
+build = { builder = "dockerfile" }
+
+[services.biped.variables]
+# Database configuration
+DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+DATABASE_PRIVATE_URL = "${{Postgres.DATABASE_PRIVATE_URL}}"
+
+# Redis configuration  
+REDIS_URL = "${{Redis.REDIS_URL}}"
+REDIS_PRIVATE_URL = "${{Redis.REDIS_PRIVATE_URL}}"
+
+# Application configuration
+PORT = "8000"
+FLASK_SECRET_KEY = "${{secrets.FLASK_SECRET_KEY}}"
+JWT_SECRET_KEY = "${{secrets.JWT_SECRET_KEY}}"
+
+# Cache busting
+CACHE_VERSION = "${{timestamp}}"
+BUILD_ID = "${{build.id}}"
+
+[experimental]
+# Enable experimental features for better caching control
+incrementalBuilds = false
+buildCache = false
+staticOptimization = true
 
