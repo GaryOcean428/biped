@@ -34,7 +34,7 @@ function Dashboard({ systemStatus }) {
     <div>
       <div className="card">
         <h2>📊 Biped Platform Dashboard</h2>
-        <p>Welcome to your enterprise trading and business management platform.</p>
+        <p>Welcome to your trades and services marketplace platform.</p>
         
         <div className="grid">
           <div className="metric-card">
@@ -71,16 +71,16 @@ function Dashboard({ systemStatus }) {
         <h3>🚀 Platform Features</h3>
         <div className="grid">
           <div className="metric-card">
-            <h4>📈 Analytics Engine</h4>
-            <p>Real-time data processing, portfolio analytics, and market intelligence</p>
+            <h4>📊 Project Analytics</h4>
+            <p>Real-time project tracking, service analytics, and business insights</p>
             <button className="btn btn-primary" onClick={() => window.location.href = '/analytics'}>
               View Analytics
             </button>
           </div>
           
           <div className="metric-card">
-            <h4>👁️ Computer Vision</h4>
-            <p>AI-powered image analysis and quality control</p>
+            <h4>👁️ Quality Control</h4>
+            <p>AI-powered image analysis and work quality assessment</p>
             <button className="btn btn-primary" onClick={() => window.location.href = '/vision'}>
               Vision Tools
             </button>
@@ -110,7 +110,7 @@ function Dashboard({ systemStatus }) {
           </div>
           
           <div className="metric-card">
-            <div className="metric-value">Enterprise</div>
+            <div className="metric-value">Marketplace</div>
             <div className="metric-label">Edition</div>
           </div>
         </div>

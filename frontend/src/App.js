@@ -65,7 +65,7 @@ function App() {
         </main>
 
         <footer className="App-footer">
-          <p>&copy; 2025 Biped Platform - Enterprise Trading & Business Management</p>
+          <p>&copy; 2025 Biped Platform - Trades & Services Marketplace</p>
         </footer>
       </div>
     </Router>

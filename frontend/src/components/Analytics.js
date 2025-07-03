@@ -56,24 +56,24 @@ function Analytics() {
         <h3>📊 Available Analytics</h3>
         <div className="grid">
           <div className="metric-card">
-            <h4>Portfolio Analytics</h4>
-            <p>Performance tracking and risk assessment</p>
+            <h4>Project Analytics</h4>
+            <p>Project performance tracking and completion rates</p>
             <button className="btn btn-success" onClick={() => window.open('/api/analytics/portfolio', '_blank')}>
               View API
             </button>
           </div>
           
           <div className="metric-card">
-            <h4>Market Intelligence</h4>
-            <p>Real-time market data and sentiment analysis</p>
+            <h4>Service Insights</h4>
+            <p>Service demand analysis and pricing trends</p>
             <button className="btn btn-success" onClick={() => window.open('/api/analytics/market', '_blank')}>
               View API
             </button>
           </div>
           
           <div className="metric-card">
-            <h4>Risk Management</h4>
-            <p>Risk scoring and alert generation</p>
+            <h4>Quality Management</h4>
+            <p>Quality scoring and issue tracking</p>
             <button className="btn btn-success" onClick={() => window.open('/api/analytics/risk', '_blank')}>
               View API
             </button>
