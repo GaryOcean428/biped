@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import logging
 
-from ..services.data_pipeline import MarketplaceIntelligenceEngine, RealTimeDataProcessor
+from ..services.data_pipeline import BusinessIntelligenceEngine, RealTimeDataProcessor
 from ..utils.security import SecurityEnhancer
 from ..utils.performance import TradingCacheService
 
@@ -43,7 +43,7 @@ def get_portfolio_analytics(user_id: str):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         analytics = loop.run_until_complete(
-            bi_engine.generate_user_analytics(user_id)
+            bi_engine.generate_portfolio_analytics(user_id)
         )
         
         return jsonify({
@@ -87,44 +87,32 @@ def get_market_intelligence():
 @analytics_bp.route('/real-time/market-data', methods=['GET'])
 @login_required
 def get_real_time_market_data():
-    """Get real-time marketplace data for service categories"""
+    """Get real-time market data for multiple symbols"""
     try:
-        categories = request.args.get('categories', '').split(',')
-        if not categories or categories == ['']:
-            categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping']
+        symbols = request.args.get('symbols', '').split(',')
+        if not symbols or symbols == ['']:
+            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
         
-        # Get cached marketplace data
+        # Get cached market data
         cache_service = current_app.config.get('CACHE_SERVICE')
         if not cache_service:
             return jsonify({'error': 'Cache service not available'}), 503
         
-        marketplace_data = {}
-        for category in categories:
-            try:
-                cached_data = cache_service.get(f"service_data:{category}")
-                if cached_data:
-                    marketplace_data[category] = cached_data
-            except Exception as e:
-                logger.debug(f"Could not get cached data for {category}: {e}")
-                # Provide fallback data
-                marketplace_data[category] = {
-                    'avg_price': 250,
-                    'demand_score': 0.6,
-                    'supply_score': 0.5,
-                    'completion_rate': 0.9,
-                    'avg_rating': 4.5,
-                    'response_time': 4.2
-                }
+        market_data = {}
+        for symbol in symbols:
+            data = cache_service.get_market_data(symbol.strip())
+            if data:
+                market_data[symbol] = data
         
         return jsonify({
             'status': 'success',
-            'data': marketplace_data,
+            'data': market_data,
             'timestamp': datetime.utcnow().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"Error getting marketplace data: {e}")
-        return jsonify({'error': 'Failed to get marketplace data'}), 500
+        logger.error(f"Error getting real-time market data: {e}")
+        return jsonify({'error': 'Failed to get market data'}), 500
 
 @analytics_bp.route('/performance/summary', methods=['GET'])
 @login_required
@@ -146,7 +134,7 @@ def get_performance_summary():
         
         # Get portfolio analytics
         analytics = loop.run_until_complete(
-            bi_engine.generate_user_analytics(user_id)
+            bi_engine.generate_portfolio_analytics(user_id)
         )
         
         # Extract performance summary
@@ -188,7 +176,7 @@ def get_risk_assessment():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         analytics = loop.run_until_complete(
-            bi_engine.generate_user_analytics(user_id)
+            bi_engine.generate_portfolio_analytics(user_id)
         )
         
         risk_assessment = {
@@ -211,10 +199,10 @@ def get_risk_assessment():
         logger.error(f"Error getting risk assessment: {e}")
         return jsonify({'error': 'Failed to get risk assessment'}), 500
 
-@analytics_bp.route('/user/activity', methods=['GET'])
+@analytics_bp.route('/trading/patterns', methods=['GET'])
 @login_required
-def get_user_activity():
-    """Analyze user marketplace activity patterns"""
+def get_trading_patterns():
+    """Analyze trading patterns for current user"""
     try:
         user_id = current_user.id
         
@@ -224,22 +212,22 @@ def get_user_activity():
         if not bi_engine:
             return jsonify({'error': 'Analytics service not available'}), 503
         
-        # Get user analytics
+        # Get trading patterns
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         analytics = loop.run_until_complete(
-            bi_engine.generate_user_analytics(user_id)
+            bi_engine.generate_portfolio_analytics(user_id)
         )
         
-        activity_patterns = analytics.get('activity_patterns', {})
+        patterns = analytics.get('trading_patterns', {})
         
         # Enhance with additional analysis
         enhanced_patterns = {
-            **activity_patterns,
-            'service_preferences': analytics.get('service_preferences', {}),
-            'satisfaction_metrics': analytics.get('satisfaction_metrics', {}),
-            'spending_analysis': analytics.get('spending_analysis', {}),
-            'recommendations': analytics.get('recommendations', [])
+            **patterns,
+            'trading_style': _determine_trading_style(patterns),
+            'efficiency_score': _calculate_efficiency_score(patterns),
+            'behavioral_insights': _analyze_trading_behavior(patterns),
+            'improvement_suggestions': _suggest_improvements(patterns)
         }
         
         return jsonify({
@@ -249,17 +237,17 @@ def get_user_activity():
         })
         
     except Exception as e:
-        logger.error(f"Error analyzing user activity: {e}")
-        return jsonify({'error': 'Failed to analyze user activity'}), 500
+        logger.error(f"Error analyzing trading patterns: {e}")
+        return jsonify({'error': 'Failed to analyze trading patterns'}), 500
 
-@analytics_bp.route('/marketplace/insights', methods=['GET'])
+@analytics_bp.route('/market/sentiment', methods=['GET'])
 @login_required
-def get_marketplace_insights():
-    """Get marketplace insights and trends"""
+def get_market_sentiment():
+    """Get market sentiment analysis"""
     try:
-        categories = request.args.get('categories', '').split(',')
-        if not categories or categories == ['']:
-            categories = ['Plumbing', 'Electrical', 'Carpentry', 'Painting', 'Landscaping']
+        symbols = request.args.get('symbols', '').split(',')
+        if not symbols or symbols == ['']:
+            symbols = ['BTC/USD', 'ETH/USD', 'AAPL', 'GOOGL', 'TSLA']
         
         services = get_services()
         bi_engine = services.get('bi_engine')
@@ -370,7 +358,7 @@ def generate_custom_report():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             report_data = loop.run_until_complete(
-                bi_engine.generate_user_analytics(user_id)
+                bi_engine.generate_portfolio_analytics(user_id)
             )
         elif report_type == 'market_analysis':
             loop = asyncio.new_event_loop()
@@ -465,12 +453,10 @@ def _analyze_diversification(allocation: Dict) -> Dict:
         'diversification_score': 75,  # 0-100 scale
         'sector_concentration': 'moderate',
         'geographic_concentration': 'low',
-        'service_category_distribution': {
-            'plumbing': 30,
-            'electrical': 25,
-            'landscaping': 20,
-            'painting': 15,
-            'cleaning': 10
+        'asset_class_distribution': {
+            'equities': 60,
+            'crypto': 30,
+            'bonds': 10
         },
         'recommendations': [
             'Consider adding international exposure',
@@ -497,78 +483,76 @@ def _perform_stress_test(analytics: Dict) -> Dict:
         'overall_resilience': 'moderate'
     }
 
-def _determine_user_type(patterns: Dict) -> str:
-    """Determine user's marketplace activity type"""
-    # Analyze patterns to determine user type
-    job_frequency = patterns.get('jobs_last_30_days', 0)
+def _determine_trading_style(patterns: Dict) -> str:
+    """Determine user's trading style"""
+    # Analyze patterns to determine style
+    frequency = patterns.get('trading_frequency', 0)
     
-    if job_frequency > 10:  # More than 10 jobs per month
-        return 'power_user'
-    elif job_frequency > 3:  # 3-10 jobs per month
-        return 'regular_user'
+    if frequency > 5:  # More than 5 trades per day
+        return 'day_trader'
+    elif frequency > 1:  # 1-5 trades per day
+        return 'swing_trader'
     else:
-        return 'occasional_user'
+        return 'position_trader'
 
-def _calculate_satisfaction_score(patterns: Dict) -> float:
-    """Calculate user satisfaction score"""
-    # Calculate satisfaction based on ratings and completion rates
-    avg_rating = patterns.get('avg_rating', 4.0)
-    completion_rate = patterns.get('completion_rate', 80)
+def _calculate_efficiency_score(patterns: Dict) -> float:
+    """Calculate trading efficiency score"""
+    # Simulated efficiency calculation
+    win_rate = patterns.get('win_rate', 50)
+    profit_factor = patterns.get('profit_factor', 1)
     
-    satisfaction = (avg_rating / 5.0) * (completion_rate / 100) * 100
-    return min(satisfaction, 100)
+    efficiency = (win_rate / 100) * profit_factor * 50
+    return min(efficiency, 100)
 
-def _analyze_user_behavior(patterns: Dict) -> Dict:
-    """Analyze behavioral patterns in marketplace usage"""
+def _analyze_trading_behavior(patterns: Dict) -> Dict:
+    """Analyze behavioral patterns in trading"""
     return {
-        'service_loyalty': 'moderate',
-        'price_sensitivity': 'average',
-        'quality_focus': 'high',
-        'planning_horizon': 'medium-term',
-        'decision_factors': ['price', 'rating', 'response_time']
+        'risk_tolerance': 'moderate',
+        'emotional_discipline': 'good',
+        'timing_consistency': 'average',
+        'position_sizing': 'conservative',
+        'behavioral_biases': ['confirmation_bias', 'loss_aversion']
     }
 
-def _suggest_marketplace_improvements(patterns: Dict) -> List[str]:
-    """Suggest marketplace usage improvements"""
+def _suggest_improvements(patterns: Dict) -> List[str]:
+    """Suggest trading improvements"""
     return [
-        'Consider posting more detailed job descriptions to improve completion rates',
-        'Look for providers with higher ratings and more completed jobs',
-        'Consider bundling related services for better value',
-        'Leave detailed reviews to help other users and providers',
-        'Plan seasonal work in advance for better availability and pricing'
+        'Consider implementing systematic position sizing',
+        'Review and backtest trading strategies',
+        'Maintain detailed trading journal',
+        'Focus on risk-adjusted returns rather than absolute returns'
     ]
 
-def _analyze_marketplace_trends(category_data: Dict) -> Dict:
-    """Analyze marketplace trends for categories"""
+def _analyze_sentiment_trends(sentiment_data: Dict) -> Dict:
+    """Analyze sentiment trends"""
     return {
-        'overall_trend': 'stable',
-        'growth_areas': ['Landscaping', 'Cleaning'],
-        'seasonal_factors': ['Winter demand for heating', 'Spring demand for landscaping'],
-        'key_drivers': ['population_growth', 'home_renovations', 'seasonal_changes']
+        'overall_trend': 'neutral',
+        'momentum': 'stable',
+        'divergences': [],
+        'key_drivers': ['economic_data', 'earnings', 'geopolitical_events']
     }
 
-def _generate_category_insights(category_data: Dict) -> List[Dict]:
-    """Generate insights for service categories"""
-    insights = []
+def _generate_sentiment_signals(sentiment_data: Dict) -> List[Dict]:
+    """Generate trading signals based on sentiment"""
+    signals = []
     
-    for category, data in category_data.items():
-        demand_score = data.get('demand_score', 0.5)
-        supply_score = data.get('supply_score', 0.5)
+    for symbol, sentiment in sentiment_data.items():
+        score = sentiment.get('score', 0)
         
-        if demand_score > 0.7 and supply_score < 0.4:
-            insights.append({
-                'category': category,
-                'insight': 'high_demand_low_supply',
-                'recommendation': 'Consider booking in advance, prices may be higher',
-                'urgency': 'high'
+        if score > 0.7:
+            signals.append({
+                'symbol': symbol,
+                'signal': 'bullish',
+                'strength': 'strong',
+                'confidence': sentiment.get('confidence', 0)
             })
-        elif demand_score < 0.3 and supply_score > 0.7:
-            insights.append({
-                'category': category,
-                'insight': 'low_demand_high_supply',
-                'recommendation': 'Good time to book, competitive pricing expected',
-                'urgency': 'low'
+        elif score < -0.7:
+            signals.append({
+                'symbol': symbol,
+                'signal': 'bearish',
+                'strength': 'strong',
+                'confidence': sentiment.get('confidence', 0)
             })
     
-    return insights
+    return signals
 
