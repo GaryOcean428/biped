@@ -1,82 +1,16 @@
 {
-  "name": "Biped - AI-Powered Trades Marketplace",
   "short_name": "Biped",
-  "description": "Connect with skilled professionals instantly. AI-powered matching, quality vision, and secure payments.",
-  "start_url": "/mobile.html",
-  "display": "standalone",
-  "background_color": "#1e40af",
-  "theme_color": "#1e40af",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "en",
-  "categories": ["business", "productivity", "utilities"],
+  "name": "Biped Platform",
   "icons": [
     {
-      "src": "/biped-logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/biped-logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/biped-hero-bg.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Post a Job",
-      "short_name": "Post Job",
-      "description": "Quickly post a new job",
-      "url": "/mobile.html#post-job",
-      "icons": [
-        {
-          "src": "/biped-logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Find Providers",
-      "short_name": "Find Providers",
-      "description": "Search for service providers",
-      "url": "/mobile.html#find-providers",
-      "icons": [
-        {
-          "src": "/biped-logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Messages",
-      "short_name": "Messages",
-      "description": "View your messages",
-      "url": "/mobile.html#messages",
-      "icons": [
-        {
-          "src": "/biped-logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  }
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
 

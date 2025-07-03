@@ -281,7 +281,7 @@ def security_status():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
-    """Serve React frontend with proper routing support"""
+    """Serve React frontend with proper routing support and MIME types"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
     # Handle API routes - don't serve React for these
@@ -290,9 +290,39 @@ def serve_react_app(path):
     
     # Handle static assets (CSS, JS, images, etc.)
     if path and '.' in path:
+        # Check if file exists in the static directory
         file_path = os.path.join(static_folder_path, path)
         if os.path.exists(file_path):
-            return send_from_directory(static_folder_path, path)
+            # Determine MIME type based on file extension
+            mimetype = None
+            if path.endswith('.js'):
+                mimetype = 'text/javascript'
+            elif path.endswith('.css'):
+                mimetype = 'text/css'
+            elif path.endswith('.json'):
+                mimetype = 'application/json'
+            elif path.endswith('.ico'):
+                mimetype = 'image/x-icon'
+            elif path.endswith('.png'):
+                mimetype = 'image/png'
+            elif path.endswith('.jpg') or path.endswith('.jpeg'):
+                mimetype = 'image/jpeg'
+            elif path.endswith('.svg'):
+                mimetype = 'image/svg+xml'
+            elif path.endswith('.woff'):
+                mimetype = 'font/woff'
+            elif path.endswith('.woff2'):
+                mimetype = 'font/woff2'
+            elif path.endswith('.ttf'):
+                mimetype = 'font/ttf'
+            elif path.endswith('.eot'):
+                mimetype = 'application/vnd.ms-fontobject'
+            
+            # Send file with proper MIME type
+            response = send_from_directory(static_folder_path, path)
+            if mimetype:
+                response.headers['Content-Type'] = mimetype
+            return response
     
     # Handle React routes - serve index.html for all non-API routes
     index_path = os.path.join(static_folder_path, 'index.html')
