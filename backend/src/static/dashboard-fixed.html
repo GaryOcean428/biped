@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biped Dashboard - AI-Powered Trades Marketplace</title>
+    
+    <!-- Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom CSS Variables */
+        :root {
+            --color-primary: #1e40af;
+            --color-primary-light: #3b82f6;
+            --color-secondary: #64748b;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --color-info: #06b6d4;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-inverse: #ffffff;
+            --border-primary: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --transition-fast: 150ms ease;
+            --transition-normal: 300ms ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-sidebar {
+            transition: transform 0.3s ease;
+            width: 280px;
+            background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        .dashboard-main {
+            transition: margin-left 0.3s ease;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+        
+        .dashboard-main.expanded {
+            margin-left: 0;
+        }
+
+        /* Navigation Styling - FIXED */
+        .nav-link {
+            display: flex !important;
+            align-items: center !important;
+            padding: 12px 16px !important;
+            margin: 4px 0 !important;
+            border-radius: 8px !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            font-weight: 500 !important;
+            position: relative !important;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            transform: translateX(4px) !important;
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .nav-link i {
+            width: 20px !important;
+            margin-right: 12px !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+        }
+
+        .nav-link span {
+            color: #ffffff !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+        }
+
+        /* Badge styling */
+        .nav-badge {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+            font-size: 11px !important;
+            padding: 2px 6px !important;
+            border-radius: 10px !important;
+            margin-left: auto !important;
+            font-weight: 600 !important;
+        }
+
+        /* Widget Styling */
+        .widget {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+        
+        .widget:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: var(--text-inverse);
+            border: none;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .metric-change {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .metric-change.positive {
+            color: #10b981;
+        }
+        
+        .metric-change.negative {
+            color: #ef4444;
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-light);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .dashboard-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(-100%);
+            }
+            
+            .dashboard-sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .dashboard-main {
+                margin-left: 0;
+            }
+            
+            .dashboard-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .dashboard-overlay.show {
+                display: block;
+            }
+        }
+
+        /* Content sections - initially hidden */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Activity item styling */
+        .activity-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-primary);
+            transition: background-color var(--transition-fast);
+        }
+        
+        .activity-item:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Overlay -->
+    <div class="dashboard-overlay" id="dashboardOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar fixed top-0 left-0 h-full z-50" id="dashboardSidebar">
+        <div class="p-6 border-b border-white border-opacity-20">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-hammer text-white"></i>
+                </div>
+                <span class="text-xl font-bold text-white">Biped</span>
+                <span class="px-2 py-1 bg-white bg-opacity-20 text-white text-xs rounded-full">Pro</span>
+            </div>
+        </div>
+        
+        <!-- User Profile -->
+        <div class="p-6 border-b border-white border-opacity-20">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <div>
+                    <div class="text-white font-medium">John Smith</div>
+                    <div class="text-white text-sm opacity-75">Trade Professional</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="p-4">
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="jobs">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Jobs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="messages">
+                        <i class="fas fa-comments"></i>
+                        <span>Messages</span>
+                        <span class="nav-badge">3</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="calendar">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="portfolio">
+                        <i class="fas fa-images"></i>
+                        <span>Portfolio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="payments">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- AI Assistant -->
+        <div class="p-4 mt-auto">
+            <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                <div class="flex items-center space-x-2 mb-2">
+                    <i class="fas fa-robot text-white"></i>
+                    <span class="text-white font-medium">AI Assistant</span>
+                </div>
+                <p class="text-white text-sm opacity-75 mb-3">Need help? Ask me anything!</p>
+                <button class="btn btn-secondary w-full">
+                    <i class="fas fa-comment mr-2"></i>
+                    Start Chat
+                </button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="dashboard-main" id="dashboardMain">
+        <!-- Top Bar -->
+        <header class="bg-white shadow-lg sticky top-0 z-40">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="btn btn-primary lg:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-bold text-gray-800" id="pageTitle">Dashboard</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Search -->
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search..." class="px-4 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+                    
+                    <!-- Profile -->
+                    <button class="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-800">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="content-section active" id="dashboard-content">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome back, John!</h2>
+                    <p class="text-gray-600">Here's what's happening with your business today.</p>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="widget metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-75 text-sm">Active Jobs</p>
+                                <p class="metric-value text-white">12</p>
+                                <p class="metric-change positive">+2 from last week</p>
+                            </div>
+                            <i class="fas fa-briefcase text-white text-2xl opacity-75"></i>
+                        </div>
+                    </div>
+
+                    <div class="widget metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-75 text-sm">Revenue</p>
+                                <p class="metric-value text-white">$8,450</p>
+                                <p class="metric-change positive">+15% from last month</p>
+                            </div>
+                            <i class="fas fa-dollar-sign text-white text-2xl opacity-75"></i>
+                        </div>
+                    </div>
+
+                    <div class="widget metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-75 text-sm">Rating</p>
+                                <p class="metric-value text-white">4.9</p>
+                                <p class="metric-change">No change</p>
+                            </div>
+                            <i class="fas fa-star text-white text-2xl opacity-75"></i>
+                        </div>
+                    </div>
+
+                    <div class="widget metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-white opacity-75 text-sm">Completion Rate</p>
+                                <p class="metric-value text-white">98%</p>
+                                <p class="metric-change positive">+3% from last month</p>
+                            </div>
+                            <i class="fas fa-check-circle text-white text-2xl opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="widget">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">Recent Activity</h3>
+                            <button class="btn btn-primary btn-sm">View All</button>
+                        </div>
+                        
+                        <div class="space-y-0">
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-green-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium">Job Completed</p>
+                                        <p class="text-sm text-gray-600">Kitchen renovation at 123 Main St completed successfully</p>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span class="status-badge status-completed">Completed</span>
+                                            <span class="text-xs text-gray-500">2 hours ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-message text-blue-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium">New Message</p>
+                                        <p class="text-sm text-gray-600">Sarah Johnson sent you a message about bathroom tiles</p>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span class="status-badge status-pending">Unread</span>
+                                            <span class="text-xs text-gray-500">4 hours ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-clock text-yellow-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium">Job Reminder</p>
+                                        <p class="text-sm text-gray-600">Plumbing repair scheduled for tomorrow at 9:00 AM</p>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span class="status-badge status-active">Upcoming</span>
+                                            <span class="text-xs text-gray-500">6 hours ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="widget">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-plus text-blue-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Create New Job</p>
+                                    <p class="text-sm text-gray-600">Start a new project</p>
+                                </div>
+                            </button>
+
+                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar text-green-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Schedule Appointment</p>
+                                    <p class="text-sm text-gray-600">Book a time slot</p>
+                                </div>
+                            </button>
+
+                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-file-invoice text-purple-600"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Send Invoice</p>
+                                    <p class="text-sm text-gray-600">Create and send bill</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="widget mt-6">
+                    <h3 class="text-lg font-semibold mb-4">AI Insights</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-lightbulb text-blue-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-blue-800">Optimization Tip</p>
+                                    <p class="text-sm text-blue-700">Consider raising your hourly rate by 10% based on your excellent reviews and completion rate.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-green-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-green-800">Growth Opportunity</p>
+                                    <p class="text-sm text-green-700">Kitchen renovations are trending in your area. Consider highlighting this service.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Content -->
+        <div class="content-section" id="jobs-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Jobs Management</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Jobs management interface will be displayed here.</p>
+                    <button class="btn btn-primary mt-4" onclick="window.location.href='/jobs'">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        Go to Full Jobs Interface
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Content -->
+        <div class="content-section" id="messages-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Messages</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Messages interface will be displayed here.</p>
+                    <div class="mt-4">
+                        <div class="space-y-4">
+                            <div class="p-4 border border-gray-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium">Sarah Johnson</span>
+                                    <span class="text-sm text-gray-500">4 hours ago</span>
+                                </div>
+                                <p class="text-gray-600">Hi John, I wanted to ask about the bathroom tiles for our renovation project...</p>
+                                <span class="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Unread</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Content -->
+        <div class="content-section" id="calendar-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Calendar</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Calendar interface will be displayed here.</p>
+                    <div class="mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 border border-gray-200 rounded-lg">
+                                <h4 class="font-medium mb-2">Upcoming Appointments</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Plumbing Repair</span>
+                                        <span class="text-sm text-gray-500">Tomorrow 9:00 AM</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Kitchen Consultation</span>
+                                        <span class="text-sm text-gray-500">Friday 2:00 PM</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Content -->
+        <div class="content-section" id="analytics-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Analytics</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Analytics dashboard will be displayed here.</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-blue-50 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600">$8,450</div>
+                            <div class="text-sm text-blue-800">Monthly Revenue</div>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600">98%</div>
+                            <div class="text-sm text-green-800">Completion Rate</div>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600">4.9</div>
+                            <div class="text-sm text-purple-800">Average Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Content -->
+        <div class="content-section" id="portfolio-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Portfolio</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Portfolio gallery will be displayed here.</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-2xl"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-2xl"></i>
+                        </div>
+                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Content -->
+        <div class="content-section" id="payments-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Payments</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Payment management interface will be displayed here.</p>
+                    <div class="mt-4">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
+                                <div>
+                                    <span class="font-medium">Kitchen Renovation - Job #1234</span>
+                                    <div class="text-sm text-gray-500">Completed on March 15, 2024</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-green-600">$2,500</div>
+                                    <span class="status-badge status-completed">Paid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="content-section" id="settings-content">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Settings</h2>
+                <div class="widget">
+                    <p class="text-gray-600">Settings and preferences will be displayed here.</p>
+                    <div class="mt-4 space-y-4">
+                        <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
+                            <div>
+                                <span class="font-medium">Email Notifications</span>
+                                <div class="text-sm text-gray-500">Receive notifications about new jobs and messages</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboardMain');
+            const overlay = document.getElementById('dashboardOverlay');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                main.classList.toggle('expanded');
+            }
+        }
+
+        // Navigation functionality - FIXED
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('pageTitle');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    link.classList.add('active');
+                    
+                    // Hide all content sections
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show the selected content section
+                    const sectionName = link.getAttribute('data-section');
+                    const targetSection = document.getElementById(sectionName + '-content');
+                    
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        
+                        // Update page title
+                        const linkText = link.querySelector('span').textContent;
+                        pageTitle.textContent = linkText;
+                        
+                        // Close sidebar on mobile after navigation
+                        if (window.innerWidth <= 768) {
+                            const sidebar = document.getElementById('dashboardSidebar');
+                            const overlay = document.getElementById('dashboardOverlay');
+                            sidebar.classList.remove('show');
+                            overlay.classList.remove('show');
+                        }
+                        
+                        console.log('Navigated to:', sectionName);
+                    }
+                });
+            });
+        }
+
+        // Handle window resize
+        function handleResize() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const main = document.getElementById('dashboardMain');
+            const overlay = document.getElementById('dashboardOverlay');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            console.log('🚀 Dashboard with fixed navigation initialized');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>
+

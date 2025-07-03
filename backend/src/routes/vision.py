@@ -1,6 +1,6 @@
 """
 Computer Vision API Routes for Biped Platform
-Provides endpoints for image analysis and quality control
+Provides endpoints for image analysis and quality control with graceful fallbacks
 """
 
 import os
@@ -11,16 +11,14 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import logging
 
-# Import computer vision engine
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from computer_vision import BipedComputerVision
+# Import fallback computer vision system
+from ..utils.cv_fallback import FallbackComputerVision, ComputerVisionChecker
 
 # Create blueprint
 vision_bp = Blueprint('vision', __name__, url_prefix='/api/vision')
 
-# Initialize computer vision engine
-cv_engine = BipedComputerVision()
+# Initialize fallback computer vision engine
+cv_engine = FallbackComputerVision()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -478,4 +476,53 @@ def _generate_mock_quality_report(job_id, category):
     }
     
     return report
+
+
+
+@vision_bp.route('/status', methods=['GET'])
+def cv_status():
+    """Get computer vision system status and capabilities"""
+    try:
+        status = cv_engine.get_capabilities()
+        cv_check = ComputerVisionChecker.get_cv_status()
+        
+        return jsonify({
+            'status': 'success',
+            'computer_vision': status,
+            'detailed_status': cv_check,
+            'timestamp': datetime.utcnow().isoformat(),
+            'environment': os.environ.get('ENVIRONMENT', 'unknown'),
+            'message': 'Computer vision status retrieved successfully'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting CV status: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'computer_vision_available': False,
+            'message': 'Error retrieving computer vision status'
+        }), 500
+
+@vision_bp.route('/health', methods=['GET'])
+def vision_health():
+    """Health check for vision services"""
+    try:
+        is_available = ComputerVisionChecker.is_cv_available()
+        
+        return jsonify({
+            'status': 'healthy' if is_available else 'degraded',
+            'computer_vision_available': is_available,
+            'timestamp': datetime.utcnow().isoformat(),
+            'message': 'Vision services operational' if is_available else 'Vision services in fallback mode'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Vision health check failed: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.utcnow().isoformat(),
+            'message': 'Vision services health check failed'
+        }), 503
 

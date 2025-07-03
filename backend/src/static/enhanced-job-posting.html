@@ -711,17 +711,48 @@
         }
 
         // Submit project
-        function submitProject() {
+        async function submitProject() {
             // Show loading state
             const button = event.target;
+            const originalText = button.innerHTML;
             button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Finding Providers...';
             button.disabled = true;
             
-            // Simulate AI processing
-            setTimeout(() => {
-                alert('🎉 Success! We found 5 perfect providers for your project. You\'ll receive their profiles and quotes within 24 hours.');
-                window.location.href = 'index.html';
-            }, 3000);
+            try {
+                // Collect form data
+                const formData = {
+                    title: document.getElementById('projectTitle')?.value || 'Kitchen Renovation',
+                    description: document.getElementById('projectDescription')?.value || 'Complete kitchen renovation including new cabinets, countertops, appliances, and flooring.',
+                    category: selectedCategory || 'construction-renovation',
+                    budget: selectedBudget || '5000-10000',
+                    timeline: selectedTimeline || 'this-month',
+                    location: document.querySelector('input[placeholder*="address"]')?.value || 'Sydney, NSW'
+                };
+                
+                // Submit to backend
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`🎉 Success! We found ${result.estimated_providers} perfect providers for your project. Job ID: ${result.job_id}`);
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('❌ Error submitting job. Please try again.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
         }
 
         // Initialize

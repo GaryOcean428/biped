@@ -1,10 +1,65 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+buildCommand = "docker system prune -af && docker builder prune -af && echo 'Cache cleared at $(date)'"
 
 [deploy]
-startCommand = "cd backend && python -m gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 src.main:app"
-healthcheckPath = "/api/health"
+startCommand = "./start.sh"
+healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
+
+[deploy.env]
+# Cache busting environment variables with unique timestamp
+CACHE_BUST = "20250703-021500"
+FLASK_STATIC_CACHE_TIMEOUT = "0"
+FLASK_ENV = "production"
+FLASK_APP = "src/main.py"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONUNBUFFERED = "1"
+
+# Force cache clearing headers
+FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
+STATIC_CACHE_TIMEOUT = "0"
+BUILD_TIMESTAMP = "20250703-021500"
+
+[deploy.headers]
+# Aggressive cache control headers to prevent caching issues
+"Cache-Control" = "no-cache, no-store, must-revalidate, max-age=0"
+"Pragma" = "no-cache"
+"Expires" = "0"
+"X-Build-Timestamp" = "20250703-021500"
+
+[deploy.redirects]
+# Ensure root redirects to main app
+"/" = "/dashboard"
+
+[services.biped]
+source = "."
+build = { builder = "dockerfile" }
+
+[services.biped.variables]
+# Database configuration
+DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+DATABASE_PRIVATE_URL = "${{Postgres.DATABASE_PRIVATE_URL}}"
+
+# Redis configuration  
+REDIS_URL = "${{Redis.REDIS_URL}}"
+REDIS_PRIVATE_URL = "${{Redis.REDIS_PRIVATE_URL}}"
+
+# Application configuration
+PORT = "8000"
+FLASK_SECRET_KEY = "${{secrets.FLASK_SECRET_KEY}}"
+JWT_SECRET_KEY = "${{secrets.JWT_SECRET_KEY}}"
+
+# Cache busting
+CACHE_VERSION = "${{timestamp}}"
+BUILD_ID = "${{build.id}}"
+
+[experimental]
+# Enable experimental features for better caching control
+incrementalBuilds = false
+buildCache = false
+staticOptimization = true
 
