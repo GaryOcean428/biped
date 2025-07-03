@@ -258,7 +258,7 @@ def admin_dashboard():
 @app.route('/')
 def root():
     """Serve the trades marketplace dashboard at root"""
-    return send_from_directory('static', 'dashboard.html')
+    return send_from_directory('static', 'index.html')
 
 @app.route('/dashboard')
 def enhanced_dashboard():
