@@ -69,7 +69,11 @@ module.exports = {
             light: '#ffeaa7',      // System message (light)
             dark: '#fdcb6e',       // System message (dark)
           }
-        }
+        },
+        
+        // Additional chat colors
+        'chat-system-light': '#ffeaa7',
+        'chat-system-dark': '#fdcb6e'
       },
       
       backgroundImage: {
