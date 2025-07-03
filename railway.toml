@@ -3,8 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [build.buildCommand]
-# Clear all caches before build
-command = "docker system prune -af && docker builder prune -af"
+# Clear all caches before build with unique timestamp
+command = "docker system prune -af && docker builder prune -af && echo 'Cache cleared at $(date)'"
 
 [deploy]
 startCommand = "./start.sh"
@@ -14,8 +14,8 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [deploy.env]
-# Cache busting environment variables
-CACHE_BUST = "${{timestamp}}"
+# Cache busting environment variables with unique timestamp
+CACHE_BUST = "20250703-021500"
 FLASK_STATIC_CACHE_TIMEOUT = "0"
 FLASK_ENV = "production"
 FLASK_APP = "src/main.py"
@@ -25,12 +25,14 @@ PYTHONUNBUFFERED = "1"
 # Force cache clearing headers
 FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
 STATIC_CACHE_TIMEOUT = "0"
+BUILD_TIMESTAMP = "20250703-021500"
 
 [deploy.headers]
-# Cache control headers to prevent caching issues
-"Cache-Control" = "no-cache, no-store, must-revalidate"
+# Aggressive cache control headers to prevent caching issues
+"Cache-Control" = "no-cache, no-store, must-revalidate, max-age=0"
 "Pragma" = "no-cache"
 "Expires" = "0"
+"X-Build-Timestamp" = "20250703-021500"
 
 [deploy.redirects]
 # Ensure root redirects to main app

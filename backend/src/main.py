@@ -255,29 +255,36 @@ with app.app_context():
 
 @app.route('/')
 def root():
-    """Serve the main trades marketplace application"""
+    """Serve the main trades marketplace application directly"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
-    # Try to serve the main application interface
-    main_app_files = [
-        'dashboard-enhanced.html',
-        'index.html', 
-        'dashboard.html'
-    ]
+    # Force serve the dashboard-enhanced.html directly
+    dashboard_file = os.path.join(static_folder_path, 'dashboard-enhanced.html')
+    if os.path.exists(dashboard_file):
+        print(f"✅ Serving dashboard-enhanced.html at root")
+        response = send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+        # Add aggressive cache busting headers
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        response.headers['ETag'] = f'"{CACHE_BUST}-root"'
+        response.headers['X-Served-From'] = 'dashboard-enhanced.html'
+        return response
     
-    for filename in main_app_files:
-        file_path = os.path.join(static_folder_path, filename)
-        if os.path.exists(file_path):
-            print(f"✅ Serving main app from: {filename}")
-            response = send_from_directory(static_folder_path, filename)
-            # Add cache busting headers
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
-            return response
+    # Fallback to dashboard.html
+    dashboard_fallback = os.path.join(static_folder_path, 'dashboard.html')
+    if os.path.exists(dashboard_fallback):
+        print(f"✅ Serving dashboard.html at root (fallback)")
+        response = send_from_directory(static_folder_path, 'dashboard.html')
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        response.headers['ETag'] = f'"{CACHE_BUST}-root-fallback"'
+        response.headers['X-Served-From'] = 'dashboard.html'
+        return response
     
-    # Fallback: Create a simple redirect to dashboard
-    print("⚠️ No main app file found, redirecting to dashboard")
+    # Final fallback: redirect to dashboard
+    print("⚠️ No dashboard files found, redirecting to /dashboard")
     return redirect('/dashboard')
 
 @app.route('/dashboard')
