@@ -1,25 +1,4 @@
-# Multi-stage Dockerfile for Biped Platform with cache clearing
-FROM node:18-alpine AS frontend-builder
-
-# Set working directory for frontend
-WORKDIR /app/frontend
-
-# Copy frontend package files
-COPY frontend/package*.json ./
-COPY frontend/yarn.lock ./
-
-# Install frontend dependencies with cache clearing
-RUN yarn install --frozen-lockfile --network-timeout 300000
-
-# Copy frontend source code
-COPY frontend/ ./
-
-# Build frontend with cache busting
-ENV GENERATE_SOURCEMAP=false
-ENV REACT_APP_CACHE_BUST=$(date +%s)
-RUN yarn build
-
-# Python backend stage
+# Single-stage Dockerfile for Biped Platform with cache clearing
 FROM python:3.11-slim AS backend-builder
 
 # Set environment variables
@@ -49,18 +28,23 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy backend source code
 COPY backend/ ./
 
-# Copy frontend build from previous stage
-COPY --from=frontend-builder /app/frontend/build ./src/static/
+# DO NOT copy frontend build to prevent conflicts
+# The static directory already contains the correct HTML files
 
-# Create cache-busting index.html with timestamp
-RUN CACHE_BUST=$(date +%s) && \
-    sed -i "s/\(href=\"[^\"]*\.\(css\|js\)\)/\1?v=${CACHE_BUST}/g" ./src/static/index.html && \
-    sed -i "s/\(src=\"[^\"]*\.\(css\|js\)\)/\1?v=${CACHE_BUST}/g" ./src/static/index.html
+# Remove any React build artifacts that might cause conflicts
+RUN find ./src/static/ -name "main.*.css" -delete || true && \
+    find ./src/static/ -name "main.*.js" -delete || true && \
+    find ./src/static/ -name "*.chunk.js" -delete || true && \
+    find ./src/static/ -name "manifest.json" -delete || true && \
+    find ./src/static/ -name "favicon.ico" -delete || true && \
+    find ./src/static/ -name "logo*.png" -delete || true
 
-# Remove any conflicting files that might cause routing issues
-RUN find ./src/static/ -name "index-system-status*" -delete || true && \
-    find ./src/static/ -name "main.*.css" -delete || true && \
-    find ./src/static/ -name "main.*.js" -delete || true
+# Ensure index.html contains the correct dashboard content
+RUN if [ -f ./src/static/dashboard-enhanced.html ]; then \
+        cp ./src/static/dashboard-enhanced.html ./src/static/index.html; \
+    elif [ -f ./src/static/dashboard.html ]; then \
+        cp ./src/static/dashboard.html ./src/static/index.html; \
+    fi
 
 # Ensure proper file permissions
 RUN chmod -R 755 ./src/static/

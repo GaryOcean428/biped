@@ -255,37 +255,26 @@ with app.app_context():
 
 @app.route('/')
 def root():
-    """Serve the main trades marketplace application directly"""
-    static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
-    
-    # Force serve the dashboard-enhanced.html directly
-    dashboard_file = os.path.join(static_folder_path, 'dashboard-enhanced.html')
-    if os.path.exists(dashboard_file):
-        print(f"✅ Serving dashboard-enhanced.html at root")
-        response = send_from_directory(static_folder_path, 'dashboard-enhanced.html')
+    """Serve the trades marketplace application at root URL"""
+    try:
+        # Serve index.html which now contains the dashboard content
+        response = send_from_directory('static', 'index.html')
+        
         # Add aggressive cache busting headers
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-        response.headers['ETag'] = f'"{CACHE_BUST}-root"'
-        response.headers['X-Served-From'] = 'dashboard-enhanced.html'
+        response.headers['ETag'] = f'"{CACHE_BUST}-root-fixed"'
+        response.headers['X-Served-From'] = 'index.html'
+        response.headers['X-Content-Source'] = 'dashboard-enhanced'
+        
+        print(f"✅ Serving trades marketplace at root URL from index.html")
         return response
-    
-    # Fallback to dashboard.html
-    dashboard_fallback = os.path.join(static_folder_path, 'dashboard.html')
-    if os.path.exists(dashboard_fallback):
-        print(f"✅ Serving dashboard.html at root (fallback)")
-        response = send_from_directory(static_folder_path, 'dashboard.html')
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        response.headers['ETag'] = f'"{CACHE_BUST}-root-fallback"'
-        response.headers['X-Served-From'] = 'dashboard.html'
-        return response
-    
-    # Final fallback: redirect to dashboard
-    print("⚠️ No dashboard files found, redirecting to /dashboard")
-    return redirect('/dashboard')
+        
+    except Exception as e:
+        print(f"❌ Error serving root URL: {e}")
+        # Fallback to dashboard route
+        return redirect('/dashboard')
 
 @app.route('/dashboard')
 def dashboard():
