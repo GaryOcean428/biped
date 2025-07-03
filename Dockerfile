@@ -39,12 +39,8 @@ RUN find ./src/static/ -name "main.*.css" -delete || true && \
     find ./src/static/ -name "favicon.ico" -delete || true && \
     find ./src/static/ -name "logo*.png" -delete || true
 
-# Ensure index.html contains the correct dashboard content
-RUN if [ -f ./src/static/dashboard-enhanced.html ]; then \
-        cp ./src/static/dashboard-enhanced.html ./src/static/index.html; \
-    elif [ -f ./src/static/dashboard.html ]; then \
-        cp ./src/static/dashboard.html ./src/static/index.html; \
-    fi
+# PRESERVE index.html as the PUBLIC landing page - DO NOT OVERWRITE
+# index.html should contain the marketplace landing page, not dashboard content
 
 # Ensure proper file permissions
 RUN chmod -R 755 ./src/static/
