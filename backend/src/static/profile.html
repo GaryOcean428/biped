@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Biped - My Profile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .profile-header {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            transform: translateY(-1px);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 text-white flex-shrink-0 hidden md:block">
+            <div class="p-4 flex items-center border-b border-gray-700">
+                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Biped</span>
+            </div>
+            <nav class="mt-6">
+                <a href="/dashboard" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/profile" class="nav-item active flex items-center px-4 py-3 text-white">
+                    <i class="fas fa-user w-6"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="/jobs" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-briefcase w-6"></i>
+                    <span>Jobs</span>
+                </a>
+                <a href="/messages" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-comments w-6"></i>
+                    <span>Messages</span>
+                </a>
+                <a href="/billing" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-credit-card w-6"></i>
+                    <span>Billing</span>
+                </a>
+                <a href="/settings" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-cog w-6"></i>
+                    <span>Settings</span>
+                </a>
+                <div class="border-t border-gray-700 mt-6 pt-4 px-4">
+                    <a href="#" id="logout-btn" class="flex items-center py-3 text-gray-300 hover:text-white">
+                        <i class="fas fa-sign-out-alt w-6"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                    <div class="flex items-center md:hidden">
+                        <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center ml-auto">
+                        <div class="relative">
+                            <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                                <img id="user-avatar" class="h-8 w-8 rounded-full object-cover" src="https://ui-avatars.com/api/?name=John+Doe&background=3b82f6&color=fff" alt="User avatar">
+                                <span id="user-name" class="hidden md:block text-sm font-medium">John Doe</span>
+                                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Profile Header -->
+            <div class="profile-header text-white p-6">
+                <div class="max-w-7xl mx-auto">
+                    <h1 class="text-2xl font-bold">My Profile</h1>
+                    <p class="text-blue-100">Manage your personal information and account settings</p>
+                </div>
+            </div>
+
+            <!-- Profile Tabs -->
+            <div class="bg-white border-b">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex overflow-x-auto">
+                        <button class="tab-button active whitespace-nowrap px-4 py-4 text-sm font-medium border-b-2 border-blue-500" data-tab="personal-info">
+                            Personal Information
+                        </button>
+                        <button class="tab-button whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300" data-tab="account-settings">
+                            Account Settings
+                        </button>
+                        <button class="tab-button whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300" data-tab="notifications">
+                            Notifications
+                        </button>
+                        <button class="tab-button whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300" data-tab="security">
+                            Security
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
+                <div class="max-w-7xl mx-auto">
+                    <!-- Personal Information Tab -->
+                    <div id="personal-info" class="tab-content active">
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900">Personal Information</h2>
+                                <p class="mt-1 text-sm text-gray-500">Update your personal details and contact information.</p>
+                            </div>
+                            <div class="border-t border-gray-200 p-6">
+                                <form id="personal-info-form" class="space-y-6">
+                                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                        <div class="sm:col-span-3">
+                                            <label for="first-name" class="block text-sm font-medium text-gray-700">First name</label>
+                                            <input type="text" name="first-name" id="first-name" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-3">
+                                            <label for="last-name" class="block text-sm font-medium text-gray-700">Last name</label>
+                                            <input type="text" name="last-name" id="last-name" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-4">
+                                            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                                            <input type="email" name="email" id="email" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm" disabled>
+                                            <p class="mt-1 text-xs text-gray-500">Your email address cannot be changed.</p>
+                                        </div>
+
+                                        <div class="sm:col-span-3">
+                                            <label for="phone" class="block text-sm font-medium text-gray-700">Phone number</label>
+                                            <input type="tel" name="phone" id="phone" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-6">
+                                            <label for="street-address" class="block text-sm font-medium text-gray-700">Street address</label>
+                                            <input type="text" name="street-address" id="street-address" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-2">
+                                            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                                            <input type="text" name="city" id="city" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-2">
+                                            <label for="state" class="block text-sm font-medium text-gray-700">State / Province</label>
+                                            <input type="text" name="state" id="state" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-2">
+                                            <label for="postal-code" class="block text-sm font-medium text-gray-700">ZIP / Postal code</label>
+                                            <input type="text" name="postal-code" id="postal-code" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                        </div>
+
+                                        <div class="sm:col-span-6">
+                                            <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                                            <textarea id="bio" name="bio" rows="3" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm"></textarea>
+                                            <p class="mt-2 text-sm text-gray-500">Brief description for your profile.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none mr-3">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="btn-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings Tab -->
+                    <div id="account-settings" class="tab-content">
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900">Account Settings</h2>
+                                <p class="mt-1 text-sm text-gray-500">Manage your account preferences and settings.</p>
+                            </div>
+                            <div class="border-t border-gray-200 p-6">
+                                <form id="account-settings-form" class="space-y-6">
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">Account Type</h3>
+                                        <p class="text-sm text-gray-500 mt-1" id="account-type-display">Customer</p>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">Language Preferences</h3>
+                                        <div class="mt-2">
+                                            <select id="language" name="language" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                                <option value="en">English</option>
+                                                <option value="es">Spanish</option>
+                                                <option value="fr">French</option>
+                                                <option value="de">German</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">Time Zone</h3>
+                                        <div class="mt-2">
+                                            <select id="timezone" name="timezone" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                                <option value="UTC">UTC</option>
+                                                <option value="America/New_York">Eastern Time (ET)</option>
+                                                <option value="America/Chicago">Central Time (CT)</option>
+                                                <option value="America/Denver">Mountain Time (MT)</option>
+                                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                                <option value="Australia/Sydney">Australian Eastern Time (AET)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none mr-3">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="btn-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div id="notifications" class="tab-content">
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900">Notification Preferences</h2>
+                                <p class="mt-1 text-sm text-gray-500">Manage how you receive notifications and updates.</p>
+                            </div>
+                            <div class="border-t border-gray-200 p-6">
+                                <form id="notifications-form" class="space-y-6">
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">Email Notifications</h3>
+                                        <div class="mt-4 space-y-4">
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input id="email-job-updates" name="email-job-updates" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="email-job-updates" class="font-medium text-gray-700">Job Updates</label>
+                                                    <p class="text-gray-500">Receive email notifications about job status changes and updates.</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input id="email-messages" name="email-messages" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="email-messages" class="font-medium text-gray-700">Messages</label>
+                                                    <p class="text-gray-500">Receive email notifications when you get new messages.</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input id="email-marketing" name="email-marketing" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="email-marketing" class="font-medium text-gray-700">Marketing</label>
+                                                    <p class="text-gray-500">Receive emails about new features, tips, and promotions.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">SMS Notifications</h3>
+                                        <div class="mt-4 space-y-4">
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input id="sms-job-updates" name="sms-job-updates" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="sms-job-updates" class="font-medium text-gray-700">Job Updates</label>
+                                                    <p class="text-gray-500">Receive SMS notifications about job status changes and updates.</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <div class="flex items-center h-5">
+                                                    <input id="sms-messages" name="sms-messages" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                </div>
+                                                <div class="ml-3 text-sm">
+                                                    <label for="sms-messages" class="font-medium text-gray-700">Messages</label>
+                                                    <p class="text-gray-500">Receive SMS notifications when you get new messages.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none mr-3">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="btn-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div id="security" class="tab-content">
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900">Security Settings</h2>
+                                <p class="mt-1 text-sm text-gray-500">Manage your password and account security.</p>
+                            </div>
+                            <div class="border-t border-gray-200 p-6">
+                                <form id="change-password-form" class="space-y-6">
+                                    <div>
+                                        <h3 class="text-md font-medium text-gray-900">Change Password</h3>
+                                        <div class="mt-4 space-y-4">
+                                            <div>
+                                                <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                                                <input type="password" name="current-password" id="current-password" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
+                                                <input type="password" name="new-password" id="new-password" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                                                <input type="password" name="confirm-password" id="confirm-password" class="input-field mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none mr-3">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="btn-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none">
+                                            Update Password
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="mt-10 pt-6 border-t border-gray-200">
+                                    <h3 class="text-md font-medium text-gray-900">Account Security</h3>
+                                    <div class="mt-4 space-y-4">
+                                        <div class="flex items-start">
+                                            <div class="flex items-center h-5">
+                                                <input id="two-factor-auth" name="two-factor-auth" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                            </div>
+                                            <div class="ml-3 text-sm">
+                                                <label for="two-factor-auth" class="font-medium text-gray-700">Two-Factor Authentication</label>
+                                                <p class="text-gray-500">Add an extra layer of security to your account by requiring a verification code in addition to your password.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-10 pt-6 border-t border-gray-200">
+                                    <h3 class="text-md font-medium text-red-600">Danger Zone</h3>
+                                    <div class="mt-4">
+                                        <button type="button" id="deactivate-account-btn" class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none">
+                                            Deactivate Account
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
+        <div class="relative flex-1 flex flex-col max-w-xs w-full sidebar">
+            <div class="absolute top-0 right-0 -mr-12 pt-2">
+                <button id="close-sidebar" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span class="sr-only">Close sidebar</span>
+                    <i class="fas fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="p-4 flex items-center border-b border-gray-700">
+                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Biped</span>
+            </div>
+            <nav class="mt-6">
+                <a href="/dashboard" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-tachometer-alt w-6"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/profile" class="nav-item active flex items-center px-4 py-3 text-white">
+                    <i class="fas fa-user w-6"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="/jobs" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-briefcase w-6"></i>
+                    <span>Jobs</span>
+                </a>
+                <a href="/messages" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-comments w-6"></i>
+                    <span>Messages</span>
+                </a>
+                <a href="/billing" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-credit-card w-6"></i>
+                    <span>Billing</span>
+                </a>
+                <a href="/settings" class="nav-item flex items-center px-4 py-3 text-gray-300">
+                    <i class="fas fa-cog w-6"></i>
+                    <span>Settings</span>
+                </a>
+                <div class="border-t border-gray-700 mt-6 pt-4 px-4">
+                    <a href="#" class="mobile-logout-btn flex items-center py-3 text-gray-300 hover:text-white">
+                        <i class="fas fa-sign-out-alt w-6"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="success-notification" class="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-50 hidden">
+        <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400 text-lg"></i>
+                    </div>
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p class="text-sm font-medium text-gray-900" id="notification-message">Successfully saved changes!</p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button id="close-notification" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active', 'border-blue-500', 'text-blue-600'));
+                    tabButtons.forEach(btn => btn.classList.add('text-gray-500', 'border-transparent'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    button.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    button.classList.remove('text-gray-500', 'border-transparent');
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+            
+            // Mobile menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const closeSidebar = document.getElementById('close-sidebar');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileSidebar.classList.remove('hidden');
+            });
+            
+            closeSidebar.addEventListener('click', () => {
+                mobileSidebar.classList.add('hidden');
+            });
+            
+            // Form submissions
+            const personalInfoForm = document.getElementById('personal-info-form');
+            const accountSettingsForm = document.getElementById('account-settings-form');
+            const notificationsForm = document.getElementById('notifications-form');
+            const changePasswordForm = document.getElementById('change-password-form');
+            const successNotification = document.getElementById('success-notification');
+            const closeNotification = document.getElementById('close-notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // Helper function to show notification
+            function showNotification(message) {
+                notificationMessage.textContent = message;
+                successNotification.classList.remove('hidden');
+                setTimeout(() => {
+                    successNotification.classList.add('hidden');
+                }, 3000);
+            }
+            
+            closeNotification.addEventListener('click', () => {
+                successNotification.classList.add('hidden');
+            });
+            
+            // Personal info form submission
+            personalInfoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    first_name: document.getElementById('first-name').value,
+                    last_name: document.getElementById('last-name').value,
+                    phone: document.getElementById('phone').value,
+                    street_address: document.getElementById('street-address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    postcode: document.getElementById('postal-code').value,
+                    bio: document.getElementById('bio').value
+                };
+                
+                // Send data to API
+                fetch('/api/users/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update profile');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Personal information updated successfully!');
+                })
+                .catch(error => {
+                    console.error('Error updating profile:', error);
+                    showNotification('Failed to update profile. Please try again.');
+                });
+            });
+            
+            // Account settings form submission
+            accountSettingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    language: document.getElementById('language').value,
+                    timezone: document.getElementById('timezone').value
+                };
+                
+                // Send data to API
+                fetch('/api/users/settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update settings');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Account settings updated successfully!');
+                })
+                .catch(error => {
+                    console.error('Error updating settings:', error);
+                    showNotification('Failed to update settings. Please try again.');
+                });
+            });
+            
+            // Notifications form submission
+            notificationsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    email_notifications: {
+                        job_updates: document.getElementById('email-job-updates').checked,
+                        messages: document.getElementById('email-messages').checked,
+                        marketing: document.getElementById('email-marketing').checked
+                    },
+                    sms_notifications: {
+                        job_updates: document.getElementById('sms-job-updates').checked,
+                        messages: document.getElementById('sms-messages').checked
+                    }
+                };
+                
+                // Send data to API
+                fetch('/api/users/notifications', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update notification preferences');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Notification preferences updated successfully!');
+                })
+                .catch(error => {
+                    console.error('Error updating notification preferences:', error);
+                    showNotification('Failed to update notification preferences. Please try again.');
+                });
+            });
+            
+            // Change password form submission
+            changePasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Validate passwords
+                if (newPassword !== confirmPassword) {
+                    showNotification('New passwords do not match!');
+                    return;
+                }
+                
+                // Send data to API
+                fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    }),
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to change password');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Password changed successfully!');
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('confirm-password').value = '';
+                })
+                .catch(error => {
+                    console.error('Error changing password:', error);
+                    showNotification('Failed to change password. Please check your current password and try again.');
+                });
+            });
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById('logout-btn');
+            const mobileLogoutBtn = document.querySelector('.mobile-logout-btn');
+            
+            function handleLogout() {
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Logout failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    window.location.href = '/';
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    window.location.href = '/';
+                });
+            }
+            
+            logoutBtn.addEventListener('click', handleLogout);
+            mobileLogoutBtn.addEventListener('click', handleLogout);
+            
+            // Load user data
+            function loadUserData() {
+                fetch('/api/auth/me', {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Not authenticated, redirect to login
+                        window.location.href = '/';
+                        throw new Error('Not authenticated');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update user info in header
+                    const user = data.user;
+                    const profile = data.profile;
+                    
+                    document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
+                    document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=3b82f6&color=fff`;
+                    
+                    // Fill personal info form
+                    document.getElementById('first-name').value = user.first_name || '';
+                    document.getElementById('last-name').value = user.last_name || '';
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('phone').value = user.phone || '';
+                    document.getElementById('street-address').value = user.street_address || '';
+                    document.getElementById('city').value = user.city || '';
+                    document.getElementById('state').value = user.state || '';
+                    document.getElementById('postal-code').value = user.postcode || '';
+                    document.getElementById('bio').value = user.bio || '';
+                    
+                    // Update account type
+                    document.getElementById('account-type-display').textContent = user.user_type.charAt(0).toUpperCase() + user.user_type.slice(1);
+                    
+                    // Load notification preferences if available
+                    if (profile && profile.notification_preferences) {
+                        const prefs = profile.notification_preferences;
+                        
+                        if (prefs.email) {
+                            document.getElementById('email-job-updates').checked = prefs.email.job_updates || false;
+                            document.getElementById('email-messages').checked = prefs.email.messages || false;
+                            document.getElementById('email-marketing').checked = prefs.email.marketing || false;
+                        }
+                        
+                        if (prefs.sms) {
+                            document.getElementById('sms-job-updates').checked = prefs.sms.job_updates || false;
+                            document.getElementById('sms-messages').checked = prefs.sms.messages || false;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user data:', error);
+                });
+            }
+            
+            // Load user data on page load
+            loadUserData();
+        });
+    </script>
+</body>
+</html>
+
