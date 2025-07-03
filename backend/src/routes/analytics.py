@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import logging
 
-from ..services.data_pipeline import BusinessIntelligenceEngine, RealTimeDataProcessor
+from ..services.data_pipeline import MarketplaceIntelligenceEngine, RealTimeDataProcessor
 from ..utils.security import SecurityEnhancer
 from ..utils.performance import TradingCacheService
 
@@ -43,7 +43,7 @@ def get_portfolio_analytics(user_id: str):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         analytics = loop.run_until_complete(
-            bi_engine.generate_portfolio_analytics(user_id)
+            bi_engine.generate_user_analytics(user_id)
         )
         
         return jsonify({
@@ -146,7 +146,7 @@ def get_performance_summary():
         
         # Get portfolio analytics
         analytics = loop.run_until_complete(
-            bi_engine.generate_portfolio_analytics(user_id)
+            bi_engine.generate_user_analytics(user_id)
         )
         
         # Extract performance summary
@@ -188,7 +188,7 @@ def get_risk_assessment():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         analytics = loop.run_until_complete(
-            bi_engine.generate_portfolio_analytics(user_id)
+            bi_engine.generate_user_analytics(user_id)
         )
         
         risk_assessment = {
@@ -370,7 +370,7 @@ def generate_custom_report():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             report_data = loop.run_until_complete(
-                bi_engine.generate_portfolio_analytics(user_id)
+                bi_engine.generate_user_analytics(user_id)
             )
         elif report_type == 'market_analysis':
             loop = asyncio.new_event_loop()
