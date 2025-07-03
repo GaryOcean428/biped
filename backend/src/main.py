@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from flask import Flask, send_from_directory, g, request, jsonify
+from flask import Flask, send_from_directory, g, request, jsonify, redirect
 
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -254,6 +254,11 @@ with app.app_context():
 def admin_dashboard():
     """Serve the admin dashboard"""
     return send_from_directory('static', 'admin.html')
+
+@app.route('/')
+def root():
+    """Redirect root to dashboard"""
+    return redirect('/dashboard')
 
 @app.route('/dashboard')
 def enhanced_dashboard():
