@@ -257,8 +257,8 @@ def admin_dashboard():
 
 @app.route('/')
 def root():
-    """Redirect root to dashboard"""
-    return redirect('/dashboard')
+    """Serve the trades marketplace dashboard at root"""
+    return send_from_directory('static', 'dashboard.html')
 
 @app.route('/dashboard')
 def enhanced_dashboard():
@@ -285,108 +285,77 @@ def security_status():
         'input_validation': True
     }
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_react_app(path):
-    """Serve trades marketplace interface with proper routing support"""
+# Specific route handlers for different pages
+@app.route('/jobs')
+def jobs_page():
+    """Serve the job posting interface"""
+    return send_from_directory('static', 'enhanced-job-posting.html')
+
+@app.route('/providers')
+def providers_page():
+    """Serve the provider dashboard"""
+    return send_from_directory('static', 'provider-dashboard.html')
+
+@app.route('/mobile')
+def mobile_page():
+    """Serve the mobile interface"""
+    return send_from_directory('static', 'mobile.html')
+
+# Static file handler for assets
+@app.route('/<path:filename>')
+def serve_static_files(filename):
+    """Serve static files (CSS, JS, images, etc.)"""
     static_folder_path = os.path.join(os.path.dirname(__file__), 'static')
     
     # Handle API routes - don't serve HTML for these
-    if path.startswith('api/'):
+    if filename.startswith('api/'):
         return jsonify({'error': 'API endpoint not found'}), 404
     
     # Handle static assets (CSS, JS, images, etc.)
-    if path and '.' in path:
-        # Check if file exists in the static directory
-        file_path = os.path.join(static_folder_path, path)
+    if '.' in filename:
+        file_path = os.path.join(static_folder_path, filename)
         
         # Handle legacy /css/ paths by redirecting to /static/css/
-        if path.startswith('css/') and not os.path.exists(file_path):
-            # Try the /static/css/ path instead
-            static_path = 'static/' + path
+        if filename.startswith('css/') and not os.path.exists(file_path):
+            static_path = 'static/' + filename
             file_path = os.path.join(static_folder_path, static_path)
             if os.path.exists(file_path):
-                path = static_path
+                filename = static_path
         
         if os.path.exists(file_path):
             # Determine MIME type based on file extension
             mimetype = None
-            if path.endswith('.js'):
+            if filename.endswith('.js'):
                 mimetype = 'text/javascript'
-            elif path.endswith('.css'):
+            elif filename.endswith('.css'):
                 mimetype = 'text/css'
-            elif path.endswith('.json'):
+            elif filename.endswith('.json'):
                 mimetype = 'application/json'
-            elif path.endswith('.ico'):
+            elif filename.endswith('.ico'):
                 mimetype = 'image/x-icon'
-            elif path.endswith('.png'):
+            elif filename.endswith('.png'):
                 mimetype = 'image/png'
-            elif path.endswith('.jpg') or path.endswith('.jpeg'):
+            elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
                 mimetype = 'image/jpeg'
-            elif path.endswith('.svg'):
+            elif filename.endswith('.svg'):
                 mimetype = 'image/svg+xml'
-            elif path.endswith('.woff'):
+            elif filename.endswith('.woff'):
                 mimetype = 'font/woff'
-            elif path.endswith('.woff2'):
+            elif filename.endswith('.woff2'):
                 mimetype = 'font/woff2'
-            elif path.endswith('.ttf'):
+            elif filename.endswith('.ttf'):
                 mimetype = 'font/ttf'
-            elif path.endswith('.eot'):
+            elif filename.endswith('.eot'):
                 mimetype = 'application/vnd.ms-fontobject'
             
             # Send file with proper MIME type
-            response = send_from_directory(static_folder_path, path)
+            response = send_from_directory(static_folder_path, filename)
             if mimetype:
                 response.headers['Content-Type'] = mimetype
             return response
     
-    # Serve the correct trades marketplace interface
-    # Route specific pages to their corresponding HTML files
-    if path == 'jobs' or path == 'post-job':
-        return send_from_directory(static_folder_path, 'enhanced-job-posting.html')
-    elif path == 'providers' or path == 'provider-dashboard':
-        return send_from_directory(static_folder_path, 'provider-dashboard.html')
-    elif path == 'admin':
-        return send_from_directory(static_folder_path, 'admin.html')
-    elif path == 'mobile':
-        return send_from_directory(static_folder_path, 'mobile.html')
-    
-    # Serve the main trades marketplace dashboard for all other routes
-    # For homepage, redirect to the working dashboard route
-    if path == '' or path == 'home':
-        from flask import redirect
-        return redirect('/dashboard')
-    
-    # For other routes, serve the regular dashboard
-    dashboard_path = os.path.join(static_folder_path, 'dashboard.html')
-    if os.path.exists(dashboard_path):
-        return send_from_directory(static_folder_path, 'dashboard.html')
-    
-    # Fallback to enhanced dashboard
-    enhanced_dashboard_path = os.path.join(static_folder_path, 'dashboard-enhanced.html')
-    if os.path.exists(enhanced_dashboard_path):
-        return send_from_directory(static_folder_path, 'dashboard-enhanced.html')
-    
-    # Final fallback
-    return jsonify({
-        'message': 'Biped Trades Marketplace',
-        'version': '2.0',
-        'status': 'operational',
-        'description': 'Connecting customers with trusted service providers',
-        'features': [
-            'Job posting and management',
-            'Provider profiles and verification', 
-            'Instant price estimates',
-            'Secure payment processing',
-            'Mobile-first design'
-        ],
-        'endpoints': {
-            'health': '/health',
-            'jobs': '/jobs',
-            'providers': '/providers',
-            'services': '/api/services'
-        }
-    }), 200
+    # For any other route, serve the dashboard (trades marketplace)
+    return send_from_directory('static', 'dashboard.html')
 
 # Error handlers
 @app.errorhandler(404)
