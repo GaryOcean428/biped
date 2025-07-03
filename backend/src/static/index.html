@@ -4,232 +4,265 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biped Dashboard - AI-Powered Trades Marketplace</title>
-    
-    <!-- Meta Tags -->
-    <meta name="theme-color" content="#1e40af">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
-    <!-- Stylesheets -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        /* Custom CSS Variables */
-        :root {
-            --color-primary: #1e40af;
-            --color-primary-light: #3b82f6;
-            --color-secondary: #64748b;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-error: #ef4444;
-            --color-info: #06b6d4;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-card: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-inverse: #ffffff;
-            --border-primary: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --radius-lg: 0.5rem;
-            --radius-xl: 0.75rem;
-            --radius-full: 9999px;
-            --space-4: 1rem;
-            --space-6: 1.5rem;
-            --space-8: 2rem;
-            --transition-fast: 150ms ease;
-            --transition-normal: 300ms ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        /* Dashboard Layout */
-        .dashboard-sidebar {
-            transition: transform 0.3s ease;
-            width: 280px;
-            background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dashboard-sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-        
-        .dashboard-main {
-            transition: margin-left 0.3s ease;
-            margin-left: 280px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-        }
-        
-        .dashboard-main.expanded {
-            margin-left: 0;
+            display: flex;
         }
 
-        /* Navigation Styling - FIXED */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        .logo .badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.75rem;
+        }
+
+        .user-info h3 {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
         .nav-link {
-            display: flex !important;
-            align-items: center !important;
-            padding: 12px 16px !important;
-            margin: 4px 0 !important;
-            border-radius: 8px !important;
-            color: #ffffff !important;
-            text-decoration: none !important;
-            transition: all 0.2s ease !important;
-            font-weight: 500 !important;
-            position: relative !important;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-            color: #ffffff !important;
-            transform: translateX(4px) !important;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
 
         .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.2) !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left: 3px solid #4ade80;
         }
 
-        .nav-link i {
-            width: 20px !important;
-            margin-right: 12px !important;
-            color: #ffffff !important;
-            font-size: 16px !important;
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            opacity: 0.8;
         }
 
-        .nav-link span {
-            color: #ffffff !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
+        .badge {
+            background: #ef4444;
+            color: white;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            margin-left: auto;
         }
 
-        /* Badge styling */
-        .nav-badge {
-            background-color: #ef4444 !important;
-            color: #ffffff !important;
-            font-size: 11px !important;
-            padding: 2px 6px !important;
-            border-radius: 10px !important;
-            margin-left: auto !important;
-            font-weight: 600 !important;
+        .ai-assistant {
+            margin-top: auto;
+            padding: 0 2rem;
         }
 
-        /* Widget Styling */
-        .widget {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-xl);
-            padding: var(--space-6);
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-normal);
+        .ai-assistant h4 {
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
-        
-        .widget:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
+
+        .ai-assistant p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
         }
-        
-        .metric-card {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-            color: var(--text-inverse);
+
+        .start-chat-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
             border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
-        
-        .metric-value {
+
+        .start-chat-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: white;
             font-size: 2rem;
             font-weight: 700;
-            line-height: 1;
-        }
-        
-        .metric-change {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-        
-        .metric-change.positive {
-            color: #10b981;
-        }
-        
-        .metric-change.negative {
-            color: #ef4444;
         }
 
-        /* Button Styling */
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            border: none;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            display: inline-flex;
+            transition: background 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-primary-light);
-        }
-
-        .btn-secondary {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .dashboard-sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                z-index: 1000;
-                transform: translateX(-100%);
-            }
-            
-            .dashboard-sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .dashboard-main {
-                margin-left: 0;
-            }
-            
-            .dashboard-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                display: none;
-            }
-            
-            .dashboard-overlay.show {
-                display: block;
-            }
-        }
-
-        /* Content sections - initially hidden */
         .content-section {
             display: none;
         }
@@ -238,605 +271,1413 @@
             display: block;
         }
 
-        /* Activity item styling */
+        .welcome-section {
+            margin-bottom: 2rem;
+        }
+
+        .welcome-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            color: #4ade80;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .activity-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .view-all-btn {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .view-all-btn:hover {
+            background: rgba(59, 130, 246, 1);
+        }
+
         .activity-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-primary);
-            transition: background-color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .activity-item:hover {
-            background: var(--bg-secondary);
-        }
-        
+
         .activity-item:last-child {
             border-bottom: none;
         }
 
-        /* Status badges */
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: var(--radius-full);
-            font-size: 12px;
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .activity-icon.completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .activity-icon.message {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .activity-icon.reminder {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            text-transform: uppercase;
         }
 
         .status-completed {
-            background: #dcfce7;
-            color: #166534;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
         }
 
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
+        .status-unread {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
         }
 
-        .status-active {
-            background: #dbeafe;
-            color: #1e40af;
+        .status-upcoming {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .activity-time {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .action-title {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .action-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .ai-insights {
+            margin-top: 2rem;
+        }
+
+        .insights-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .insight-text {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Chat Interface */
+        .chat-interface {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 350px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            resize: none;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #3b82f6;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.ai {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-section {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-input {
+                width: 200px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Overlay -->
-    <div class="dashboard-overlay" id="dashboardOverlay" onclick="toggleSidebar()"></div>
-    
     <!-- Sidebar -->
-    <aside class="dashboard-sidebar fixed top-0 left-0 h-full z-50" id="dashboardSidebar">
-        <div class="p-6 border-b border-white border-opacity-20">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-hammer text-white"></i>
-                </div>
-                <span class="text-xl font-bold text-white">Biped</span>
-                <span class="px-2 py-1 bg-white bg-opacity-20 text-white text-xs rounded-full">Pro</span>
+    <div class="sidebar">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <h1>Biped</h1>
+            <span class="badge">Pro</span>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-avatar">JS</div>
+            <div class="user-info">
+                <h3>John Smith</h3>
+                <p>Trade Professional</p>
             </div>
         </div>
-        
-        <!-- User Profile -->
-        <div class="p-6 border-b border-white border-opacity-20">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-user text-white"></i>
-                </div>
-                <div>
-                    <div class="text-white font-medium">John Smith</div>
-                    <div class="text-white text-sm opacity-75">Trade Professional</div>
-                </div>
-            </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-section="dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="jobs">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
+                    </svg>
+                    Jobs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="messages">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                    Messages
+                    <span class="badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="calendar">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                    Calendar
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="analytics">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                    </svg>
+                    Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="portfolio">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11.5-9L8 10.5l1.5 1.5 3-3 4.5 4.5V6H10.5z"/>
+                    </svg>
+                    Portfolio
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="payments">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                    </svg>
+                    Payments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="settings">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                    Settings
+                </a>
+            </li>
+        </ul>
+
+        <div class="ai-assistant">
+            <h4>AI Assistant</h4>
+            <p>Need help? Ask me anything!</p>
+            <button class="start-chat-btn" onclick="toggleChat()">
+                <svg style="width: 16px; height: 16px; margin-right: 0.5rem;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                Start Chat
+            </button>
         </div>
-        
-        <!-- Navigation -->
-        <nav class="p-4">
-            <ul class="space-y-1">
-                <li>
-                    <a href="#" class="nav-link active" data-section="dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="jobs">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Jobs</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="messages">
-                        <i class="fas fa-comments"></i>
-                        <span>Messages</span>
-                        <span class="nav-badge">3</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="calendar">
-                        <i class="fas fa-calendar"></i>
-                        <span>Calendar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="analytics">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="portfolio">
-                        <i class="fas fa-images"></i>
-                        <span>Portfolio</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="payments">
-                        <i class="fas fa-credit-card"></i>
-                        <span>Payments</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-section="settings">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        
-        <!-- AI Assistant -->
-        <div class="p-4 mt-auto">
-            <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                <div class="flex items-center space-x-2 mb-2">
-                    <i class="fas fa-robot text-white"></i>
-                    <span class="text-white font-medium">AI Assistant</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search..." id="search-input">
+                    <div class="search-results" id="search-results"></div>
                 </div>
-                <p class="text-white text-sm opacity-75 mb-3">Need help? Ask me anything!</p>
-                <button class="btn btn-secondary w-full">
-                    <i class="fas fa-comment mr-2"></i>
-                    Start Chat
+                <button class="notification-btn" onclick="showNotifications()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="notification-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
                 </button>
             </div>
         </div>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="dashboard-main" id="dashboardMain">
-        <!-- Top Bar -->
-        <header class="bg-white shadow-lg sticky top-0 z-40">
-            <div class="flex items-center justify-between px-6 py-4">
-                <div class="flex items-center space-x-4">
-                    <button onclick="toggleSidebar()" class="btn btn-primary lg:hidden">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="text-xl font-bold text-gray-800" id="pageTitle">Dashboard</h1>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <!-- Search -->
-                    <div class="relative hidden md:block">
-                        <input type="text" placeholder="Search..." class="px-4 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
-                    
-                    <!-- Notifications -->
-                    <button class="relative p-2 text-gray-600 hover:text-gray-800">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </button>
-                    
-                    <!-- Profile -->
-                    <button class="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-800">
-                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </header>
 
         <!-- Dashboard Content -->
-        <div class="content-section active" id="dashboard-content">
-            <div class="p-6">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome back, John!</h2>
-                    <p class="text-gray-600">Here's what's happening with your business today.</p>
+        <div id="dashboard-content" class="content-section active">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Welcome back, John!</h2>
+                <p class="welcome-subtitle">Here's what's happening with your business today.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Active Jobs</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-change">+2 from last week</div>
                 </div>
 
-                <!-- Metrics Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="widget metric-card">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-white opacity-75 text-sm">Active Jobs</p>
-                                <p class="metric-value text-white">12</p>
-                                <p class="metric-change positive">+2 from last week</p>
-                            </div>
-                            <i class="fas fa-briefcase text-white text-2xl opacity-75"></i>
-                        </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Revenue</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                        </svg>
                     </div>
-
-                    <div class="widget metric-card">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-white opacity-75 text-sm">Revenue</p>
-                                <p class="metric-value text-white">$8,450</p>
-                                <p class="metric-change positive">+15% from last month</p>
-                            </div>
-                            <i class="fas fa-dollar-sign text-white text-2xl opacity-75"></i>
-                        </div>
-                    </div>
-
-                    <div class="widget metric-card">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-white opacity-75 text-sm">Rating</p>
-                                <p class="metric-value text-white">4.9</p>
-                                <p class="metric-change">No change</p>
-                            </div>
-                            <i class="fas fa-star text-white text-2xl opacity-75"></i>
-                        </div>
-                    </div>
-
-                    <div class="widget metric-card">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-white opacity-75 text-sm">Completion Rate</p>
-                                <p class="metric-value text-white">98%</p>
-                                <p class="metric-change positive">+3% from last month</p>
-                            </div>
-                            <i class="fas fa-check-circle text-white text-2xl opacity-75"></i>
-                        </div>
-                    </div>
+                    <div class="stat-value">$8,450</div>
+                    <div class="stat-change">+15% from last month</div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="widget">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold">Recent Activity</h3>
-                            <button class="btn btn-primary btn-sm">View All</button>
-                        </div>
-                        
-                        <div class="space-y-0">
-                            <div class="activity-item">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-check text-green-600 text-sm"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="font-medium">Job Completed</p>
-                                        <p class="text-sm text-gray-600">Kitchen renovation at 123 Main St completed successfully</p>
-                                        <div class="flex items-center justify-between mt-2">
-                                            <span class="status-badge status-completed">Completed</span>
-                                            <span class="text-xs text-gray-500">2 hours ago</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Rating</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-change">No change</div>
+                </div>
 
-                            <div class="activity-item">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-message text-blue-600 text-sm"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="font-medium">New Message</p>
-                                        <p class="text-sm text-gray-600">Sarah Johnson sent you a message about bathroom tiles</p>
-                                        <div class="flex items-center justify-between mt-2">
-                                            <span class="status-badge status-pending">Unread</span>
-                                            <span class="text-xs text-gray-500">4 hours ago</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Completion Rate</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">98%</div>
+                    <div class="stat-change">+3% from last month</div>
+                </div>
+            </div>
 
-                            <div class="activity-item">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-clock text-yellow-600 text-sm"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="font-medium">Job Reminder</p>
-                                        <p class="text-sm text-gray-600">Plumbing repair scheduled for tomorrow at 9:00 AM</p>
-                                        <div class="flex items-center justify-between mt-2">
-                                            <span class="status-badge status-active">Upcoming</span>
-                                            <span class="text-xs text-gray-500">6 hours ago</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="quick-actions">
+                <h3 class="quick-actions-title">Quick Actions</h3>
+                <div class="actions-grid">
+                    <div class="action-card" onclick="openJobModal()">
+                        <div class="action-header">
+                            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            <span class="action-title">Create New Job</span>
                         </div>
+                        <p class="action-description">Start a new project</p>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="widget">
-                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-                        
-                        <div class="grid grid-cols-1 gap-4">
-                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-plus text-blue-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium">Create New Job</p>
-                                    <p class="text-sm text-gray-600">Start a new project</p>
-                                </div>
-                            </button>
-
-                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-calendar text-green-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium">Schedule Appointment</p>
-                                    <p class="text-sm text-gray-600">Book a time slot</p>
-                                </div>
-                            </button>
-
-                            <button class="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-file-invoice text-purple-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium">Send Invoice</p>
-                                    <p class="text-sm text-gray-600">Create and send bill</p>
-                                </div>
-                            </button>
+                    <div class="action-card" onclick="openAppointmentModal()">
+                        <div class="action-header">
+                            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                            <span class="action-title">Schedule Appointment</span>
                         </div>
+                        <p class="action-description">Book a time slot</p>
+                    </div>
+
+                    <div class="action-card" onclick="openInvoiceModal()">
+                        <div class="action-header">
+                            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                            </svg>
+                            <span class="action-title">Send Invoice</span>
+                        </div>
+                        <p class="action-description">Create and send bill</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity-section">
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <button class="view-all-btn" onclick="showAllActivity()">View All</button>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon completed">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Job Completed</div>
+                            <div class="activity-description">Kitchen renovation at 123 Main St completed successfully</div>
+                            <span class="activity-status status-completed">COMPLETED</span>
+                        </div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon message">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Message</div>
+                            <div class="activity-description">Sarah Johnson sent you a message about bathroom tiles</div>
+                            <span class="activity-status status-unread">UNREAD</span>
+                        </div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon reminder">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Job Reminder</div>
+                            <div class="activity-description">Plumbing repair scheduled for tomorrow at 9:00 AM</div>
+                            <span class="activity-status status-upcoming">UPCOMING</span>
+                        </div>
+                        <div class="activity-time">6 hours ago</div>
                     </div>
                 </div>
 
-                <!-- AI Insights -->
-                <div class="widget mt-6">
-                    <h3 class="text-lg font-semibold mb-4">AI Insights</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-lightbulb text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-blue-800">Optimization Tip</p>
-                                    <p class="text-sm text-blue-700">Consider raising your hourly rate by 10% based on your excellent reviews and completion rate.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-green-50 rounded-lg">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-chart-line text-green-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-green-800">Growth Opportunity</p>
-                                    <p class="text-sm text-green-700">Kitchen renovations are trending in your area. Consider highlighting this service.</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="ai-insights">
+                    <h3 class="insights-title">AI Insights</h3>
+                    <div class="insight-card">
+                        <p class="insight-text">
+                            Your completion rate has improved by 3% this month. Consider promoting your reliability in your profile to attract more premium clients. Based on current trends, you could increase your rates by 8-12% for kitchen renovation projects.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Jobs Content -->
-        <div class="content-section" id="jobs-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Jobs Management</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Jobs management interface will be displayed here.</p>
-                    <button class="btn btn-primary mt-4" onclick="window.location.href='/jobs'">
-                        <i class="fas fa-external-link-alt mr-2"></i>
-                        Go to Full Jobs Interface
-                    </button>
+        <div id="jobs-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Jobs Management</h2>
+                <p class="welcome-subtitle">Manage your active and completed projects.</p>
+            </div>
+            
+            <div class="activity-card">
+                <div class="card-header">
+                    <h3 class="card-title">Active Jobs</h3>
+                    <button class="view-all-btn" onclick="openJobModal()">Create New Job</button>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon message">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Kitchen Renovation - Downtown Apartment</div>
+                        <div class="activity-description">Complete kitchen remodel including cabinets, countertops, and appliances</div>
+                        <span class="activity-status status-upcoming">IN PROGRESS</span>
+                    </div>
+                    <div class="activity-time">Due: Dec 15</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon reminder">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Bathroom Plumbing Repair</div>
+                        <div class="activity-description">Fix leaking pipes and replace fixtures in master bathroom</div>
+                        <span class="activity-status status-upcoming">SCHEDULED</span>
+                    </div>
+                    <div class="activity-time">Tomorrow 9:00 AM</div>
                 </div>
             </div>
         </div>
 
         <!-- Messages Content -->
-        <div class="content-section" id="messages-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Messages</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Messages interface will be displayed here.</p>
-                    <div class="mt-4">
-                        <div class="space-y-4">
-                            <div class="p-4 border border-gray-200 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="font-medium">Sarah Johnson</span>
-                                    <span class="text-sm text-gray-500">4 hours ago</span>
-                                </div>
-                                <p class="text-gray-600">Hi John, I wanted to ask about the bathroom tiles for our renovation project...</p>
-                                <span class="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Unread</span>
-                            </div>
-                        </div>
+        <div id="messages-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Messages</h2>
+                <p class="welcome-subtitle">Communicate with your clients and team.</p>
+            </div>
+            
+            <div class="activity-card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Messages</h3>
+                    <button class="view-all-btn">Mark All Read</button>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon message">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
                     </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Sarah Johnson</div>
+                        <div class="activity-description">Hi John, I wanted to discuss the tile options for the bathroom renovation...</div>
+                        <span class="activity-status status-unread">UNREAD</span>
+                    </div>
+                    <div class="activity-time">2 hours ago</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon message">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Mike Chen</div>
+                        <div class="activity-description">The kitchen project looks amazing! When can we schedule the final walkthrough?</div>
+                        <span class="activity-status status-unread">UNREAD</span>
+                    </div>
+                    <div class="activity-time">5 hours ago</div>
                 </div>
             </div>
         </div>
 
         <!-- Calendar Content -->
-        <div class="content-section" id="calendar-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Calendar</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Calendar interface will be displayed here.</p>
-                    <div class="mt-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 border border-gray-200 rounded-lg">
-                                <h4 class="font-medium mb-2">Upcoming Appointments</h4>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between">
-                                        <span>Plumbing Repair</span>
-                                        <span class="text-sm text-gray-500">Tomorrow 9:00 AM</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Kitchen Consultation</span>
-                                        <span class="text-sm text-gray-500">Friday 2:00 PM</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div id="calendar-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Calendar</h2>
+                <p class="welcome-subtitle">Manage your appointments and schedule.</p>
+            </div>
+            
+            <div class="activity-card">
+                <div class="card-header">
+                    <h3 class="card-title">Upcoming Appointments</h3>
+                    <button class="view-all-btn" onclick="openAppointmentModal()">Schedule New</button>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon reminder">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2z"/>
+                        </svg>
                     </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Bathroom Plumbing Consultation</div>
+                        <div class="activity-description">Initial assessment for Sarah Johnson's bathroom renovation</div>
+                        <span class="activity-status status-upcoming">TOMORROW</span>
+                    </div>
+                    <div class="activity-time">9:00 AM</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon reminder">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Kitchen Final Walkthrough</div>
+                        <div class="activity-description">Final inspection with Mike Chen for kitchen renovation project</div>
+                        <span class="activity-status status-upcoming">FRIDAY</span>
+                    </div>
+                    <div class="activity-time">2:00 PM</div>
                 </div>
             </div>
         </div>
 
         <!-- Analytics Content -->
-        <div class="content-section" id="analytics-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Analytics</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Analytics dashboard will be displayed here.</p>
-                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-4 bg-blue-50 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-blue-600">$8,450</div>
-                            <div class="text-sm text-blue-800">Monthly Revenue</div>
-                        </div>
-                        <div class="p-4 bg-green-50 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-green-600">98%</div>
-                            <div class="text-sm text-green-800">Completion Rate</div>
-                        </div>
-                        <div class="p-4 bg-purple-50 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-purple-600">4.9</div>
-                            <div class="text-sm text-purple-800">Average Rating</div>
-                        </div>
+        <div id="analytics-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Analytics</h2>
+                <p class="welcome-subtitle">Track your business performance and growth.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Monthly Revenue</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                        </svg>
                     </div>
+                    <div class="stat-value">$12,450</div>
+                    <div class="stat-change">+22% from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Jobs Completed</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-change">+5 from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Customer Satisfaction</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-change">+0.2 from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Response Time</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">2.3h</div>
+                    <div class="stat-change">-0.5h from last month</div>
                 </div>
             </div>
         </div>
 
         <!-- Portfolio Content -->
-        <div class="content-section" id="portfolio-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Portfolio</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Portfolio gallery will be displayed here.</p>
-                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-image text-gray-400 text-2xl"></i>
-                        </div>
-                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-image text-gray-400 text-2xl"></i>
-                        </div>
-                        <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-image text-gray-400 text-2xl"></i>
-                        </div>
+        <div id="portfolio-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Portfolio</h2>
+                <p class="welcome-subtitle">Showcase your best work and projects.</p>
+            </div>
+            
+            <div class="actions-grid">
+                <div class="action-card">
+                    <div style="height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white" opacity="0.7">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
                     </div>
+                    <div class="action-title">Kitchen Renovation</div>
+                    <div class="action-description">Modern kitchen with custom cabinets and granite countertops</div>
+                </div>
+                
+                <div class="action-card">
+                    <div style="height: 200px; background: linear-gradient(45deg, #764ba2, #667eea); border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white" opacity="0.7">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </div>
+                    <div class="action-title">Bathroom Remodel</div>
+                    <div class="action-description">Luxury bathroom with walk-in shower and heated floors</div>
+                </div>
+                
+                <div class="action-card">
+                    <div style="height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white" opacity="0.7">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </div>
+                    <div class="action-title">Plumbing Installation</div>
+                    <div class="action-description">Complete plumbing system for new construction project</div>
                 </div>
             </div>
         </div>
 
         <!-- Payments Content -->
-        <div class="content-section" id="payments-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Payments</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Payment management interface will be displayed here.</p>
-                    <div class="mt-4">
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
-                                <div>
-                                    <span class="font-medium">Kitchen Renovation - Job #1234</span>
-                                    <div class="text-sm text-gray-500">Completed on March 15, 2024</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-bold text-green-600">$2,500</div>
-                                    <span class="status-badge status-completed">Paid</span>
-                                </div>
-                            </div>
-                        </div>
+        <div id="payments-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Payments</h2>
+                <p class="welcome-subtitle">Manage invoices, payments, and financial records.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Outstanding Invoices</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6z"/>
+                        </svg>
                     </div>
+                    <div class="stat-value">$3,200</div>
+                    <div class="stat-change">3 pending invoices</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">This Month</span>
+                        <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">$8,450</div>
+                    <div class="stat-change">+15% from last month</div>
+                </div>
+            </div>
+            
+            <div class="activity-card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Transactions</h3>
+                    <button class="view-all-btn" onclick="openInvoiceModal()">Create Invoice</button>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon completed">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Payment Received - Kitchen Project</div>
+                        <div class="activity-description">$2,500 from Mike Chen for kitchen renovation completion</div>
+                        <span class="activity-status status-completed">PAID</span>
+                    </div>
+                    <div class="activity-time">2 days ago</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon reminder">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Invoice Sent - Bathroom Consultation</div>
+                        <div class="activity-description">$150 consultation fee sent to Sarah Johnson</div>
+                        <span class="activity-status status-upcoming">PENDING</span>
+                    </div>
+                    <div class="activity-time">1 week ago</div>
                 </div>
             </div>
         </div>
 
         <!-- Settings Content -->
-        <div class="content-section" id="settings-content">
-            <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Settings</h2>
-                <div class="widget">
-                    <p class="text-gray-600">Settings and preferences will be displayed here.</p>
-                    <div class="mt-4 space-y-4">
-                        <div class="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
-                            <div>
-                                <span class="font-medium">Email Notifications</span>
-                                <div class="text-sm text-gray-500">Receive notifications about new jobs and messages</div>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
+        <div id="settings-content" class="content-section">
+            <div class="welcome-section">
+                <h2 class="welcome-title">Settings</h2>
+                <p class="welcome-subtitle">Manage your account and preferences.</p>
+            </div>
+            
+            <div class="activity-card">
+                <div class="card-header">
+                    <h3 class="card-title">Account Settings</h3>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-title">Email Notifications</div>
+                        <div class="activity-description">Receive notifications about new jobs and messages</div>
                     </div>
+                    <label style="margin-left: auto;">
+                        <input type="checkbox" checked style="transform: scale(1.2);">
+                    </label>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-title">SMS Alerts</div>
+                        <div class="activity-description">Get text messages for urgent updates</div>
+                    </div>
+                    <label style="margin-left: auto;">
+                        <input type="checkbox" style="transform: scale(1.2);">
+                    </label>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-title">Profile Visibility</div>
+                        <div class="activity-description">Make your profile visible to potential clients</div>
+                    </div>
+                    <label style="margin-left: auto;">
+                        <input type="checkbox" checked style="transform: scale(1.2);">
+                    </label>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Job Creation Modal -->
+    <div id="jobModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('jobModal')">&times;</span>
+            <h2>Create New Job</h2>
+            <form id="jobForm">
+                <div class="form-group">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" name="jobTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="jobDescription">Description</label>
+                    <textarea id="jobDescription" name="jobDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="jobCategory">Category</label>
+                    <select id="jobCategory" name="jobCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="plumbing">Plumbing</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="construction">Construction</option>
+                        <option value="renovation">Renovation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jobBudget">Budget</label>
+                    <input type="number" id="jobBudget" name="jobBudget" min="0" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-primary">Create Job</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('jobModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('appointmentModal')">&times;</span>
+            <h2>Schedule Appointment</h2>
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label for="appointmentTitle">Appointment Title</label>
+                    <input type="text" id="appointmentTitle" name="appointmentTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentDate">Date</label>
+                    <input type="date" id="appointmentDate" name="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Time</label>
+                    <input type="time" id="appointmentTime" name="appointmentTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentClient">Client</label>
+                    <input type="text" id="appointmentClient" name="appointmentClient" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentNotes">Notes</label>
+                    <textarea id="appointmentNotes" name="appointmentNotes"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Schedule Appointment</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('appointmentModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('invoiceModal')">&times;</span>
+            <h2>Create Invoice</h2>
+            <form id="invoiceForm">
+                <div class="form-group">
+                    <label for="invoiceClient">Client Name</label>
+                    <input type="text" id="invoiceClient" name="invoiceClient" required>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceProject">Project</label>
+                    <input type="text" id="invoiceProject" name="invoiceProject" required>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceAmount">Amount</label>
+                    <input type="number" id="invoiceAmount" name="invoiceAmount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceDueDate">Due Date</label>
+                    <input type="date" id="invoiceDueDate" name="invoiceDueDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceDescription">Description</label>
+                    <textarea id="invoiceDescription" name="invoiceDescription"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Create & Send Invoice</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('invoiceModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatInterface" class="chat-interface">
+        <div class="chat-header">
+            <span class="chat-title">AI Assistant</span>
+            <button class="chat-close" onclick="toggleChat()">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                <p>Hello! I'm your AI assistant. How can I help you today?</p>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="2"></textarea>
+        </div>
+    </div>
 
     <script>
-        // Sidebar toggle functionality
-        function toggleSidebar() {
-            const sidebar = document.getElementById('dashboardSidebar');
-            const main = document.getElementById('dashboardMain');
-            const overlay = document.getElementById('dashboardOverlay');
-            
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed');
-                main.classList.toggle('expanded');
-            }
-        }
-
-        // Navigation functionality - FIXED
-        function initNavigation() {
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
             const navLinks = document.querySelectorAll('.nav-link');
             const contentSections = document.querySelectorAll('.content-section');
-            const pageTitle = document.getElementById('pageTitle');
+            const pageTitle = document.getElementById('page-title');
 
             navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
                     
                     // Remove active class from all links
                     navLinks.forEach(l => l.classList.remove('active'));
                     
                     // Add active class to clicked link
-                    link.classList.add('active');
+                    this.classList.add('active');
                     
                     // Hide all content sections
-                    contentSections.forEach(section => {
-                        section.classList.remove('active');
-                    });
+                    contentSections.forEach(section => section.classList.remove('active'));
                     
-                    // Show the selected content section
-                    const sectionName = link.getAttribute('data-section');
-                    const targetSection = document.getElementById(sectionName + '-content');
-                    
-                    if (targetSection) {
-                        targetSection.classList.add('active');
-                        
-                        // Update page title
-                        const linkText = link.querySelector('span').textContent;
-                        pageTitle.textContent = linkText;
-                        
-                        // Close sidebar on mobile after navigation
-                        if (window.innerWidth <= 768) {
-                            const sidebar = document.getElementById('dashboardSidebar');
-                            const overlay = document.getElementById('dashboardOverlay');
-                            sidebar.classList.remove('show');
-                            overlay.classList.remove('show');
-                        }
-                        
-                        console.log('Navigated to:', sectionName);
+                    // Show target content section
+                    const targetSection = this.getAttribute('data-section');
+                    const targetElement = document.getElementById(targetSection + '-content');
+                    if (targetElement) {
+                        targetElement.classList.add('active');
                     }
+                    
+                    // Update page title
+                    const sectionTitle = this.textContent.trim().replace(/\d+$/, '').trim();
+                    pageTitle.textContent = sectionTitle;
                 });
             });
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query.length > 0) {
+                    // Simulate search results
+                    const mockResults = [
+                        { title: 'Kitchen Renovation Project', type: 'Job', description: 'Downtown apartment kitchen remodel' },
+                        { title: 'Sarah Johnson', type: 'Client', description: 'Bathroom renovation client' },
+                        { title: 'Plumbing Repair', type: 'Service', description: 'Emergency plumbing services' },
+                        { title: 'Invoice #1234', type: 'Invoice', description: '$2,500 - Kitchen project payment' }
+                    ].filter(item => 
+                        item.title.toLowerCase().includes(query) || 
+                        item.description.toLowerCase().includes(query)
+                    );
+
+                    if (mockResults.length > 0) {
+                        searchResults.innerHTML = mockResults.map(result => `
+                            <div class="search-result-item" onclick="selectSearchResult('${result.title}', '${result.type}')">
+                                <div style="font-weight: 600; color: #333;">${result.title}</div>
+                                <div style="font-size: 0.8rem; color: #666;">${result.type} - ${result.description}</div>
+                            </div>
+                        `).join('');
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                        searchResults.style.display = 'block';
+                    }
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Hide search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-box')) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Form submissions
+            document.getElementById('jobForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Job created successfully!');
+                closeModal('jobModal');
+                this.reset();
+            });
+
+            document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Appointment scheduled successfully!');
+                closeModal('appointmentModal');
+                this.reset();
+            });
+
+            document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Invoice created and sent successfully!');
+                closeModal('invoiceModal');
+                this.reset();
+            });
+
+            // Chat functionality
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                }
+            });
+        });
+
+        // Modal functions
+        function openJobModal() {
+            document.getElementById('jobModal').style.display = 'block';
         }
 
-        // Handle window resize
-        function handleResize() {
-            const sidebar = document.getElementById('dashboardSidebar');
-            const main = document.getElementById('dashboardMain');
-            const overlay = document.getElementById('dashboardOverlay');
+        function openAppointmentModal() {
+            document.getElementById('appointmentModal').style.display = 'block';
+        }
+
+        function openInvoiceModal() {
+            document.getElementById('invoiceModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Search result selection
+        function selectSearchResult(title, type) {
+            document.getElementById('search-input').value = title;
+            document.getElementById('search-results').style.display = 'none';
             
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+            // Navigate to appropriate section based on type
+            const sectionMap = {
+                'Job': 'jobs',
+                'Client': 'messages',
+                'Service': 'jobs',
+                'Invoice': 'payments'
+            };
+            
+            const targetSection = sectionMap[type];
+            if (targetSection) {
+                const targetLink = document.querySelector(`[data-section="${targetSection}"]`);
+                if (targetLink) {
+                    targetLink.click();
+                }
             }
         }
 
-        // Initialize everything when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            initNavigation();
-            console.log('🚀 Dashboard with fixed navigation initialized');
-        });
+        // Notification functions
+        function showNotifications() {
+            alert('Notifications:\n\n• New message from Sarah Johnson\n• Payment received from Mike Chen\n• Appointment reminder for tomorrow');
+        }
 
-        // Handle window resize
-        window.addEventListener('resize', handleResize);
+        function showAllActivity() {
+            // Navigate to a detailed activity view
+            alert('Showing all activity...\n\nThis would typically open a detailed activity log or navigate to a dedicated activity page.');
+        }
+
+        // Chat functions
+        function toggleChat() {
+            const chatInterface = document.getElementById('chatInterface');
+            if (chatInterface.style.display === 'none' || chatInterface.style.display === '') {
+                chatInterface.style.display = 'flex';
+            } else {
+                chatInterface.style.display = 'none';
+            }
+        }
+
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatMessages = document.getElementById('chatMessages');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `<p>${message}</p>`;
+                chatMessages.appendChild(userMessage);
+                
+                // Clear input
+                chatInput.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai';
+                    aiMessage.innerHTML = `<p>I understand you're asking about "${message}". I'm here to help with your business operations, scheduling, and any questions about your projects. How can I assist you further?</p>`;
+                    chatMessages.appendChild(aiMessage);
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
 
-<- Ensure proper secret management for production Force deployment Thu Jul  3 03:44:36 EDT 2025 -->

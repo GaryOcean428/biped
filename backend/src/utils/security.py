@@ -92,13 +92,13 @@ class SecurityEnhancer:
             'default-src': "'self'",
             'script-src': [
                 "'self'",
-                "'unsafe-inline'",  # Required for some inline scripts
+                "'unsafe-inline'",  # Allow inline scripts
                 "https://cdn.jsdelivr.net",
                 "https://cdnjs.cloudflare.com"
             ],
             'style-src': [
                 "'self'",
-                "'unsafe-inline'",
+                "'unsafe-inline'",  # Allow inline styles
                 "https://cdn.jsdelivr.net",
                 "https://cdnjs.cloudflare.com",
                 "https://fonts.googleapis.com"
@@ -130,7 +130,7 @@ class SecurityEnhancer:
             strict_transport_security=False,  # Disable for development
             strict_transport_security_max_age=31536000,
             content_security_policy=csp,
-            content_security_policy_nonce_in=[],  # Disable nonce requirement to fix CSP violations
+            content_security_policy_nonce_in=[],  # Disable nonce to allow unsafe-inline
             referrer_policy='strict-origin-when-cross-origin',
             feature_policy={
                 'geolocation': "'none'",
