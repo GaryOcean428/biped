@@ -12,7 +12,7 @@ restartPolicyMaxRetries = 3
 
 [deploy.env]
 # Cache busting environment variables with unique timestamp
-CACHE_BUST = "20250703-021500"
+CACHE_BUST = "20250703-133900"
 FLASK_STATIC_CACHE_TIMEOUT = "0"
 FLASK_ENV = "production"
 FLASK_APP = "src/main.py"
@@ -22,18 +22,17 @@ PYTHONUNBUFFERED = "1"
 # Force cache clearing headers
 FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
 STATIC_CACHE_TIMEOUT = "0"
-BUILD_TIMESTAMP = "20250703-021500"
+BUILD_TIMESTAMP = "20250703-133900"
 
 [deploy.headers]
 # Aggressive cache control headers to prevent caching issues
 "Cache-Control" = "no-cache, no-store, must-revalidate, max-age=0"
 "Pragma" = "no-cache"
 "Expires" = "0"
-"X-Build-Timestamp" = "20250703-021500"
+"X-Build-Timestamp" = "20250703-133900"
 
-[deploy.redirects]
-# Ensure root redirects to main app
-"/" = "/dashboard"
+# Redirects removed - let Flask handle routing properly
+# Root URL should serve the public landing page, not dashboard
 
 [services.biped]
 source = "."
