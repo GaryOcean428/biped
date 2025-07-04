@@ -51,7 +51,7 @@ flask-talisman==1.1.0
 flask-wtf==1.2.1
 
 # Missing dependencies identified from deployment logs
-flask-caching==2.0.2
+flask-caching==2.3.0
 flask-compress==1.14
 flask-migrate==4.0.5
 
