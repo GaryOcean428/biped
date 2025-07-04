@@ -60,7 +60,7 @@ tradehub-platform/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/GaryOcean428/biped.git
-   cd tradehub-platform
+   cd biped
    ```
 
 2. **Set up the backend**
