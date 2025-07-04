@@ -24,21 +24,31 @@ class RedisClient:
         self._connect()
 
     def _connect(self):
-        """Establish Redis connection with fallback"""
+        """Establish Redis connection with Railway support and fallback"""
         try:
+            # Try Railway Redis URL first
             if self.redis_url.startswith("rediss://"):
-                # SSL connection for production
+                # SSL connection for Railway production
                 self.redis_client = redis.from_url(
-                    self.redis_url, decode_responses=True, ssl_cert_reqs=None
+                    self.redis_url, 
+                    decode_responses=True, 
+                    ssl_cert_reqs=None,
+                    socket_timeout=5,
+                    socket_connect_timeout=5
                 )
             else:
-                # Standard connection
-                self.redis_client = redis.from_url(self.redis_url, decode_responses=True)
+                # Standard connection for Railway or local
+                self.redis_client = redis.from_url(
+                    self.redis_url, 
+                    decode_responses=True,
+                    socket_timeout=5,
+                    socket_connect_timeout=5
+                )
 
             # Test connection
             self.redis_client.ping()
             self.connected = True
-            logger.info("Redis connection established successfully")
+            logger.info(f"✅ Redis connected successfully to {self.redis_url[:30]}...")
 
         except Exception as e:
             logger.warning(f"Redis connection failed: {e}. Running without Redis.")

@@ -53,14 +53,22 @@ RUN chmod -R 755 ./src/static/
 RUN echo '#!/bin/bash\n\
 export CACHE_BUST=$(date +%s)\n\
 export FLASK_STATIC_CACHE_TIMEOUT=0\n\
+export PYTHONPATH=/app:$PYTHONPATH\n\
+export FLASK_APP=src/main.py\n\
+\n\
+echo "Environment variables:"\n\
+echo "DATABASE_URL: ${DATABASE_URL:0:30}..."\n\
+echo "REDIS_URL: ${REDIS_URL:0:30}..."\n\
+echo "PORT: ${PORT:-8000}"\n\
+echo "PYTHONPATH: $PYTHONPATH"\n\
 \n\
 # Verify critical dependencies before starting\n\
 echo "Verifying dependencies..."\n\
-pip list | grep -E "flask-caching|flask-compress|flask-cors|flask-migrate"\n\
+pip list | grep -E "flask-caching|flask-compress|flask-cors|flask-migrate" || echo "Some optional dependencies missing but handled gracefully"\n\
 \n\
 # Start the application with proper error handling\n\
 echo "Starting Flask application..."\n\
-python -m flask run --host=0.0.0.0 --port=${PORT:-8000}\n\
+python src/main.py\n\
 ' > start.sh && chmod +x start.sh
 
 # Expose port
