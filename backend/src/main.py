@@ -160,7 +160,7 @@ def create_app():
     
     # Register blueprints
     try:
-        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp
+        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp, legal_bp
         from src.routes.integration import integration_bp
         
         app.register_blueprint(health_bp)
@@ -169,6 +169,7 @@ def create_app():
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         app.register_blueprint(integration_bp)
         app.register_blueprint(jobs_bp)
+        app.register_blueprint(legal_bp)  # Register legal routes at root level
         
         logger.info("✅ Blueprints registered successfully")
         
@@ -202,7 +203,10 @@ def create_app():
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
+        try:
+            return render_template('404.html'), 404
+        except:
+            return jsonify({'error': 'Not found'}), 404
     
     @app.errorhandler(500)
     def internal_error(error):
