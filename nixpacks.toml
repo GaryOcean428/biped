@@ -1,18 +1,12 @@
-# nixpacks.toml
-# Configuration file for Railway deployment using Nixpacks
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip"]
+
+[phases.install]
+cmds = ["cd backend && pip install -r requirements.txt"]
+
+[phases.build]
+cmds = ["echo 'Build phase complete'"]
 
 [start]
-cmd = "gunicorn --bind 0.0.0.0:$PORT backend.src.main:app"
-
-[variables]
-PYTHONPATH = "/app"
-DATA_DIR = "/data"
-
-[phases.setup]
-cmds = [
-  "mkdir -p /data/uploads",
-  "mkdir -p /data/logs", 
-  "mkdir -p /data/backups",
-  "chmod 755 /data"
-]
+cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --access-logfile - --error-logfile - --log-level info --chdir backend src.main:app"
 

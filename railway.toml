@@ -2,28 +2,12 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "cd backend && python -m gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --access-logfile - --error-logfile - --log-level info src.main:app"
+startCommand = "python3 start.py"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [deploy.envs]
-# Cache busting environment variables
-CACHE_BUST = "FORCE_REBUILD_20250703_150000"
-NO_CACHE = "1"
-
-# Headers for cache control
-[deploy.headers]
-"Cache-Control" = "no-cache, no-store, must-revalidate"
-"Pragma" = "no-cache"
-"Expires" = "0"
-"X-Build-Timestamp" = "FORCE_REBUILD_20250703_150000"
-
-# Developer authentication variables
-DEV_EMAIL = "dev@biped.app"
-DEV_ACCESS_KEY = "dev_biped_2025"
-
-# Redirects removed - let Flask handle routing properly
-# Root URL should serve the public landing page, not dashboard
+PYTHONPATH = "/app:/app/backend"
 
