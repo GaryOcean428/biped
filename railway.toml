@@ -1,18 +1,25 @@
 [build]
 builder = "dockerfile"
-buildCommand = "echo Building Biped Platform..."
-watchPatterns = ["backend/**", "frontend/**", "Dockerfile", "railway.toml", "start.sh"]
+buildCommand = "echo Building with Dockerfile..."
 
 [deploy]
-startCommand = "sh start.sh"
+startCommand = "./start.sh"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 5
 
 [deploy.envs]
 # Cache busting environment variables
-"X-Build-Timestamp" = "FORCE_REBUILD_20250703_140000"
+CACHE_BUST = "FORCE_REBUILD_20250703_150000"
+NO_CACHE = "1"
+
+# Headers for cache control
+[deploy.headers]
+"Cache-Control" = "no-cache, no-store, must-revalidate"
+"Pragma" = "no-cache"
+"Expires" = "0"
+"X-Build-Timestamp" = "FORCE_REBUILD_20250703_150000"
 
 # Developer authentication variables
 DEV_EMAIL = "dev@biped.app"

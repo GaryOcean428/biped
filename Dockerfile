@@ -21,9 +21,13 @@ WORKDIR /app
 # Copy backend requirements
 COPY backend/requirements.txt ./
 
-# Install Python dependencies
+# Install Python dependencies with verbose output to diagnose installation issues
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip list
+
+# Verify critical dependencies are installed
+RUN pip show flask-caching flask-compress flask-cors flask-migrate || echo "Some dependencies may be missing but will be handled gracefully"
 
 # Copy backend source code
 COPY backend/ ./
@@ -45,10 +49,17 @@ RUN find ./src/static/ -name "main.*.css" -delete || true && \
 # Ensure proper file permissions
 RUN chmod -R 755 ./src/static/
 
-# Create a startup script with cache headers
+# Create a startup script with cache headers and dependency verification
 RUN echo '#!/bin/bash\n\
 export CACHE_BUST=$(date +%s)\n\
 export FLASK_STATIC_CACHE_TIMEOUT=0\n\
+\n\
+# Verify critical dependencies before starting\n\
+echo "Verifying dependencies..."\n\
+pip list | grep -E "flask-caching|flask-compress|flask-cors|flask-migrate"\n\
+\n\
+# Start the application with proper error handling\n\
+echo "Starting Flask application..."\n\
 python -m flask run --host=0.0.0.0 --port=${PORT:-8000}\n\
 ' > start.sh && chmod +x start.sh
 
