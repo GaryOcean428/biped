@@ -1,3 +1,20 @@
+#!/bin/bash
+# quick_fix.sh - Apply all fixes for Railway deployment
+
+echo "🚀 Applying Railway deployment fixes..."
+
+# Backup existing files
+echo "📦 Creating backups..."
+[ -f "src/main.py" ] && cp src/main.py src/main.py.backup
+[ -f "src/utils/redis_client.py" ] && cp src/utils/redis_client.py src/utils/redis_client.py.backup
+[ -f "src/utils/rate_limiting.py" ] && cp src/utils/rate_limiting.py src/utils/rate_limiting.py.backup
+
+# Create directories if needed
+mkdir -p src/utils
+
+# Fix main.py (creating a minimal working version)
+echo "📝 Fixing main.py..."
+cat > src/main.py << 'MAINPY'
 import os
 import logging
 from flask import Flask, jsonify
@@ -75,3 +92,59 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     logger.info(f"Starting on port {port}")
     socketio.run(app, host='0.0.0.0', port=port, debug=False)
+MAINPY
+
+# Fix rate_limiting.py
+echo "📝 Fixing rate_limiting.py..."
+cat > src/utils/rate_limiting.py << 'RATELIMIT'
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+RATELIMIT
+
+# Fix redis_client.py
+echo "📝 Fixing redis_client.py..."
+cat > src/utils/redis_client.py << 'REDISCLIENT'
+import os
+import redis
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_redis_client():
+    redis_url = os.environ.get('REDIS_URL')
+    if redis_url:
+        try:
+            client = redis.from_url(redis_url)
+            client.ping()
+            return client
+        except Exception as e:
+            logger.error(f"Redis error: {e}")
+    return None
+REDISCLIENT
+
+# Update Procfile
+echo "📝 Creating Procfile..."
+echo "web: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:\$PORT src.main:app" > Procfile
+
+# Ensure __init__.py files exist
+touch src/__init__.py
+touch src/utils/__init__.py
+
+echo "
+✅ All fixes applied!
+
+Next steps:
+1. Review the changes
+2. Test locally: python src/main.py
+3. Commit and push:
+   git add .
+   git commit -m 'Fix Railway deployment issues'
+   git push
+
+4. Check Railway logs after deployment
+"
