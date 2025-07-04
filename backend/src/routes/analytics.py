@@ -45,10 +45,16 @@ def get_portfolio_analytics(user_id: str):
         # Get analytics asynchronously
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        analytics = loop.run_until_complete(bi_engine.generate_portfolio_analytics(user_id))
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
 
         return jsonify(
-            {"status": "success", "data": analytics, "timestamp": datetime.utcnow().isoformat()}
+            {
+                "status": "success",
+                "data": analytics,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
         )
 
     except Exception as e:
@@ -73,7 +79,11 @@ def get_market_intelligence():
         intelligence = loop.run_until_complete(bi_engine.generate_market_intelligence())
 
         return jsonify(
-            {"status": "success", "data": intelligence, "timestamp": datetime.utcnow().isoformat()}
+            {
+                "status": "success",
+                "data": intelligence,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
         )
 
     except Exception as e:
@@ -88,7 +98,13 @@ def get_real_time_market_data():
     try:
         service_categories = request.args.get("categories", "").split(",")
         if not service_categories or service_categories == [""]:
-            service_categories = ["Plumbing", "Electrical", "Carpentry", "Painting", "Landscaping"]
+            service_categories = [
+                "Plumbing",
+                "Electrical",
+                "Carpentry",
+                "Painting",
+                "Landscaping",
+            ]
 
         # Get cached market data
         cache_service = current_app.config.get("CACHE_SERVICE")
@@ -102,7 +118,11 @@ def get_real_time_market_data():
                 market_data[service_category] = data
 
         return jsonify(
-            {"status": "success", "data": market_data, "timestamp": datetime.utcnow().isoformat()}
+            {
+                "status": "success",
+                "data": market_data,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
         )
 
     except Exception as e:
@@ -129,15 +149,25 @@ def get_performance_summary():
         asyncio.set_event_loop(loop)
 
         # Get portfolio analytics
-        analytics = loop.run_until_complete(bi_engine.generate_portfolio_analytics(user_id))
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
 
         # Extract performance summary
         performance_summary = {
-            "portfolio_value": analytics.get("portfolio_summary", {}).get("total_value", 0),
+            "portfolio_value": analytics.get("portfolio_summary", {}).get(
+                "total_value", 0
+            ),
             "total_pnl": analytics.get("portfolio_summary", {}).get("total_pnl", 0),
-            "total_pnl_percent": analytics.get("portfolio_summary", {}).get("total_pnl_percent", 0),
-            "daily_change": analytics.get("portfolio_summary", {}).get("daily_change", 0),
-            "position_count": analytics.get("portfolio_summary", {}).get("position_count", 0),
+            "total_pnl_percent": analytics.get("portfolio_summary", {}).get(
+                "total_pnl_percent", 0
+            ),
+            "daily_change": analytics.get("portfolio_summary", {}).get(
+                "daily_change", 0
+            ),
+            "position_count": analytics.get("portfolio_summary", {}).get(
+                "position_count", 0
+            ),
             "performance_metrics": analytics.get("performance_metrics", {}),
             "risk_metrics": analytics.get("risk_metrics", {}),
             "period_days": days,
@@ -172,7 +202,9 @@ def get_risk_assessment():
         # Get risk assessment
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        analytics = loop.run_until_complete(bi_engine.generate_portfolio_analytics(user_id))
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
 
         risk_assessment = {
             "risk_score": analytics.get("risk_metrics", {}).get("volatility", 0)
@@ -216,7 +248,9 @@ def get_trading_patterns():
         # Get trading patterns
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        analytics = loop.run_until_complete(bi_engine.generate_portfolio_analytics(user_id))
+        analytics = loop.run_until_complete(
+            bi_engine.generate_portfolio_analytics(user_id)
+        )
 
         patterns = analytics.get("trading_patterns", {})
 
@@ -249,7 +283,13 @@ def get_market_sentiment():
     try:
         service_categories = request.args.get("categories", "").split(",")
         if not service_categories or service_categories == [""]:
-            service_categories = ["Plumbing", "Electrical", "Carpentry", "Painting", "Landscaping"]
+            service_categories = [
+                "Plumbing",
+                "Electrical",
+                "Carpentry",
+                "Painting",
+                "Landscaping",
+            ]
 
         services = get_services()
         bi_engine = services.get("bi_engine")
@@ -271,7 +311,9 @@ def get_market_sentiment():
                 sentiment_data[symbol] = symbol_analysis[symbol].get("sentiment", {})
 
         # Overall market sentiment
-        overall_sentiment = intelligence.get("market_overview", {}).get("market_sentiment", {})
+        overall_sentiment = intelligence.get("market_overview", {}).get(
+            "market_sentiment", {}
+        )
 
         return jsonify(
             {
@@ -320,7 +362,9 @@ def generate_custom_alerts():
         # Store alert (in production, save to database)
         cache_service = current_app.config.get("CACHE_SERVICE")
         if cache_service:
-            cache_service.cache_user_data(f"{user_id}:alerts:{alert['id']}", alert, ttl=86400)
+            cache_service.cache_user_data(
+                f"{user_id}:alerts:{alert['id']}", alert, ttl=86400
+            )
 
         return jsonify(
             {
@@ -363,11 +407,15 @@ def generate_custom_report():
         if report_type == "portfolio_performance":
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            report_data = loop.run_until_complete(bi_engine.generate_portfolio_analytics(user_id))
+            report_data = loop.run_until_complete(
+                bi_engine.generate_portfolio_analytics(user_id)
+            )
         elif report_type == "market_analysis":
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            report_data = loop.run_until_complete(bi_engine.generate_market_intelligence())
+            report_data = loop.run_until_complete(
+                bi_engine.generate_market_intelligence()
+            )
         else:
             return jsonify({"error": "Unknown report type"}), 400
 
@@ -384,7 +432,11 @@ def generate_custom_report():
         }
 
         return jsonify(
-            {"status": "success", "data": report, "timestamp": datetime.utcnow().isoformat()}
+            {
+                "status": "success",
+                "data": report,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
         )
 
     except Exception as e:
@@ -445,7 +497,9 @@ def _generate_risk_recommendations(analytics: Dict) -> List[str]:
         recommendations.append("Implement stop-loss orders to limit downside risk")
 
     if "poor_risk_adjusted_returns" in risk_factors:
-        recommendations.append("Review trading strategy and consider risk-adjusted metrics")
+        recommendations.append(
+            "Review trading strategy and consider risk-adjusted metrics"
+        )
 
     return recommendations
 
@@ -477,7 +531,10 @@ def _perform_stress_test(analytics: Dict) -> Dict:
     # Simulated stress test results
     return {
         "market_crash_scenario": {"portfolio_loss": -25.5, "recovery_time_months": 8},
-        "interest_rate_shock": {"portfolio_impact": -5.2, "affected_positions": ["bonds", "reits"]},
+        "interest_rate_shock": {
+            "portfolio_impact": -5.2,
+            "affected_positions": ["bonds", "reits"],
+        },
         "sector_rotation": {
             "portfolio_impact": -3.1,
             "beneficiary_sectors": ["technology", "healthcare"],

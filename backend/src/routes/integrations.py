@@ -36,7 +36,9 @@ def verify_webhook_signature(f):
             return jsonify({"error": "Missing signature"}), 401
 
         payload = request.get_data()
-        expected_signature = hmac.new(WEBHOOK_SECRET.encode(), payload, hashlib.sha256).hexdigest()
+        expected_signature = hmac.new(
+            WEBHOOK_SECRET.encode(), payload, hashlib.sha256
+        ).hexdigest()
 
         if not hmac.compare_digest(signature, expected_signature):
             return jsonify({"error": "Invalid signature"}), 401
@@ -84,7 +86,10 @@ def trigger_n8n_workflow(workflow_name):
         else:
             return (
                 jsonify(
-                    {"success": False, "error": f"Workflow trigger failed: {response.status_code}"}
+                    {
+                        "success": False,
+                        "error": f"Workflow trigger failed: {response.status_code}",
+                    }
                 ),
                 500,
             )
@@ -133,7 +138,11 @@ def get_available_workflows():
             {
                 "name": "financial_automation",
                 "description": "Automated financial processes and reporting",
-                "triggers": ["invoice_generated", "payment_received", "expense_recorded"],
+                "triggers": [
+                    "invoice_generated",
+                    "payment_received",
+                    "expense_recorded",
+                ],
             },
             {
                 "name": "market_analysis",
@@ -142,7 +151,9 @@ def get_available_workflows():
             },
         ]
 
-        return jsonify({"success": True, "workflows": workflows, "total_count": len(workflows)})
+        return jsonify(
+            {"success": True, "workflows": workflows, "total_count": len(workflows)}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -206,7 +217,10 @@ def flowise_chat(chatflow_id):
         else:
             return (
                 jsonify(
-                    {"success": False, "error": f"Flowise request failed: {response.status_code}"}
+                    {
+                        "success": False,
+                        "error": f"Flowise request failed: {response.status_code}",
+                    }
                 ),
                 500,
             )
@@ -226,7 +240,11 @@ def get_available_chatflows():
                 "id": "customer-support",
                 "name": "Customer Support Assistant",
                 "description": "AI assistant for customer support and general inquiries",
-                "use_cases": ["General questions", "Platform navigation", "Troubleshooting"],
+                "use_cases": [
+                    "General questions",
+                    "Platform navigation",
+                    "Troubleshooting",
+                ],
             },
             {
                 "id": "quote-generator",
@@ -244,7 +262,11 @@ def get_available_chatflows():
                 "id": "business-advisor",
                 "name": "Business Growth Advisor",
                 "description": "AI advisor for business growth and optimization",
-                "use_cases": ["Business strategy", "Growth planning", "Market insights"],
+                "use_cases": [
+                    "Business strategy",
+                    "Growth planning",
+                    "Market insights",
+                ],
             },
             {
                 "id": "compliance-checker",
@@ -266,17 +288,27 @@ def get_available_chatflows():
                 "id": "project-planner",
                 "name": "Project Planning Assistant",
                 "description": "AI-powered project planning and scheduling",
-                "use_cases": ["Project timelines", "Resource planning", "Risk assessment"],
+                "use_cases": [
+                    "Project timelines",
+                    "Resource planning",
+                    "Risk assessment",
+                ],
             },
             {
                 "id": "financial-advisor",
                 "name": "Financial Management Advisor",
                 "description": "AI advisor for financial planning and management",
-                "use_cases": ["Financial planning", "Tax optimization", "Cash flow management"],
+                "use_cases": [
+                    "Financial planning",
+                    "Tax optimization",
+                    "Cash flow management",
+                ],
             },
         ]
 
-        return jsonify({"success": True, "chatflows": chatflows, "total_count": len(chatflows)})
+        return jsonify(
+            {"success": True, "chatflows": chatflows, "total_count": len(chatflows)}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -305,7 +337,10 @@ def receive_n8n_webhook(workflow_name):
             process_financial_automation_result(data)
 
         return jsonify(
-            {"success": True, "message": f"Webhook {workflow_name} processed successfully"}
+            {
+                "success": True,
+                "message": f"Webhook {workflow_name} processed successfully",
+            }
         )
 
     except Exception as e:
@@ -322,7 +357,9 @@ def receive_flowise_feedback():
         # Process AI interaction feedback
         process_ai_feedback(data)
 
-        return jsonify({"success": True, "message": "Flowise feedback processed successfully"})
+        return jsonify(
+            {"success": True, "message": "Flowise feedback processed successfully"}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -444,7 +481,11 @@ def check_n8n_status():
             "last_checked": datetime.utcnow().isoformat(),
         }
     except Exception as e:
-        return {"healthy": False, "error": str(e), "last_checked": datetime.utcnow().isoformat()}
+        return {
+            "healthy": False,
+            "error": str(e),
+            "last_checked": datetime.utcnow().isoformat(),
+        }
 
 
 def check_flowise_status():
@@ -457,7 +498,11 @@ def check_flowise_status():
             "last_checked": datetime.utcnow().isoformat(),
         }
     except Exception as e:
-        return {"healthy": False, "error": str(e), "last_checked": datetime.utcnow().isoformat()}
+        return {
+            "healthy": False,
+            "error": str(e),
+            "last_checked": datetime.utcnow().isoformat(),
+        }
 
 
 def get_recent_automation_activities(user_id):

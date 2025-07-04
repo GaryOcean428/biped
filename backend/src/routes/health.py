@@ -48,9 +48,9 @@ def health_check():
         }
     except ImportError as e:
         health_status["checks"]["dependencies"] = {
-            "status": "degraded", 
+            "status": "degraded",
             "error": str(e),
-            "note": "Some optional packages missing - platform runs in degraded mode"
+            "note": "Some optional packages missing - platform runs in degraded mode",
         }
 
     # Check Redis connection
@@ -87,7 +87,7 @@ def health_check():
                     if os.environ.get("DATABASE_URL")
                     else "not_set"
                 ),
-                "note": "Configuration check only - actual connection not tested"
+                "note": "Configuration check only - actual connection not tested",
             }
         else:
             health_status["checks"]["database"] = {
@@ -179,14 +179,17 @@ def health_check():
     # Only fail for truly critical issues, not optional dependencies
     critical_checks = ["database"]  # Only database is truly critical
     critical_failures = [
-        check for check_name, check in health_status["checks"].items() 
+        check
+        for check_name, check in health_status["checks"].items()
         if check_name in critical_checks and check.get("status") == "unhealthy"
     ]
-    
+
     if critical_failures:
         health_status["status"] = "unhealthy"
         status_code = 503
-    elif any(check.get("status") == "degraded" for check in health_status["checks"].values()):
+    elif any(
+        check.get("status") == "degraded" for check in health_status["checks"].values()
+    ):
         health_status["status"] = "degraded"
         status_code = 200
     else:
@@ -198,7 +201,10 @@ def health_check():
 @health_bp.route("/health/simple", methods=["GET"])
 def simple_health_check():
     """Simple health check for Railway health monitoring"""
-    return jsonify({"status": "healthy", "timestamp": datetime.utcnow().isoformat()}), 200
+    return (
+        jsonify({"status": "healthy", "timestamp": datetime.utcnow().isoformat()}),
+        200,
+    )
 
 
 @health_bp.route("/health/vision", methods=["GET"])
@@ -288,6 +294,14 @@ def dependencies_check():
                 "version": getattr(module, "__version__", "unknown"),
             }
         except ImportError:
-            dependencies[package] = {"status": "missing", "error": f"Module {package} not found"}
+            dependencies[package] = {
+                "status": "missing",
+                "error": f"Module {package} not found",
+            }
 
-    return jsonify({"dependencies": dependencies, "timestamp": datetime.utcnow().isoformat()}), 200
+    return (
+        jsonify(
+            {"dependencies": dependencies, "timestamp": datetime.utcnow().isoformat()}
+        ),
+        200,
+    )

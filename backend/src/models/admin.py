@@ -35,10 +35,14 @@ class Admin(db.Model):
     # Audit trail
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    created_admins = db.relationship("Admin", backref=db.backref("creator", remote_side=[id]))
+    created_admins = db.relationship(
+        "Admin", backref=db.backref("creator", remote_side=[id])
+    )
 
     def set_password(self, password):
         """Hash and set password"""
@@ -154,9 +158,13 @@ class Admin(db.Model):
             data.update(
                 {
                     "login_attempts": self.login_attempts,
-                    "locked_until": self.locked_until.isoformat() if self.locked_until else None,
+                    "locked_until": (
+                        self.locked_until.isoformat() if self.locked_until else None
+                    ),
                     "session_expires": (
-                        self.session_expires.isoformat() if self.session_expires else None
+                        self.session_expires.isoformat()
+                        if self.session_expires
+                        else None
                     ),
                 }
             )
@@ -169,8 +177,12 @@ class AdminAction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     admin_id = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=False)
-    action = db.Column(db.String(100), nullable=False)  # e.g., 'user_created', 'job_deleted'
-    target_type = db.Column(db.String(50), nullable=True)  # e.g., 'user', 'job', 'service'
+    action = db.Column(
+        db.String(100), nullable=False
+    )  # e.g., 'user_created', 'job_deleted'
+    target_type = db.Column(
+        db.String(50), nullable=True
+    )  # e.g., 'user', 'job', 'service'
     target_id = db.Column(db.Integer, nullable=True)
     details = db.Column(db.JSON, nullable=True)  # Additional action details
     ip_address = db.Column(db.String(45), nullable=True)

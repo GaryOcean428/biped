@@ -219,7 +219,12 @@ SAMPLE_PROVIDERS = [
         "business_name": "Precision Carpentry & Construction",
         "rating": 4.7,
         "reviews_count": 156,
-        "specialties": ["Carpentry", "Renovation", "Custom Furniture", "Deck Construction"],
+        "specialties": [
+            "Carpentry",
+            "Renovation",
+            "Custom Furniture",
+            "Deck Construction",
+        ],
         "location": "Brisbane, QLD",
         "suburbs_served": [
             "New Farm",
@@ -266,10 +271,14 @@ def get_jobs():
         filtered_jobs = SAMPLE_JOBS.copy()
 
         if category and category != "All Categories":
-            filtered_jobs = [job for job in filtered_jobs if job["category"] == category]
+            filtered_jobs = [
+                job for job in filtered_jobs if job["category"] == category
+            ]
 
         if location and location != "All Locations":
-            filtered_jobs = [job for job in filtered_jobs if location in job["location"]]
+            filtered_jobs = [
+                job for job in filtered_jobs if location in job["location"]
+            ]
 
         if urgent_only:
             filtered_jobs = [job for job in filtered_jobs if job["urgent"]]
@@ -277,7 +286,9 @@ def get_jobs():
         # Limit results
         filtered_jobs = filtered_jobs[:limit]
 
-        return jsonify({"success": True, "jobs": filtered_jobs, "total": len(filtered_jobs)})
+        return jsonify(
+            {"success": True, "jobs": filtered_jobs, "total": len(filtered_jobs)}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -312,10 +323,14 @@ def get_providers():
         filtered_providers = SAMPLE_PROVIDERS.copy()
 
         if specialty and specialty != "All Specialties":
-            filtered_providers = [p for p in filtered_providers if specialty in p["specialties"]]
+            filtered_providers = [
+                p for p in filtered_providers if specialty in p["specialties"]
+            ]
 
         if location and location != "All Locations":
-            filtered_providers = [p for p in filtered_providers if location in p["location"]]
+            filtered_providers = [
+                p for p in filtered_providers if location in p["location"]
+            ]
 
         if verified_only:
             filtered_providers = [p for p in filtered_providers if p["verified"]]
@@ -324,7 +339,11 @@ def get_providers():
         filtered_providers = filtered_providers[:limit]
 
         return jsonify(
-            {"success": True, "providers": filtered_providers, "total": len(filtered_providers)}
+            {
+                "success": True,
+                "providers": filtered_providers,
+                "total": len(filtered_providers),
+            }
         )
 
     except Exception as e:

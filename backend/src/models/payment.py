@@ -9,13 +9,17 @@ class StripeAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     stripe_account_id = db.Column(db.String(255), unique=True, nullable=False)
-    account_type = db.Column(db.String(50), default="express")  # express, standard, custom
+    account_type = db.Column(
+        db.String(50), default="express"
+    )  # express, standard, custom
     charges_enabled = db.Column(db.Boolean, default=False)
     payouts_enabled = db.Column(db.Boolean, default=False)
     details_submitted = db.Column(db.Boolean, default=False)
     requirements_due = db.Column(db.Text)  # JSON string of requirements
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationship
     user = db.relationship("User", backref="stripe_account")
@@ -48,9 +52,13 @@ class Payment(db.Model):
     stripe_charge_id = db.Column(db.String(255))
 
     # Payment amounts (in cents)
-    total_amount = db.Column(db.Integer, nullable=False)  # Total amount paid by customer
+    total_amount = db.Column(
+        db.Integer, nullable=False
+    )  # Total amount paid by customer
     platform_fee = db.Column(db.Integer, nullable=False)  # Platform fee (5-10%)
-    provider_amount = db.Column(db.Integer, nullable=False)  # Amount to transfer to provider
+    provider_amount = db.Column(
+        db.Integer, nullable=False
+    )  # Amount to transfer to provider
 
     # Payment status
     status = db.Column(
@@ -74,8 +82,12 @@ class Payment(db.Model):
 
     # Relationships
     job = db.relationship("Job", backref="payments")
-    customer = db.relationship("User", foreign_keys=[customer_id], backref="customer_payments")
-    provider = db.relationship("User", foreign_keys=[provider_id], backref="provider_payments")
+    customer = db.relationship(
+        "User", foreign_keys=[customer_id], backref="customer_payments"
+    )
+    provider = db.relationship(
+        "User", foreign_keys=[provider_id], backref="provider_payments"
+    )
 
     def to_dict(self):
         return {
@@ -92,7 +104,9 @@ class Payment(db.Model):
             "payment_method": self.payment_method,
             "escrow_released": self.escrow_released,
             "escrow_release_date": (
-                self.escrow_release_date.isoformat() if self.escrow_release_date else None
+                self.escrow_release_date.isoformat()
+                if self.escrow_release_date
+                else None
             ),
             "auto_release_date": (
                 self.auto_release_date.isoformat() if self.auto_release_date else None
@@ -101,7 +115,9 @@ class Payment(db.Model):
             "meta_data": self.meta_data,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "paid_at": self.paid_at.isoformat() if self.paid_at else None,
-            "transferred_at": self.transferred_at.isoformat() if self.transferred_at else None,
+            "transferred_at": (
+                self.transferred_at.isoformat() if self.transferred_at else None
+            ),
         }
 
 
@@ -119,7 +135,9 @@ class Transfer(db.Model):
     currency = db.Column(db.String(3), default="USD")
 
     # Status and metadata
-    status = db.Column(db.String(50), default="pending")  # pending, paid, failed, canceled
+    status = db.Column(
+        db.String(50), default="pending"
+    )  # pending, paid, failed, canceled
     failure_reason = db.Column(db.String(255))
     description = db.Column(db.Text)
     meta_data = db.Column(db.Text)  # JSON string
@@ -146,7 +164,9 @@ class Transfer(db.Model):
             "description": self.description,
             "meta_data": self.meta_data,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "transferred_at": self.transferred_at.isoformat() if self.transferred_at else None,
+            "transferred_at": (
+                self.transferred_at.isoformat() if self.transferred_at else None
+            ),
         }
 
 
@@ -160,7 +180,9 @@ class Dispute(db.Model):
     # Dispute details
     amount = db.Column(db.Integer, nullable=False)  # Disputed amount (in cents)
     currency = db.Column(db.String(3), default="USD")
-    reason = db.Column(db.String(100))  # duplicate, fraudulent, subscription_canceled, etc.
+    reason = db.Column(
+        db.String(100)
+    )  # duplicate, fraudulent, subscription_canceled, etc.
     status = db.Column(
         db.String(50)
     )  # warning_needs_response, warning_under_review, warning_closed, etc.
@@ -175,7 +197,9 @@ class Dispute(db.Model):
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationship
     payment = db.relationship("Payment", backref="disputes")
@@ -189,7 +213,9 @@ class Dispute(db.Model):
             "currency": self.currency,
             "reason": self.reason,
             "status": self.status,
-            "evidence_due_by": self.evidence_due_by.isoformat() if self.evidence_due_by else None,
+            "evidence_due_by": (
+                self.evidence_due_by.isoformat() if self.evidence_due_by else None
+            ),
             "evidence_submitted": self.evidence_submitted,
             "is_charge_refundable": self.is_charge_refundable,
             "meta_data": self.meta_data,

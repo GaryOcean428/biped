@@ -23,17 +23,26 @@ class EmailMicroserviceClient:
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": (
-                    f"Bearer {self.email_service_api_key}" if self.email_service_api_key else ""
+                    f"Bearer {self.email_service_api_key}"
+                    if self.email_service_api_key
+                    else ""
                 ),
             }
 
-            response = requests.post(url, json=data, headers=headers, timeout=self.timeout)
+            response = requests.post(
+                url, json=data, headers=headers, timeout=self.timeout
+            )
 
             if response.status_code == 200:
                 return {"success": True, "data": response.json()}
             else:
-                logger.error(f"Email service error: {response.status_code} - {response.text}")
-                return {"success": False, "error": f"HTTP {response.status_code}: {response.text}"}
+                logger.error(
+                    f"Email service error: {response.status_code} - {response.text}"
+                )
+                return {
+                    "success": False,
+                    "error": f"HTTP {response.status_code}: {response.text}",
+                }
 
         except requests.exceptions.Timeout:
             logger.error("Email service timeout")
@@ -101,7 +110,9 @@ class EnhancedNotificationService:
     """Enhanced notification service with microservice integration"""
 
     def __init__(self):
-        self.use_microservice = os.getenv("USE_EMAIL_MICROSERVICE", "false").lower() == "true"
+        self.use_microservice = (
+            os.getenv("USE_EMAIL_MICROSERVICE", "false").lower() == "true"
+        )
 
         if self.use_microservice:
             self.email_client = EmailMicroserviceClient()
@@ -134,7 +145,9 @@ class EnhancedNotificationService:
             html_content = self._get_welcome_email_html(user_name, user_email)
             text_content = self._get_welcome_email_text(user_name)
 
-            return self.email_client.send_email([user_email], subject, html_content, text_content)
+            return self.email_client.send_email(
+                [user_email], subject, html_content, text_content
+            )
 
     def send_job_notification(
         self, provider_email: str, provider_name: str, job_title: str, job_id: str
@@ -153,7 +166,9 @@ class EnhancedNotificationService:
             )
         else:
             subject = f"New Job Opportunity: {job_title}"
-            html_content = self._get_job_notification_html(provider_name, job_title, job_id)
+            html_content = self._get_job_notification_html(
+                provider_name, job_title, job_id
+            )
 
             return self.email_client.send_email([provider_email], subject, html_content)
 
@@ -203,7 +218,9 @@ class EnhancedNotificationService:
             )
         else:
             subject = "Payment Confirmation - Biped"
-            html_content = self._get_payment_confirmation_html(user_name, amount, job_title)
+            html_content = self._get_payment_confirmation_html(
+                user_name, amount, job_title
+            )
 
             return self.email_client.send_email([user_email], subject, html_content)
 
@@ -294,7 +311,9 @@ class EnhancedNotificationService:
         The Biped Team
         """
 
-    def _get_job_notification_html(self, provider_name: str, job_title: str, job_id: str) -> str:
+    def _get_job_notification_html(
+        self, provider_name: str, job_title: str, job_id: str
+    ) -> str:
         """Get job notification HTML content"""
         return f"""
         <html>
@@ -327,7 +346,11 @@ class EnhancedNotificationService:
         """
 
     def _get_quote_notification_html(
-        self, customer_name: str, provider_name: str, job_title: str, quote_amount: float
+        self,
+        customer_name: str,
+        provider_name: str,
+        job_title: str,
+        quote_amount: float,
     ) -> str:
         """Get quote notification HTML content"""
         return f"""
@@ -361,7 +384,9 @@ class EnhancedNotificationService:
         </html>
         """
 
-    def _get_payment_confirmation_html(self, user_name: str, amount: float, job_title: str) -> str:
+    def _get_payment_confirmation_html(
+        self, user_name: str, amount: float, job_title: str
+    ) -> str:
         """Get payment confirmation HTML content"""
         return f"""
         <html>
