@@ -137,7 +137,9 @@ class StorageManager:
                 files = []
                 for root, dirs, filenames in os.walk(self.uploads_dir):
                     for filename in filenames:
-                        rel_path = os.path.relpath(os.path.join(root, filename), self.uploads_dir)
+                        rel_path = os.path.relpath(
+                            os.path.join(root, filename), self.uploads_dir
+                        )
                         files.append(rel_path)
                 return files
         except Exception as e:
@@ -182,11 +184,19 @@ class StorageManager:
                 "data_dir": self.data_dir,
                 "directories": {
                     "uploads": (
-                        len(os.listdir(self.uploads_dir)) if os.path.exists(self.uploads_dir) else 0
+                        len(os.listdir(self.uploads_dir))
+                        if os.path.exists(self.uploads_dir)
+                        else 0
                     ),
-                    "logs": len(os.listdir(self.logs_dir)) if os.path.exists(self.logs_dir) else 0,
+                    "logs": (
+                        len(os.listdir(self.logs_dir))
+                        if os.path.exists(self.logs_dir)
+                        else 0
+                    ),
                     "backups": (
-                        len(os.listdir(self.backups_dir)) if os.path.exists(self.backups_dir) else 0
+                        len(os.listdir(self.backups_dir))
+                        if os.path.exists(self.backups_dir)
+                        else 0
                     ),
                 },
             }

@@ -72,7 +72,16 @@ class ConfigManager:
     def get_security_config(self) -> SecurityConfig:
         """Get security configuration based on environment"""
         if "security" not in self._config_cache:
-            base_secret = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+            base_secret = os.getenv("SECRET_KEY")
+            if not base_secret:
+                import secrets
+
+                base_secret = secrets.token_urlsafe(32)
+                import logging
+
+                logging.warning(
+                    "⚠️ SECRET_KEY not set. Using random key. Set SECRET_KEY environment variable for production."
+                )
 
             self._config_cache["security"] = SecurityConfig(
                 jwt_secret_key=os.getenv("JWT_SECRET_KEY", f"{base_secret}-jwt"),
@@ -80,7 +89,9 @@ class ConfigManager:
                 jwt_refresh_expiration_days=int(os.getenv("JWT_REFRESH_DAYS", "30")),
                 password_min_length=int(os.getenv("PASSWORD_MIN_LENGTH", "8")),
                 max_login_attempts=int(os.getenv("MAX_LOGIN_ATTEMPTS", "5")),
-                lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", "15")),
+                lockout_duration_minutes=int(
+                    os.getenv("LOCKOUT_DURATION_MINUTES", "15")
+                ),
                 csrf_token_expiration_hours=int(os.getenv("CSRF_TOKEN_HOURS", "1")),
                 https_only=os.getenv("HTTPS_ONLY", "false").lower() == "true",
                 secure_cookies=os.getenv("SECURE_COOKIES", "false").lower() == "true",
@@ -100,13 +111,21 @@ class ConfigManager:
                 default_pool_size = 5
 
             self._config_cache["performance"] = PerformanceConfig(
-                cache_default_timeout=int(os.getenv("CACHE_TIMEOUT", str(default_cache_timeout))),
+                cache_default_timeout=int(
+                    os.getenv("CACHE_TIMEOUT", str(default_cache_timeout))
+                ),
                 cache_max_size=int(os.getenv("CACHE_MAX_SIZE", "1000")),
-                response_compression_min_size=int(os.getenv("COMPRESSION_MIN_SIZE", "1000")),
-                database_pool_size=int(os.getenv("DB_POOL_SIZE", str(default_pool_size))),
+                response_compression_min_size=int(
+                    os.getenv("COMPRESSION_MIN_SIZE", "1000")
+                ),
+                database_pool_size=int(
+                    os.getenv("DB_POOL_SIZE", str(default_pool_size))
+                ),
                 database_pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", "30")),
                 database_pool_recycle=int(os.getenv("DB_POOL_RECYCLE", "3600")),
-                max_content_length=int(os.getenv("MAX_CONTENT_LENGTH", str(16 * 1024 * 1024))),
+                max_content_length=int(
+                    os.getenv("MAX_CONTENT_LENGTH", str(16 * 1024 * 1024))
+                ),
             )
 
         return self._config_cache["performance"]
@@ -123,9 +142,13 @@ class ConfigManager:
                 api_limit = 100
 
             self._config_cache["rate_limit"] = RateLimitConfig(
-                auth_requests_per_minute=int(os.getenv("AUTH_RATE_LIMIT", str(auth_limit))),
+                auth_requests_per_minute=int(
+                    os.getenv("AUTH_RATE_LIMIT", str(auth_limit))
+                ),
                 auth_window_minutes=int(os.getenv("AUTH_WINDOW_MINUTES", "5")),
-                api_requests_per_minute=int(os.getenv("API_RATE_LIMIT", str(api_limit))),
+                api_requests_per_minute=int(
+                    os.getenv("API_RATE_LIMIT", str(api_limit))
+                ),
                 api_window_minutes=int(os.getenv("API_WINDOW_MINUTES", "15")),
                 global_requests_per_hour=int(os.getenv("GLOBAL_RATE_LIMIT", "1000")),
                 burst_allowance=int(os.getenv("BURST_ALLOWANCE", "20")),
@@ -147,10 +170,14 @@ class ConfigManager:
                 log_format=os.getenv(
                     "LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
                 ),
-                log_file_max_bytes=int(os.getenv("LOG_FILE_MAX_BYTES", str(10 * 1024 * 1024))),
+                log_file_max_bytes=int(
+                    os.getenv("LOG_FILE_MAX_BYTES", str(10 * 1024 * 1024))
+                ),
                 log_backup_count=int(os.getenv("LOG_BACKUP_COUNT", "5")),
                 metrics_retention_hours=int(os.getenv("METRICS_RETENTION_HOURS", "24")),
-                performance_alert_threshold_ms=int(os.getenv("PERF_ALERT_THRESHOLD_MS", "1000")),
+                performance_alert_threshold_ms=int(
+                    os.getenv("PERF_ALERT_THRESHOLD_MS", "1000")
+                ),
                 error_alert_threshold=int(os.getenv("ERROR_ALERT_THRESHOLD", "100")),
             )
 
@@ -178,7 +205,9 @@ class ConfigManager:
             }
         else:
             # Local SQLite with optimizations
-            db_path = os.path.join(os.path.dirname(__file__), "..", "database", "app.db")
+            db_path = os.path.join(
+                os.path.dirname(__file__), "..", "database", "app.db"
+            )
             config = {
                 "SQLALCHEMY_DATABASE_URI": f"sqlite:///{db_path}",
                 "SQLALCHEMY_ENGINE_OPTIONS": {
@@ -199,9 +228,11 @@ class ConfigManager:
         performance_config = self.get_performance_config()
 
         config = {
-            "SECRET_KEY": os.getenv("SECRET_KEY", "dev-secret-key-change-in-production"),
+            "SECRET_KEY": self.get_security_config().jwt_secret_key.replace("-jwt", ""),
             "JWT_SECRET_KEY": security_config.jwt_secret_key,
-            "JWT_ACCESS_TOKEN_EXPIRES": timedelta(hours=security_config.jwt_expiration_hours),
+            "JWT_ACCESS_TOKEN_EXPIRES": timedelta(
+                hours=security_config.jwt_expiration_hours
+            ),
             "JWT_REFRESH_TOKEN_EXPIRES": timedelta(
                 days=security_config.jwt_refresh_expiration_days
             ),
@@ -210,7 +241,9 @@ class ConfigManager:
             "SESSION_COOKIE_SECURE": security_config.secure_cookies,
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SAMESITE": "Lax",
-            "PERMANENT_SESSION_LIFETIME": timedelta(hours=security_config.jwt_expiration_hours),
+            "PERMANENT_SESSION_LIFETIME": timedelta(
+                hours=security_config.jwt_expiration_hours
+            ),
         }
 
         # Add database configuration
@@ -218,9 +251,13 @@ class ConfigManager:
 
         # Environment-specific settings
         if self.environment == "production":
-            config.update({"DEBUG": False, "TESTING": False, "PROPAGATE_EXCEPTIONS": False})
+            config.update(
+                {"DEBUG": False, "TESTING": False, "PROPAGATE_EXCEPTIONS": False}
+            )
         elif self.environment == "development":
-            config.update({"DEBUG": True, "TESTING": False, "PROPAGATE_EXCEPTIONS": True})
+            config.update(
+                {"DEBUG": True, "TESTING": False, "PROPAGATE_EXCEPTIONS": True}
+            )
         elif self.environment == "testing":
             config.update(
                 {
@@ -239,8 +276,12 @@ class ConfigManager:
 
         # Security validation
         security_config = self.get_security_config()
-        if security_config.jwt_secret_key == "dev-secret-key-change-in-production-jwt":
-            issues.append("JWT secret key is using default value - change in production")
+        if security_config.jwt_secret_key.endswith(
+            "-dev-secret-key-change-in-production-jwt"
+        ):
+            issues.append(
+                "JWT secret key is using default value - change in production"
+            )
 
         if self.environment == "production":
             if not security_config.https_only:

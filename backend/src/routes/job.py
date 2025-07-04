@@ -81,7 +81,10 @@ def create_job():
         db.session.add(job)
         db.session.commit()
 
-        return jsonify({"message": "Job created successfully", "job": job.to_dict()}), 201
+        return (
+            jsonify({"message": "Job created successfully", "job": job.to_dict()}),
+            201,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -120,7 +123,9 @@ def get_jobs():
             # Get provider's service IDs
             from src.models.service import ProviderService
 
-            provider_service_ids = [ps.service_id for ps in provider.services if ps.is_available]
+            provider_service_ids = [
+                ps.service_id for ps in provider.services if ps.is_available
+            ]
 
             if not provider_service_ids:
                 return jsonify({"jobs": [], "pagination": {}}), 200
@@ -207,15 +212,23 @@ def get_job(job_id):
         quotes = []
         if user.user_type == "customer" or job.assigned_provider_id == user_id:
             quotes = (
-                Quote.query.filter_by(job_id=job_id, is_active=True).order_by(Quote.price).all()
+                Quote.query.filter_by(job_id=job_id, is_active=True)
+                .order_by(Quote.price)
+                .all()
             )
 
         # Get messages
-        messages = JobMessage.query.filter_by(job_id=job_id).order_by(JobMessage.created_at).all()
+        messages = (
+            JobMessage.query.filter_by(job_id=job_id)
+            .order_by(JobMessage.created_at)
+            .all()
+        )
 
         # Get milestones
         milestones = (
-            JobMilestone.query.filter_by(job_id=job_id).order_by(JobMilestone.sort_order).all()
+            JobMilestone.query.filter_by(job_id=job_id)
+            .order_by(JobMilestone.sort_order)
+            .all()
         )
 
         return (
@@ -255,7 +268,9 @@ def create_quote():
             return jsonify({"error": "Job is not available for quotes"}), 400
 
         # Check if provider already quoted
-        existing_quote = Quote.query.filter_by(job_id=job_id, provider_id=user_id).first()
+        existing_quote = Quote.query.filter_by(
+            job_id=job_id, provider_id=user_id
+        ).first()
         if existing_quote:
             return jsonify({"error": "You have already quoted for this job"}), 409
 
@@ -300,7 +315,12 @@ def create_quote():
 
         db.session.commit()
 
-        return jsonify({"message": "Quote created successfully", "quote": quote.to_dict()}), 201
+        return (
+            jsonify(
+                {"message": "Quote created successfully", "quote": quote.to_dict()}
+            ),
+            201,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -339,7 +359,9 @@ def accept_quote(job_id, quote_id):
         job.accepted_at = datetime.utcnow()
 
         # Deactivate other quotes
-        other_quotes = Quote.query.filter(and_(Quote.job_id == job_id, Quote.id != quote_id)).all()
+        other_quotes = Quote.query.filter(
+            and_(Quote.job_id == job_id, Quote.id != quote_id)
+        ).all()
         for other_quote in other_quotes:
             other_quote.is_active = False
 
@@ -384,7 +406,10 @@ def start_job(job_id):
 
         db.session.commit()
 
-        return jsonify({"message": "Job started successfully", "job": job.to_dict()}), 200
+        return (
+            jsonify({"message": "Job started successfully", "job": job.to_dict()}),
+            200,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -404,7 +429,10 @@ def complete_job(job_id):
             return jsonify({"error": "Job not found"}), 404
 
         if job.assigned_provider_id != user_id:
-            return jsonify({"error": "Only assigned provider can complete the job"}), 403
+            return (
+                jsonify({"error": "Only assigned provider can complete the job"}),
+                403,
+            )
 
         if job.status != JobStatus.IN_PROGRESS:
             return jsonify({"error": "Job must be in progress to complete"}), 400
@@ -423,7 +451,10 @@ def complete_job(job_id):
 
         db.session.commit()
 
-        return jsonify({"message": "Job completed successfully", "job": job.to_dict()}), 200
+        return (
+            jsonify({"message": "Job completed successfully", "job": job.to_dict()}),
+            200,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -462,7 +493,12 @@ def send_job_message(job_id):
         db.session.commit()
 
         return (
-            jsonify({"message": "Message sent successfully", "job_message": message.to_dict()}),
+            jsonify(
+                {
+                    "message": "Message sent successfully",
+                    "job_message": message.to_dict(),
+                }
+            ),
             201,
         )
 

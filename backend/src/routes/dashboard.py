@@ -30,7 +30,12 @@ def get_dashboard_stats():
         # Get active jobs (not completed, cancelled, or disputed)
         active_jobs = Job.query.filter(
             Job.status.in_(
-                [JobStatus.POSTED, JobStatus.MATCHED, JobStatus.ACCEPTED, JobStatus.IN_PROGRESS]
+                [
+                    JobStatus.POSTED,
+                    JobStatus.MATCHED,
+                    JobStatus.ACCEPTED,
+                    JobStatus.IN_PROGRESS,
+                ]
             )
         ).count()
 
@@ -38,9 +43,9 @@ def get_dashboard_stats():
         completed_jobs = Job.query.filter_by(status=JobStatus.COMPLETED).count()
 
         # Get total revenue (sum of all completed platform revenue)
-        total_revenue = db.session.query(func.sum(PlatformRevenue.commission_amount)).filter(
-            PlatformRevenue.payment_status == "completed"
-        ).scalar() or Decimal("0")
+        total_revenue = db.session.query(
+            func.sum(PlatformRevenue.commission_amount)
+        ).filter(PlatformRevenue.payment_status == "completed").scalar() or Decimal("0")
 
         # Get average rating
         avg_rating = db.session.query(func.avg(Review.overall_rating)).scalar() or 0.0
@@ -51,12 +56,16 @@ def get_dashboard_stats():
         recent_users = User.query.filter(User.created_at >= thirty_days_ago).count()
 
         # Get monthly revenue (last 30 days)
-        monthly_revenue = db.session.query(func.sum(PlatformRevenue.commission_amount)).filter(
+        monthly_revenue = db.session.query(
+            func.sum(PlatformRevenue.commission_amount)
+        ).filter(
             and_(
                 PlatformRevenue.payment_status == "completed",
                 PlatformRevenue.created_at >= thirty_days_ago,
             )
-        ).scalar() or Decimal("0")
+        ).scalar() or Decimal(
+            "0"
+        )
 
         return jsonify(
             {
@@ -70,7 +79,9 @@ def get_dashboard_stats():
                     "total_customers": total_customers,
                     "total_revenue": float(total_revenue),
                     "monthly_revenue": float(monthly_revenue),
-                    "average_rating": round(float(avg_rating), 1) if avg_rating else 0.0,
+                    "average_rating": (
+                        round(float(avg_rating), 1) if avg_rating else 0.0
+                    ),
                     "recent_jobs": recent_jobs,
                     "recent_users": recent_users,
                     "last_updated": datetime.utcnow().isoformat(),
@@ -94,7 +105,9 @@ def get_recent_jobs():
         for job in jobs:
             customer = User.query.get(job.customer_id)
             provider = (
-                User.query.get(job.assigned_provider_id) if job.assigned_provider_id else None
+                User.query.get(job.assigned_provider_id)
+                if job.assigned_provider_id
+                else None
             )
 
             jobs_data.append(
@@ -106,7 +119,11 @@ def get_recent_jobs():
                         if len(job.description) > 100
                         else job.description
                     ),
-                    "status": job.status.value if hasattr(job.status, "value") else str(job.status),
+                    "status": (
+                        job.status.value
+                        if hasattr(job.status, "value")
+                        else str(job.status)
+                    ),
                     "budget_min": float(job.budget_min) if job.budget_min else None,
                     "budget_max": float(job.budget_max) if job.budget_max else None,
                     "location": f"{job.city}, {job.state}",
@@ -122,7 +139,9 @@ def get_recent_jobs():
                         if provider
                         else None
                     ),
-                    "created_at": job.created_at.isoformat() if job.created_at else None,
+                    "created_at": (
+                        job.created_at.isoformat() if job.created_at else None
+                    ),
                     "is_urgent": job.is_urgent,
                 }
             )
@@ -159,7 +178,9 @@ def get_revenue_chart():
         # Format data for charts
         chart_data = []
         for record in daily_revenue:
-            chart_data.append({"date": record.date.isoformat(), "revenue": float(record.revenue)})
+            chart_data.append(
+                {"date": record.date.isoformat(), "revenue": float(record.revenue)}
+            )
 
         return jsonify({"success": True, "data": chart_data})
 
@@ -202,7 +223,9 @@ def get_top_providers():
                     "location": f"{user.city}, {user.state}" if user.city else None,
                     "job_count": job_count or 0,
                     "avg_rating": round(float(avg_rating), 1) if avg_rating else 0.0,
-                    "hourly_rate": float(profile.hourly_rate) if profile.hourly_rate else None,
+                    "hourly_rate": (
+                        float(profile.hourly_rate) if profile.hourly_rate else None
+                    ),
                     "years_experience": profile.years_experience,
                     "is_available": profile.is_available,
                     "total_earnings": (

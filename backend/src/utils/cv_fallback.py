@@ -110,7 +110,9 @@ class ComputerVisionChecker:
 
             status["libraries"]["pillow"] = {
                 "available": True,
-                "version": Image.__version__ if hasattr(Image, "__version__") else "unknown",
+                "version": (
+                    Image.__version__ if hasattr(Image, "__version__") else "unknown"
+                ),
             }
         except Exception as e:
             status["libraries"]["pillow"] = {"available": False, "error": str(e)}
@@ -119,7 +121,10 @@ class ComputerVisionChecker:
         try:
             import numpy as np
 
-            status["libraries"]["numpy"] = {"available": True, "version": np.__version__}
+            status["libraries"]["numpy"] = {
+                "available": True,
+                "version": np.__version__,
+            }
         except Exception as e:
             status["libraries"]["numpy"] = {"available": False, "error": str(e)}
 
@@ -145,7 +150,9 @@ class FallbackComputerVision:
         else:
             logger.warning("Computer vision unavailable - using fallback mode")
 
-    def analyze_image(self, image_data: bytes, image_id: str = None) -> MockImageAnalysis:
+    def analyze_image(
+        self, image_data: bytes, image_id: str = None
+    ) -> MockImageAnalysis:
         """Analyze image with fallback to mock results"""
         if image_id is None:
             import hashlib
@@ -208,7 +215,9 @@ class FallbackComputerVision:
                 "image_analysis": "fallback" if not self.cv_available else "full",
                 "progress_comparison": "fallback" if not self.cv_available else "full",
                 "quality_assessment": "fallback" if not self.cv_available else "full",
-                "defect_detection": "unavailable" if not self.cv_available else "available",
+                "defect_detection": (
+                    "unavailable" if not self.cv_available else "available"
+                ),
             },
             "recommendations": (
                 [

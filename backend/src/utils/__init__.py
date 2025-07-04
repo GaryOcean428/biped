@@ -10,9 +10,8 @@ validate_password = InputValidator.validate_password
 validate_required_fields = InputValidator.validate_required_fields
 
 __all__ = [
-    'InputValidator',
-    'validate_email',
-    'validate_password', 
-    'validate_required_fields'
+    "InputValidator",
+    "validate_email",
+    "validate_password",
+    "validate_required_fields",
 ]
-

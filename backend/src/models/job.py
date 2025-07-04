@@ -22,7 +22,9 @@ class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey("service.id"), nullable=False)
-    assigned_provider_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    assigned_provider_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=True
+    )
 
     # Job details
     title = db.Column(db.String(200), nullable=False)
@@ -45,10 +47,14 @@ class Job(db.Model):
     # Budget
     budget_min = db.Column(Numeric(10, 2), nullable=True)
     budget_max = db.Column(Numeric(10, 2), nullable=True)
-    budget_type = db.Column(db.String(20), nullable=True)  # 'fixed', 'hourly', 'negotiable'
+    budget_type = db.Column(
+        db.String(20), nullable=True
+    )  # 'fixed', 'hourly', 'negotiable'
 
     # Job characteristics
-    property_type = db.Column(db.String(20), nullable=False)  # 'residential', 'commercial'
+    property_type = db.Column(
+        db.String(20), nullable=False
+    )  # 'residential', 'commercial'
     access_requirements = db.Column(db.Text, nullable=True)
     special_requirements = db.Column(db.Text, nullable=True)
 
@@ -72,16 +78,24 @@ class Job(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    customer = db.relationship("User", foreign_keys=[customer_id], backref="posted_jobs")
+    customer = db.relationship(
+        "User", foreign_keys=[customer_id], backref="posted_jobs"
+    )
     assigned_provider = db.relationship(
         "User", foreign_keys=[assigned_provider_id], backref="assigned_jobs"
     )
     quotes = db.relationship("Quote", backref="job", cascade="all, delete-orphan")
-    messages = db.relationship("JobMessage", backref="job", cascade="all, delete-orphan")
-    milestones = db.relationship("JobMilestone", backref="job", cascade="all, delete-orphan")
+    messages = db.relationship(
+        "JobMessage", backref="job", cascade="all, delete-orphan"
+    )
+    milestones = db.relationship(
+        "JobMilestone", backref="job", cascade="all, delete-orphan"
+    )
     reviews = db.relationship("Review", backref="job", cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -89,7 +103,11 @@ class Job(db.Model):
 
     def get_estimated_price(self):
         """Get estimated price based on service and job details"""
-        if self.service and self.service.typical_price_min and self.service.typical_price_max:
+        if (
+            self.service
+            and self.service.typical_price_min
+            and self.service.typical_price_max
+        ):
             return {
                 "min": float(self.service.typical_price_min),
                 "max": float(self.service.typical_price_max),
@@ -112,7 +130,9 @@ class Job(db.Model):
             "latitude": self.latitude,
             "longitude": self.longitude,
             "preferred_start_date": (
-                self.preferred_start_date.isoformat() if self.preferred_start_date else None
+                self.preferred_start_date.isoformat()
+                if self.preferred_start_date
+                else None
             ),
             "preferred_end_date": (
                 self.preferred_end_date.isoformat() if self.preferred_end_date else None
@@ -131,17 +151,23 @@ class Job(db.Model):
             "is_active": self.is_active,
             "agreed_price": float(self.agreed_price) if self.agreed_price else None,
             "final_price": float(self.final_price) if self.final_price else None,
-            "commission_amount": float(self.commission_amount) if self.commission_amount else None,
+            "commission_amount": (
+                float(self.commission_amount) if self.commission_amount else None
+            ),
             "posted_at": self.posted_at.isoformat() if self.posted_at else None,
             "accepted_at": self.accepted_at.isoformat() if self.accepted_at else None,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": (
+                self.completed_at.isoformat() if self.completed_at else None
+            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "estimated_price": self.get_estimated_price(),
             "service_name": self.service.name if self.service else None,
             "customer_name": self.customer.get_full_name() if self.customer else None,
             "provider_name": (
-                self.assigned_provider.get_full_name() if self.assigned_provider else None
+                self.assigned_provider.get_full_name()
+                if self.assigned_provider
+                else None
             ),
         }
 
@@ -175,7 +201,9 @@ class Quote(db.Model):
     valid_until = db.Column(db.DateTime, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     provider = db.relationship("User", backref="quotes")
@@ -191,7 +219,9 @@ class Quote(db.Model):
             "price": float(self.price),
             "description": self.description,
             "estimated_start_date": (
-                self.estimated_start_date.isoformat() if self.estimated_start_date else None
+                self.estimated_start_date.isoformat()
+                if self.estimated_start_date
+                else None
             ),
             "estimated_completion_date": (
                 self.estimated_completion_date.isoformat()
@@ -238,7 +268,9 @@ class JobMilestone(db.Model):
 
     sort_order = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def __repr__(self):
         return f"<JobMilestone {self.title}>"
@@ -251,9 +283,15 @@ class JobMilestone(db.Model):
             "description": self.description,
             "is_completed": self.is_completed,
             "completion_percentage": self.completion_percentage,
-            "planned_date": self.planned_date.isoformat() if self.planned_date else None,
-            "completed_date": self.completed_date.isoformat() if self.completed_date else None,
-            "payment_amount": float(self.payment_amount) if self.payment_amount else None,
+            "planned_date": (
+                self.planned_date.isoformat() if self.planned_date else None
+            ),
+            "completed_date": (
+                self.completed_date.isoformat() if self.completed_date else None
+            ),
+            "payment_amount": (
+                float(self.payment_amount) if self.payment_amount else None
+            ),
             "is_payment_released": self.is_payment_released,
             "sort_order": self.sort_order,
         }

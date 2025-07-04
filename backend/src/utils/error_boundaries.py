@@ -23,11 +23,11 @@ class ErrorBoundary:
     ) -> Tuple[Dict[str, Any], int]:
         """
         Handle errors with proper logging and user-friendly responses
-        
+
         Args:
             error: The exception that occurred
             context: Additional context information
-            
+
         Returns:
             Tuple of (error_response, status_code)
         """
@@ -173,36 +173,43 @@ class ErrorBoundary:
 # Custom Exception Classes
 class ValidationError(Exception):
     """Raised when input validation fails"""
+
     pass
 
 
 class AuthenticationError(Exception):
     """Raised when authentication fails"""
+
     pass
 
 
 class AuthorizationError(Exception):
     """Raised when authorization fails"""
+
     pass
 
 
 class NotFoundError(Exception):
     """Raised when a resource is not found"""
+
     pass
 
 
 class RateLimitError(Exception):
     """Raised when rate limit is exceeded"""
+
     pass
 
 
 class DatabaseError(Exception):
     """Raised when database operations fail"""
+
     pass
 
 
 class ExternalServiceError(Exception):
     """Raised when external service calls fail"""
+
     pass
 
 
@@ -210,10 +217,11 @@ class ExternalServiceError(Exception):
 def handle_errors(context: Optional[Dict[str, Any]] = None):
     """
     Decorator to automatically handle errors in route functions
-    
+
     Args:
         context: Additional context to include in error logs
     """
+
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -223,7 +231,9 @@ def handle_errors(context: Optional[Dict[str, Any]] = None):
             except Exception as e:
                 error_response, status_code = error_boundary.handle_error(e, context)
                 return jsonify(error_response), status_code
+
         return decorated_function
+
     return decorator
 
 
@@ -282,4 +292,3 @@ def register_error_handlers(app):
             ExternalServiceError("Service unavailable"), {"error_code": 503}
         )
         return jsonify(response), status_code
-

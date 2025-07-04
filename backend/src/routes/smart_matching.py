@@ -15,7 +15,9 @@ from src.models.review import Review
 from src.models.service import Service, ServiceCategory
 from src.models.user import ProviderProfile, User, db
 
-smart_matching_bp = Blueprint("smart_matching", __name__, url_prefix="/api/smart-matching")
+smart_matching_bp = Blueprint(
+    "smart_matching", __name__, url_prefix="/api/smart-matching"
+)
 
 
 class SmartMatchingEngine:
@@ -45,7 +47,9 @@ class SmartMatchingEngine:
             return 0.0
 
         # Convert skills to lowercase for comparison
-        provider_skills = [skill.lower().strip() for skill in provider.skills.split(",")]
+        provider_skills = [
+            skill.lower().strip() for skill in provider.skills.split(",")
+        ]
         job_category = job.category.lower().strip()
 
         # Direct category match
@@ -67,20 +71,26 @@ class SmartMatchingEngine:
         job_related = related_skills.get(job_category, [])
         if job_related:
             matches = sum(
-                1 for skill in provider_skills if any(related in skill for related in job_related)
+                1
+                for skill in provider_skills
+                if any(related in skill for related in job_related)
             )
             return min(matches / len(job_related), 1.0)
 
         return 0.3  # Base compatibility score
 
-    def calculate_location_proximity(self, job: Job, provider: ProviderProfile) -> float:
+    def calculate_location_proximity(
+        self, job: Job, provider: ProviderProfile
+    ) -> float:
         """Calculate location proximity score (0-1)"""
         if not job.location or not provider.service_area:
             return 0.5  # Neutral score if location data missing
 
         # Simplified location matching (in real implementation, use geolocation)
         job_location = job.location.lower()
-        service_areas = [area.lower().strip() for area in provider.service_area.split(",")]
+        service_areas = [
+            area.lower().strip() for area in provider.service_area.split(",")
+        ]
 
         # Check for exact matches or partial matches
         for area in service_areas:
@@ -137,7 +147,9 @@ class SmartMatchingEngine:
         else:
             return 1.0
 
-    def calculate_price_compatibility(self, job: Job, provider: ProviderProfile) -> float:
+    def calculate_price_compatibility(
+        self, job: Job, provider: ProviderProfile
+    ) -> float:
         """Calculate price compatibility score (0-1)"""
         if not job.budget or not provider.hourly_rate:
             return 0.5
@@ -186,7 +198,9 @@ class SmartMatchingEngine:
         }
 
         # Calculate weighted overall score
-        overall_score = sum(scores[factor] * weight for factor, weight in self.weights.items())
+        overall_score = sum(
+            scores[factor] * weight for factor, weight in self.weights.items()
+        )
 
         return overall_score, scores
 
@@ -198,7 +212,10 @@ class SmartMatchingEngine:
 
         # Get all available providers
         providers = (
-            db.session.query(ProviderProfile).join(User).filter(User.is_active == True).all()
+            db.session.query(ProviderProfile)
+            .join(User)
+            .filter(User.is_active == True)
+            .all()
         )
 
         matches = []
@@ -215,7 +232,9 @@ class SmartMatchingEngine:
                 "provider_name": user.full_name,
                 "provider_email": user.email,
                 "overall_score": round(overall_score, 3),
-                "component_scores": {k: round(v, 3) for k, v in component_scores.items()},
+                "component_scores": {
+                    k: round(v, 3) for k, v in component_scores.items()
+                },
                 "provider_details": {
                     "skills": provider.skills,
                     "hourly_rate": provider.hourly_rate,
@@ -224,7 +243,9 @@ class SmartMatchingEngine:
                     "availability": provider.availability,
                 },
                 "confidence_level": self._calculate_confidence(overall_score),
-                "recommendation_reason": self._generate_recommendation_reason(component_scores),
+                "recommendation_reason": self._generate_recommendation_reason(
+                    component_scores
+                ),
             }
             matches.append(match_data)
 
@@ -256,7 +277,9 @@ class SmartMatchingEngine:
             "experience_level": "extensive experience",
         }
 
-        reason_text = " and ".join([reasons.get(factor, factor) for factor, _ in top_factors])
+        reason_text = " and ".join(
+            [reasons.get(factor, factor) for factor, _ in top_factors]
+        )
         return f"Recommended due to {reason_text}"
 
 
@@ -295,17 +318,29 @@ def calculate_match_score():
         provider_id = data.get("provider_id")
 
         if not job_id or not provider_id:
-            return jsonify({"success": False, "error": "job_id and provider_id are required"}), 400
+            return (
+                jsonify(
+                    {"success": False, "error": "job_id and provider_id are required"}
+                ),
+                400,
+            )
 
         job = db.session.query(Job).filter(Job.id == job_id).first()
         provider = (
-            db.session.query(ProviderProfile).filter(ProviderProfile.user_id == provider_id).first()
+            db.session.query(ProviderProfile)
+            .filter(ProviderProfile.user_id == provider_id)
+            .first()
         )
 
         if not job or not provider:
-            return jsonify({"success": False, "error": "Job or provider not found"}), 404
+            return (
+                jsonify({"success": False, "error": "Job or provider not found"}),
+                404,
+            )
 
-        overall_score, component_scores = matching_engine.calculate_match_score(job, provider)
+        overall_score, component_scores = matching_engine.calculate_match_score(
+            job, provider
+        )
 
         return jsonify(
             {
@@ -313,8 +348,12 @@ def calculate_match_score():
                 "job_id": job_id,
                 "provider_id": provider_id,
                 "overall_score": round(overall_score, 3),
-                "component_scores": {k: round(v, 3) for k, v in component_scores.items()},
-                "confidence_level": matching_engine._calculate_confidence(overall_score),
+                "component_scores": {
+                    k: round(v, 3) for k, v in component_scores.items()
+                },
+                "confidence_level": matching_engine._calculate_confidence(
+                    overall_score
+                ),
                 "recommendation_reason": matching_engine._generate_recommendation_reason(
                     component_scores
                 ),
@@ -331,11 +370,17 @@ def get_algorithm_stats():
     try:
         # Calculate algorithm performance metrics
         total_jobs = db.session.query(Job).count()
-        matched_jobs = db.session.query(Job).filter(Job.assigned_provider_id.isnot(None)).count()
-        completed_jobs = db.session.query(Job).filter(Job.status == JobStatus.COMPLETED).count()
+        matched_jobs = (
+            db.session.query(Job).filter(Job.assigned_provider_id.isnot(None)).count()
+        )
+        completed_jobs = (
+            db.session.query(Job).filter(Job.status == JobStatus.COMPLETED).count()
+        )
 
         match_rate = (matched_jobs / total_jobs * 100) if total_jobs > 0 else 0
-        completion_rate = (completed_jobs / matched_jobs * 100) if matched_jobs > 0 else 0
+        completion_rate = (
+            (completed_jobs / matched_jobs * 100) if matched_jobs > 0 else 0
+        )
 
         # Get average ratings for matched jobs
         avg_rating = (
@@ -380,14 +425,20 @@ def update_algorithm_weights():
 
         # Validate weights
         if not isinstance(new_weights, dict):
-            return jsonify({"success": False, "error": "Weights must be a dictionary"}), 400
+            return (
+                jsonify({"success": False, "error": "Weights must be a dictionary"}),
+                400,
+            )
 
         # Check if weights sum to 1.0
         total_weight = sum(new_weights.values())
         if abs(total_weight - 1.0) > 0.01:
             return (
                 jsonify(
-                    {"success": False, "error": f"Weights must sum to 1.0, got {total_weight}"}
+                    {
+                        "success": False,
+                        "error": f"Weights must sum to 1.0, got {total_weight}",
+                    }
                 ),
                 400,
             )

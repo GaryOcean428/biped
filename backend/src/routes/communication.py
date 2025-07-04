@@ -1,4 +1,5 @@
 import logging
+import os
 
 from flask import Blueprint, jsonify, request, session
 from src.models.user import User, db
@@ -76,7 +77,9 @@ def send_welcome_email():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        success = enhanced_notification_service.send_welcome_email(user.email, user.get_full_name())
+        success = enhanced_notification_service.send_welcome_email(
+            user.email, user.get_full_name()
+        )
 
         if success:
             return jsonify({"message": "Welcome email sent successfully"}), 200
@@ -136,7 +139,11 @@ def send_quote_notification():
             return jsonify({"error": "Customer not found"}), 404
 
         success = enhanced_notification_service.send_quote_notification(
-            customer.email, customer.get_full_name(), provider_name, job_title, quote_amount
+            customer.email,
+            customer.get_full_name(),
+            provider_name,
+            job_title,
+            quote_amount,
         )
 
         if success:
@@ -302,7 +309,12 @@ def update_communication_config():
                 config_updates.append("Twilio Phone Number")
 
         return (
-            jsonify({"message": "Configuration updated successfully", "updated": config_updates}),
+            jsonify(
+                {
+                    "message": "Configuration updated successfully",
+                    "updated": config_updates,
+                }
+            ),
             200,
         )
 
