@@ -1,5 +1,6 @@
 # Core Flask and web framework
 Flask==2.3.3
+Werkzeug==3.0.6
 gunicorn==23.0.0
 
 # Flask extensions
@@ -10,6 +11,9 @@ flask-cors==6.0.0
 flask-migrate==4.0.5
 flask-socketio==5.3.6
 flask-limiter==3.5.0
+flask-jwt-extended==4.5.3
+flask-wtf==1.1.1
+flask-talisman==1.1.0
 
 # Database and caching
 redis==5.0.1
@@ -23,5 +27,7 @@ stripe==6.6.0
 email-validator==2.0.0
 python-dotenv==1.0.0
 bcrypt==4.0.1
+pyotp==2.9.0
+qrcode==7.4.2
 eventlet==0.35.2
 
