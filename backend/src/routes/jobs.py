@@ -5,7 +5,7 @@ Handles job posting, browsing, and management
 
 from flask import Blueprint, request, jsonify, render_template
 from flask_cors import cross_origin
-from src.models import db, Job, User, ServiceCategory
+from src.models import db, Job, User, ServiceCategory, Service
 from src.utils.validation import validate_required_fields
 from src.utils.rate_limiting import limiter
 from datetime import datetime
@@ -44,14 +44,20 @@ def create_job():
         job = Job(
             title=data['title'],
             description=data['description'],
-            category_id=data['category_id'],
-            budget=float(data['budget']),
-            location=data['location'],
-            urgency=data.get('urgency', 'normal'),
-            requirements=data.get('requirements', ''),
-            customer_id=data.get('customer_id'),  # Will be set from session in real app
+            service_id=data['category_id'],  # Using service_id to match model
+            budget_min=float(data['budget']),
+            budget_max=float(data['budget']),
+            budget_type='fixed',
+            street_address=data['location'],  # Using street_address for location
+            city=data['location'],
+            state='NSW',  # Default state
+            postcode='2000',  # Default postcode
+            property_type='residential',  # Default property type
+            is_urgent=(data.get('urgency') == 'asap'),
+            special_requirements=data.get('requirements', ''),
+            customer_id=data.get('customer_id', 1),  # Default customer for demo
             status='posted',
-            created_at=datetime.utcnow()
+            posted_at=datetime.utcnow()
         )
         
         db.session.add(job)
@@ -85,13 +91,14 @@ def get_jobs():
         query = Job.query.filter_by(status='posted')
         
         if category_id:
-            query = query.filter_by(category_id=category_id)
+            # Join with Service to filter by category
+            query = query.join(Service).filter(Service.category_id == category_id)
         if location:
-            query = query.filter(Job.location.ilike(f'%{location}%'))
+            query = query.filter(Job.street_address.ilike(f'%{location}%'))
         if min_budget:
-            query = query.filter(Job.budget >= min_budget)
+            query = query.filter(Job.budget_min >= min_budget)
         if max_budget:
-            query = query.filter(Job.budget <= max_budget)
+            query = query.filter(Job.budget_max <= max_budget)
         
         # Order by creation date (newest first)
         query = query.order_by(Job.created_at.desc())
@@ -110,11 +117,13 @@ def get_jobs():
                 'id': job.id,
                 'title': job.title,
                 'description': job.description[:200] + '...' if len(job.description) > 200 else job.description,
-                'budget': job.budget,
-                'location': job.location,
-                'urgency': job.urgency,
+                'budget_min': float(job.budget_min) if job.budget_min else None,
+                'budget_max': float(job.budget_max) if job.budget_max else None,
+                'location': job.street_address,
+                'is_urgent': job.is_urgent,
                 'created_at': job.created_at.isoformat(),
-                'category': job.category.name if job.category else None
+                'service_name': job.service.name if job.service else None,
+                'category_name': job.service.category.name if job.service and job.service.category else None
             }
             job_list.append(job_data)
         
@@ -145,20 +154,22 @@ def get_job(job_id):
             'id': job.id,
             'title': job.title,
             'description': job.description,
-            'budget': job.budget,
-            'location': job.location,
-            'urgency': job.urgency,
-            'requirements': job.requirements,
-            'status': job.status,
+            'budget_min': float(job.budget_min) if job.budget_min else None,
+            'budget_max': float(job.budget_max) if job.budget_max else None,
+            'location': job.street_address,
+            'is_urgent': job.is_urgent,
+            'special_requirements': job.special_requirements,
+            'status': job.status.value if hasattr(job.status, 'value') else str(job.status),
             'created_at': job.created_at.isoformat(),
-            'category': {
-                'id': job.category.id,
-                'name': job.category.name,
-                'slug': job.category.slug
-            } if job.category else None,
+            'service': {
+                'id': job.service.id,
+                'name': job.service.name,
+                'category_id': job.service.category_id,
+                'category_name': job.service.category.name if job.service.category else None
+            } if job.service else None,
             'customer': {
                 'id': job.customer.id,
-                'name': f"{job.customer.profile.first_name} {job.customer.profile.last_name}" if job.customer and job.customer.profile else "Anonymous"
+                'name': f"{job.customer.customer_profile.first_name} {job.customer.customer_profile.last_name}" if job.customer and job.customer.customer_profile else "Anonymous"
             } if job.customer else None
         }
         
