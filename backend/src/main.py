@@ -5,10 +5,14 @@ Properly configured for Railway deployment with Gunicorn
 
 import os
 import logging
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from sqlalchemy.exc import IntegrityError
+
+# Import security utilities
+from src.utils.security import SecurityEnhancer, SecurityConfig
+from src.utils.error_handling import ErrorHandler
 
 # Configure logging
 logging.basicConfig(
@@ -22,7 +26,7 @@ def create_app():
     
     app = Flask(__name__, 
                 static_folder='static',
-                template_folder='static')
+                template_folder='static/templates')
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -33,13 +37,52 @@ def create_app():
         'pool_recycle': 3600,
         'pool_pre_ping': True
     }
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
     
-    # CORS configuration
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    # Secure CORS configuration - restrict to specific domains in production
+    allowed_origins = [
+        "https://home.biped.app",
+        "https://biped.app",
+        "https://www.biped.app"
+    ]
+    # Allow localhost for development
+    if app.config.get('ENV') == 'development' or os.environ.get('ENVIRONMENT') == 'development':
+        allowed_origins.extend([
+            "http://localhost:3000",
+            "http://localhost:8080",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:8080"
+        ])
+    
+    # CORS configuration with security restrictions
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": allowed_origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        },
+        r"/*": {
+            "origins": allowed_origins,
+            "supports_credentials": True
+        }
+    })
     
     # Initialize extensions
     from src.models import db
     db.init_app(app)
+    
+    # Initialize security enhancements
+    try:
+        security_config = SecurityConfig()
+        security_enhancer = SecurityEnhancer(app, security_config)
+        logger.info("✅ Security enhancements initialized")
+    except Exception as e:
+        logger.warning(f"⚠️ Security setup failed: {e}")
+    
+    # Set up error handling
+    error_handler = ErrorHandler()
+    app.logger = error_handler.setup_logging()
     
     # Initialize Redis
     redis_client = None
@@ -199,14 +242,74 @@ def create_app():
             'version': '2.0'
         })
     
-    # Error handlers
+    # Enhanced Error handlers with custom pages and security
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
+        # Check if request is from API or browser
+        if request.path.startswith('/api/') or request.headers.get('Content-Type') == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'error': 'Page not found',
+                'message': 'The requested resource could not be found',
+                'status_code': 404
+            }), 404
+        else:
+            try:
+                return render_template('errors/404.html'), 404
+            except:
+                return jsonify({
+                    'error': 'Page not found',
+                    'message': 'The requested resource could not be found',
+                    'status_code': 404
+                }), 404
+    
+    @app.errorhandler(403)
+    def forbidden(error):
+        # Check if request is from API or browser
+        if request.path.startswith('/api/') or request.headers.get('Content-Type') == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'error': 'Access forbidden',
+                'message': 'You do not have permission to access this resource',
+                'status_code': 403
+            }), 403
+        else:
+            try:
+                return render_template('errors/403.html'), 403
+            except:
+                return jsonify({
+                    'error': 'Access forbidden',
+                    'message': 'You do not have permission to access this resource',
+                    'status_code': 403
+                }), 403
     
     @app.errorhandler(500)
     def internal_error(error):
-        return jsonify({'error': 'Internal server error'}), 500
+        # Log the error for debugging
+        app.logger.error(f'Server Error: {error}', exc_info=True)
+        
+        # Check if request is from API or browser
+        if request.path.startswith('/api/') or request.headers.get('Content-Type') == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'error': 'Internal server error',
+                'message': 'An unexpected error occurred. Please try again later.',
+                'status_code': 500
+            }), 500
+        else:
+            try:
+                return render_template('errors/500.html'), 500
+            except:
+                return jsonify({
+                    'error': 'Internal server error',
+                    'message': 'An unexpected error occurred. Please try again later.',
+                    'status_code': 500
+                }), 500
+    
+    @app.errorhandler(429)
+    def rate_limit_exceeded(error):
+        return jsonify({
+            'error': 'Rate limit exceeded',
+            'message': 'Too many requests. Please try again later.',
+            'status_code': 429
+        }), 429
     
     logger.info("🚀 Biped Platform initialized successfully")
     return app
