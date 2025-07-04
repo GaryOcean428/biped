@@ -4,138 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found - Biped Platform</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
-        Skip to main content
-    </a>
-
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+            <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center">
-                        <i class="fas fa-hard-hat text-2xl text-blue-600 mr-3"></i>
-                        <span class="text-xl font-bold text-gray-900">Biped Platform</span>
+                    <a href="/" class="flex items-center space-x-2">
+                        <i class="fas fa-walking text-blue-600 text-2xl"></i>
+                        <span class="text-xl font-bold text-gray-900">Biped</span>
                     </a>
                 </div>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
-                    <a href="/jobs" class="text-gray-700 hover:text-blue-600">Post Job</a>
-                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600">Dashboard</a>
-                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-600 hover:text-gray-900">Back to Home</a>
+                </div>
             </div>
         </div>
-    </header>
+    </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <main class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full text-center">
+            <!-- Error Icon -->
             <div class="mb-8">
-                <!-- 404 Illustration -->
-                <div class="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-8">
-                    <i class="fas fa-tools text-4xl text-blue-600"></i>
-                </div>
-                
-                <h1 class="text-6xl font-bold text-gray-900 mb-4">404</h1>
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Page Not Found</h2>
-                <p class="text-gray-600 mb-8">
-                    Oops! The page you're looking for seems to have gone missing. 
-                    Don't worry, even the best contractors sometimes lose their blueprints.
-                </p>
+                <i class="fas fa-exclamation-triangle text-6xl text-yellow-500"></i>
             </div>
-
-            <!-- Action Buttons -->
+            
+            <!-- Error Message -->
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Page Not Found</h1>
+            <p class="text-lg text-gray-600 mb-8">
+                Sorry, we couldn't find the page you're looking for. The page may have been moved, deleted, or you may have entered the wrong URL.
+            </p>
+            
+            <!-- Actions -->
             <div class="space-y-4">
                 <a href="/" 
-                   class="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
                     <i class="fas fa-home mr-2"></i>
-                    Go Home
+                    Go to Homepage
                 </a>
                 
-                <a href="/jobs" 
-                   class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                    <i class="fas fa-plus mr-2"></i>
-                    Post a Job
-                </a>
-                
-                <button onclick="history.back()" 
-                        class="w-full inline-flex items-center justify-center px-6 py-3 text-blue-600 font-medium hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Go Back
-                </button>
-            </div>
-
-            <!-- Search Suggestion -->
-            <div class="mt-12 p-6 bg-white rounded-lg shadow-md">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Looking for something specific?</h3>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">For Customers:</h4>
-                        <ul class="space-y-1 text-gray-600">
-                            <li><a href="/jobs" class="hover:text-blue-600">Post a Job</a></li>
-                            <li><a href="/dashboard" class="hover:text-blue-600">Dashboard</a></li>
-                            <li><a href="/help" class="hover:text-blue-600">Help Center</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-700 mb-2">For Providers:</h4>
-                        <ul class="space-y-1 text-gray-600">
-                            <li><a href="/provider-dashboard" class="hover:text-blue-600">Provider Dashboard</a></li>
-                            <li><a href="/profile" class="hover:text-blue-600">Profile</a></li>
-                            <li><a href="/billing" class="hover:text-blue-600">Billing</a></li>
-                        </ul>
-                    </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/contact" 
+                       class="text-blue-600 hover:text-blue-700 font-medium">
+                        <i class="fas fa-envelope mr-1"></i>
+                        Contact Support
+                    </a>
+                    <a href="/about" 
+                       class="text-blue-600 hover:text-blue-700 font-medium">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        About Us
+                    </a>
                 </div>
             </div>
-
-            <!-- Contact Support -->
-            <div class="mt-8 text-center">
-                <p class="text-gray-600 text-sm">
-                    Still can't find what you're looking for? 
-                    <a href="/contact" class="text-blue-600 hover:text-blue-800 font-medium">Contact Support</a>
-                </p>
+            
+            <!-- Helpful Links -->
+            <div class="mt-12 p-6 bg-white rounded-lg shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Popular Pages</h2>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <a href="/auth/register?type=customer" class="text-blue-600 hover:underline">
+                        <i class="fas fa-user mr-1"></i>
+                        Join as Customer
+                    </a>
+                    <a href="/auth/register?type=provider" class="text-blue-600 hover:underline">
+                        <i class="fas fa-tools mr-1"></i>
+                        Join as Provider
+                    </a>
+                    <a href="/privacy" class="text-blue-600 hover:underline">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Privacy Policy
+                    </a>
+                    <a href="/terms" class="text-blue-600 hover:underline">
+                        <i class="fas fa-file-contract mr-1"></i>
+                        Terms of Service
+                    </a>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center mb-4 md:mb-0">
-                    <i class="fas fa-hard-hat text-xl text-blue-400 mr-2"></i>
-                    <span class="font-bold">Biped Platform</span>
-                </div>
-                
-                <div class="flex space-x-6 text-sm text-gray-400">
-                    <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
-                    <a href="/terms" class="hover:text-white transition-colors">Terms</a>
-                    <a href="/contact" class="hover:text-white transition-colors">Contact</a>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-6 pt-6 text-center">
-                <p class="text-gray-400 text-sm">&copy; 2025 Biped Platform. All rights reserved.</p>
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 Biped Platform. All rights reserved. | 
+                    Operated by Braden Pty Ltd | ABN: 45 123 456 789
+                </p>
             </div>
         </div>
     </footer>
-
-    <script>
-        // Accessibility: Focus management for screen readers
-        document.addEventListener('DOMContentLoaded', function() {
-            // Announce to screen readers that this is a 404 page
-            const announcement = document.createElement('div');
-            announcement.setAttribute('aria-live', 'polite');
-            announcement.setAttribute('aria-atomic', 'true');
-            announcement.className = 'sr-only';
-            announcement.textContent = 'Error 404: Page not found. The requested page could not be located.';
-            document.body.appendChild(announcement);
-        });
-    </script>
 </body>
 </html>

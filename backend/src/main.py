@@ -26,8 +26,7 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    # Use SQLite for development if no DATABASE_URL is provided
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///biped_dev.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_size': 10,
@@ -37,22 +36,6 @@ def create_app():
     
     # CORS configuration
     CORS(app, resources={r"/*": {"origins": "*"}})
-    
-    # Security configuration
-    try:
-        from src.utils.security import SecurityEnhancer
-        security = SecurityEnhancer(app)
-        logger.info("✅ Security enhancements configured")
-    except ImportError as e:
-        logger.warning(f"⚠️ Security module not available: {e}")
-        # Add basic security headers manually
-        @app.after_request
-        def add_security_headers(response):
-            response.headers['X-Content-Type-Options'] = 'nosniff'
-            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-            response.headers['X-XSS-Protection'] = '1; mode=block'
-            response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-            return response
     
     # Initialize extensions
     from src.models import db
@@ -177,7 +160,7 @@ def create_app():
     
     # Register blueprints
     try:
-        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp
+        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp, legal_bp
         from src.routes.integration import integration_bp
         
         app.register_blueprint(health_bp)
@@ -186,6 +169,7 @@ def create_app():
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         app.register_blueprint(integration_bp)
         app.register_blueprint(jobs_bp)
+        app.register_blueprint(legal_bp)  # Register legal routes at root level
         
         logger.info("✅ Blueprints registered successfully")
         
@@ -216,40 +200,17 @@ def create_app():
             'version': '2.0'
         })
     
-    # Legal compliance routes
-    @app.route('/privacy')
-    def privacy_policy():
-        """Privacy Policy page"""
-        from datetime import datetime
-        return render_template('privacy.html', current_date=datetime.now().strftime('%B %d, %Y'))
-    
-    @app.route('/terms')
-    def terms_of_service():
-        """Terms of Service page"""
-        from datetime import datetime
-        return render_template('terms.html', current_date=datetime.now().strftime('%B %d, %Y'))
-    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
-        """Custom 404 error page"""
         try:
             return render_template('404.html'), 404
         except:
-            return jsonify({'error': 'Not found', 'status_code': 404}), 404
+            return jsonify({'error': 'Not found'}), 404
     
     @app.errorhandler(500)
     def internal_error(error):
-        """Custom 500 error page"""
-        try:
-            import uuid
-            from datetime import datetime
-            error_id = str(uuid.uuid4())[:8]
-            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
-            logger.error(f"Internal server error {error_id}: {error}")
-            return render_template('500.html', error_id=error_id, timestamp=timestamp), 500
-        except:
-            return jsonify({'error': 'Internal server error', 'status_code': 500}), 500
+        return jsonify({'error': 'Internal server error'}), 500
     
     logger.info("🚀 Biped Platform initialized successfully")
     return app
@@ -262,3 +223,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     logger.info(f"🔧 Development mode - starting on port {port}")
     app.run(host='0.0.0.0', port=port, debug=True)
+
