@@ -4,188 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Biped Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
+    <header class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
+            <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-blue-600">Biped</a>
+                    <a href="/" class="flex items-center">
+                        <i class="fas fa-hard-hat text-2xl text-blue-600 mr-3"></i>
+                        <span class="text-xl font-bold text-gray-900">Biped Platform</span>
+                    </a>
                 </div>
-                <nav class="space-x-8">
-                    <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
-                    <a href="/terms" class="text-gray-900 font-medium">Terms</a>
-                    <a href="/privacy" class="text-gray-600 hover:text-gray-900">Privacy</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
+                    <a href="/jobs" class="text-gray-700 hover:text-blue-600">Post Job</a>
+                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600">Dashboard</a>
                 </nav>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-sm p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
-            
-            <div class="prose prose-lg max-w-none">
-                <p class="text-sm text-gray-600 mb-8">
-                    <strong>Last updated:</strong> {{ current_date }}<br>
-                    <strong>Effective date:</strong> {{ current_date }}
-                </p>
+    <main id="main-content" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Terms of Service</h1>
+                <p class="text-gray-600">Last updated: <time datetime="2025-01-01">January 1, 2025</time></p>
+            </div>
 
+            <div class="prose prose-lg max-w-none">
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
                     <p class="text-gray-700 mb-4">
-                        By accessing and using the Biped Platform ("Platform"), you accept and agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Platform.
-                    </p>
-                    <p class="text-gray-700">
-                        These Terms constitute a legal agreement between you and Biped Platform regarding your use of our trades marketplace services.
+                        By accessing or using the Biped Platform service, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use our service.
                     </p>
                 </section>
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
                     <p class="text-gray-700 mb-4">
-                        Biped Platform is a digital marketplace that connects customers with qualified trade professionals for various services including construction, plumbing, electrical work, and other skilled trades.
-                    </p>
-                    <p class="text-gray-700">
-                        We facilitate connections between customers and service providers but are not directly involved in the performance of services.
+                        Biped Platform is an online marketplace that connects customers with qualified service providers for home improvement, maintenance, and trade services. We facilitate connections but are not party to any agreements between users.
                     </p>
                 </section>
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. User Accounts</h2>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">3.1 Account Registration</h3>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">Account Creation</h3>
                     <p class="text-gray-700 mb-4">
-                        To use certain features, you must create an account. You agree to:
+                        You must create an account to use certain features of our service. You are responsible for maintaining the security of your account and all activities that occur under your account.
                     </p>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">Eligibility</h3>
                     <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Provide accurate and complete information</li>
-                        <li>Maintain the security of your account</li>
-                        <li>Notify us immediately of any unauthorized access</li>
-                        <li>Be responsible for all activities under your account</li>
+                        <li>You must be at least 18 years old</li>
+                        <li>You must provide accurate and complete information</li>
+                        <li>Service providers must have appropriate licenses and insurance</li>
+                        <li>You must comply with all applicable laws and regulations</li>
                     </ul>
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">3.2 Trade Professional Verification</h3>
-                    <p class="text-gray-700">
-                        Trade professionals must provide valid licenses, insurance, and other required documentation. We reserve the right to verify credentials and suspend unqualified accounts.
-                    </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Platform Usage</h2>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">4.1 Permitted Use</h3>
-                    <p class="text-gray-700 mb-4">You may use the Platform to:</p>
-                    <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Find and hire trade professionals</li>
-                        <li>Offer your services as a qualified trade professional</li>
-                        <li>Communicate with other users regarding services</li>
-                        <li>Leave reviews and ratings</li>
-                    </ul>
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">4.2 Prohibited Activities</h3>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. User Conduct</h2>
                     <p class="text-gray-700 mb-4">You agree not to:</p>
-                    <ul class="list-disc pl-6 text-gray-700">
-                        <li>Use the Platform for unlawful purposes</li>
-                        <li>Provide false or misleading information</li>
-                        <li>Circumvent our payment systems</li>
-                        <li>Harass or discriminate against other users</li>
-                        <li>Post inappropriate content</li>
-                        <li>Attempt to compromise platform security</li>
-                    </ul>
-                </section>
-
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Payments and Fees</h2>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">5.1 Service Fees</h3>
-                    <p class="text-gray-700 mb-4">
-                        We charge a commission fee on completed transactions. Current fees are:
-                    </p>
                     <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Customer booking fee: 3% of project value</li>
-                        <li>Trade professional commission: 8% of project value</li>
-                        <li>Payment processing fees may apply</li>
+                        <li>Use the service for any illegal or unauthorized purpose</li>
+                        <li>Post false, misleading, or fraudulent information</li>
+                        <li>Harass, abuse, or harm other users</li>
+                        <li>Attempt to gain unauthorized access to our systems</li>
+                        <li>Interfere with the proper functioning of the service</li>
+                        <li>Violate any local, state, or federal laws</li>
                     </ul>
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">5.2 Payment Processing</h3>
-                    <p class="text-gray-700">
-                        Payments are processed through secure third-party providers. We use an escrow system to protect both customers and trade professionals.
-                    </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Liability and Disclaimers</h2>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">6.1 Platform Liability</h3>
-                    <p class="text-gray-700 mb-4">
-                        Biped Platform acts as an intermediary. We are not responsible for:
-                    </p>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Service Provider Obligations</h2>
+                    <p class="text-gray-700 mb-4">Service providers must:</p>
                     <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Quality of services provided by trade professionals</li>
-                        <li>Disputes between customers and service providers</li>
-                        <li>Damage or injury resulting from services</li>
-                        <li>Verification of all credentials (though we make reasonable efforts)</li>
+                        <li>Maintain valid licenses and certifications</li>
+                        <li>Carry appropriate insurance coverage</li>
+                        <li>Provide services in a professional and timely manner</li>
+                        <li>Comply with all safety regulations and standards</li>
+                        <li>Honor quoted prices and completion timelines</li>
                     </ul>
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">6.2 User Responsibilities</h3>
-                    <p class="text-gray-700">
-                        Users are responsible for verifying credentials, obtaining necessary permits, and ensuring compliance with local regulations.
-                    </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Intellectual Property</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Customer Obligations</h2>
+                    <p class="text-gray-700 mb-4">Customers must:</p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Provide accurate project descriptions and requirements</li>
+                        <li>Ensure safe access to work areas</li>
+                        <li>Make timely payments for completed work</li>
+                        <li>Communicate clearly and respectfully with service providers</li>
+                        <li>Allow reasonable access for work completion</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Payments and Fees</h2>
                     <p class="text-gray-700 mb-4">
-                        The Platform and its content are protected by intellectual property laws. You may not copy, modify, or distribute our content without permission.
+                        Biped Platform may charge fees for certain services. All fees are non-refundable unless otherwise specified. Payments are processed through secure third-party providers.
                     </p>
-                    <p class="text-gray-700">
-                        By posting content, you grant us a license to use it for platform operations.
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">Payment Terms</h3>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Payments may be held in escrow until work completion</li>
+                        <li>Disputes must be reported within 30 days</li>
+                        <li>Platform fees are deducted from service provider payments</li>
+                        <li>Refunds are subject to our dispute resolution process</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Disclaimers and Limitations</h2>
+                    <p class="text-gray-700 mb-4">
+                        Biped Platform provides the service "as is" without warranties of any kind. We do not guarantee the quality, safety, or legality of services provided by third parties.
+                    </p>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                        <p class="text-yellow-800">
+                            <strong>Important:</strong> Users are responsible for verifying the credentials, insurance, and qualifications of service providers before engaging their services.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Dispute Resolution</h2>
+                    <p class="text-gray-700 mb-4">
+                        In case of disputes between users, we encourage resolution through our platform's dispute resolution process. For legal disputes, these Terms are governed by the laws of [Jurisdiction].
                     </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Privacy</h2>
-                    <p class="text-gray-700">
-                        Your privacy is important to us. Please review our <a href="/privacy" class="text-blue-600 hover:underline">Privacy Policy</a> to understand how we collect and use your information.
-                    </p>
-                </section>
-
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Termination</h2>
-                    <p class="text-gray-700">
-                        We may terminate or suspend your account for violations of these Terms. You may terminate your account at any time by contacting us.
-                    </p>
-                </section>
-
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">10. Dispute Resolution</h2>
-                    <p class="text-gray-700">
-                        Any disputes arising from these Terms will be resolved through binding arbitration in accordance with applicable laws.
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">10. Termination</h2>
+                    <p class="text-gray-700 mb-4">
+                        We may terminate or suspend your account at any time for violations of these Terms. You may terminate your account at any time by contacting us.
                     </p>
                 </section>
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">11. Changes to Terms</h2>
-                    <p class="text-gray-700">
-                        We may update these Terms from time to time. Changes will be posted on this page with an updated effective date.
+                    <p class="text-gray-700 mb-4">
+                        We reserve the right to modify these Terms at any time. We will notify users of significant changes via email or platform notifications.
                     </p>
                 </section>
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">12. Contact Information</h2>
-                    <p class="text-gray-700">
-                        For questions about these Terms, please contact us at:
+                    <p class="text-gray-700 mb-4">
+                        If you have questions about these Terms, please contact us at:
                     </p>
-                    <div class="bg-gray-50 p-4 rounded-lg mt-4">
+                    <div class="bg-gray-50 p-4 rounded-md">
                         <p class="text-gray-700">
-                            <strong>Email:</strong> legal@biped.app<br>
-                            <strong>Address:</strong> [Business Address - To be updated]<br>
-                            <strong>Phone:</strong> [Business Phone - To be updated]<br>
-                            <strong>ABN:</strong> [Australian Business Number - To be updated]
+                            <strong>Email:</strong> legal@biped.platform<br>
+                            <strong>Address:</strong> Biped Platform, Legal Department<br>
+                            123 Business Street, Suite 100<br>
+                            City, State 12345
                         </p>
                     </div>
                 </section>
@@ -194,14 +173,39 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p>&copy; 2025 Biped Platform. All rights reserved.</p>
-                <div class="mt-4 space-x-4">
-                    <a href="/privacy" class="text-gray-300 hover:text-white">Privacy Policy</a>
-                    <a href="/terms" class="text-gray-300 hover:text-white">Terms of Service</a>
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hard-hat text-2xl text-blue-400 mr-3"></i>
+                        <span class="text-xl font-bold">Biped Platform</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Connecting skilled tradespeople with customers who need quality work done right.
+                    </p>
                 </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition-colors" aria-current="page">Terms of Service</a></li>
+                        <li><a href="/cookies" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/help" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="/contact" class="hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2025 Biped Platform. All rights reserved.</p>
             </div>
         </div>
     </footer>

@@ -4,133 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Biped Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
+    <header class="bg-white shadow-sm border-b">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
+            <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-blue-600">Biped</a>
+                    <a href="/" class="flex items-center">
+                        <i class="fas fa-hard-hat text-2xl text-blue-600 mr-3"></i>
+                        <span class="text-xl font-bold text-gray-900">Biped Platform</span>
+                    </a>
                 </div>
-                <nav class="space-x-8">
-                    <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
-                    <a href="/terms" class="text-gray-600 hover:text-gray-900">Terms</a>
-                    <a href="/privacy" class="text-gray-900 font-medium">Privacy</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
+                    <a href="/jobs" class="text-gray-700 hover:text-blue-600">Post Job</a>
+                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600">Dashboard</a>
                 </nav>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-sm p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
-            
+    <main id="main-content" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+                <p class="text-gray-600">Last updated: <time datetime="2025-01-01">January 1, 2025</time></p>
+            </div>
+
             <div class="prose prose-lg max-w-none">
-                <p class="text-sm text-gray-600 mb-8">
-                    <strong>Last updated:</strong> {{ current_date }}<br>
-                    <strong>Effective date:</strong> {{ current_date }}
-                </p>
-
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
                     <p class="text-gray-700 mb-4">
-                        Biped Platform ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our trades marketplace platform.
+                        Biped Platform ("we," "our," or "us") collects information you provide directly to us, such as when you create an account, post a job, submit a quote, or contact us for support.
                     </p>
-                    <p class="text-gray-700">
-                        By using our platform, you agree to the collection and use of information in accordance with this policy.
-                    </p>
-                </section>
-
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Information We Collect</h2>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">2.1 Personal Information</h3>
-                    <p class="text-gray-700 mb-4">
-                        We collect information you provide directly to us, including:
-                    </p>
+                    <h3 class="text-xl font-medium text-gray-900 mb-2">Information you provide to us:</h3>
                     <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Name, email address, phone number</li>
-                        <li>Business information (for trade professionals)</li>
-                        <li>Profile information and preferences</li>
-                        <li>Payment information (processed securely through third parties)</li>
-                        <li>Communications with us</li>
-                    </ul>
-
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">2.2 Automatically Collected Information</h3>
-                    <ul class="list-disc pl-6 text-gray-700 mb-4">
-                        <li>Device information and browser type</li>
-                        <li>IP address and location data</li>
-                        <li>Usage patterns and interactions</li>
-                        <li>Cookies and similar technologies</li>
+                        <li>Account information (name, email address, phone number)</li>
+                        <li>Profile information (business details, certifications, location)</li>
+                        <li>Job posting details and project information</li>
+                        <li>Communications with other users and our support team</li>
+                        <li>Payment and billing information</li>
                     </ul>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. How We Use Your Information</h2>
-                    <p class="text-gray-700 mb-4">We use your information to:</p>
-                    <ul class="list-disc pl-6 text-gray-700">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. How We Use Your Information</h2>
+                    <p class="text-gray-700 mb-4">We use the information we collect to:</p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
                         <li>Provide, maintain, and improve our services</li>
-                        <li>Match customers with appropriate trade professionals</li>
-                        <li>Process payments and transactions</li>
-                        <li>Communicate with you about our services</li>
-                        <li>Ensure platform security and prevent fraud</li>
+                        <li>Connect customers with qualified service providers</li>
+                        <li>Process transactions and send related information</li>
+                        <li>Send technical notices, updates, and support messages</li>
+                        <li>Protect against fraud and enforce our terms of service</li>
                         <li>Comply with legal obligations</li>
-                        <li>Improve our AI matching algorithms</li>
                     </ul>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Information Sharing</h2>
-                    <p class="text-gray-700 mb-4">We may share your information with:</p>
-                    <ul class="list-disc pl-6 text-gray-700">
-                        <li><strong>Trade professionals:</strong> When you request services</li>
-                        <li><strong>Service providers:</strong> Third parties who assist in platform operations</li>
-                        <li><strong>Legal authorities:</strong> When required by law</li>
-                        <li><strong>Business transfers:</strong> In case of merger or acquisition</li>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. Information Sharing</h2>
+                    <p class="text-gray-700 mb-4">
+                        We do not sell, trade, or otherwise transfer your personal information to third parties except as described in this policy:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>With service providers who help us operate our platform</li>
+                        <li>When you explicitly consent to the sharing</li>
+                        <li>To comply with legal obligations or protect our rights</li>
+                        <li>In connection with a business transfer or merger</li>
                     </ul>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Data Security</h2>
-                    <p class="text-gray-700">
-                        We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no internet transmission is completely secure.
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Data Security</h2>
+                    <p class="text-gray-700 mb-4">
+                        We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
                     </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Your Rights (GDPR/CCPA)</h2>
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Your Rights</h2>
                     <p class="text-gray-700 mb-4">You have the right to:</p>
-                    <ul class="list-disc pl-6 text-gray-700">
-                        <li>Access your personal information</li>
-                        <li>Correct inaccurate information</li>
-                        <li>Delete your information</li>
-                        <li>Restrict processing</li>
-                        <li>Data portability</li>
-                        <li>Object to processing</li>
-                        <li>Opt-out of marketing communications</li>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Access and update your personal information</li>
+                        <li>Request deletion of your account and data</li>
+                        <li>Object to processing of your personal information</li>
+                        <li>Data portability where applicable</li>
                     </ul>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Cookies</h2>
-                    <p class="text-gray-700">
-                        We use cookies and similar technologies to enhance your experience, analyze usage, and provide personalized content. You can control cookie preferences through your browser settings.
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Cookies and Tracking</h2>
+                    <p class="text-gray-700 mb-4">
+                        We use cookies and similar technologies to improve your experience on our platform. You can control cookie settings through your browser preferences.
                     </p>
                 </section>
 
                 <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Contact Us</h2>
-                    <p class="text-gray-700">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Contact Us</h2>
+                    <p class="text-gray-700 mb-4">
                         If you have questions about this Privacy Policy, please contact us at:
                     </p>
-                    <div class="bg-gray-50 p-4 rounded-lg mt-4">
+                    <div class="bg-gray-50 p-4 rounded-md">
                         <p class="text-gray-700">
-                            <strong>Email:</strong> privacy@biped.app<br>
-                            <strong>Address:</strong> [Business Address - To be updated]<br>
-                            <strong>Phone:</strong> [Business Phone - To be updated]
+                            <strong>Email:</strong> privacy@biped.platform<br>
+                            <strong>Address:</strong> Biped Platform, Legal Department<br>
+                            123 Business Street, Suite 100<br>
+                            City, State 12345
                         </p>
                     </div>
                 </section>
@@ -139,14 +126,39 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <p>&copy; 2025 Biped Platform. All rights reserved.</p>
-                <div class="mt-4 space-x-4">
-                    <a href="/privacy" class="text-gray-300 hover:text-white">Privacy Policy</a>
-                    <a href="/terms" class="text-gray-300 hover:text-white">Terms of Service</a>
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hard-hat text-2xl text-blue-400 mr-3"></i>
+                        <span class="text-xl font-bold">Biped Platform</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Connecting skilled tradespeople with customers who need quality work done right.
+                    </p>
                 </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/privacy" class="hover:text-white transition-colors" aria-current="page">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="/cookies" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/help" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="/contact" class="hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2025 Biped Platform. All rights reserved.</p>
             </div>
         </div>
     </footer>
