@@ -59,9 +59,7 @@ except ImportError as e:
 
 # Import route blueprints with error handling
 try:
-    from src.routes.auth import auth_bp
-    from src.routes.admin_auth import admin_auth_bp
-    from src.routes.dev_auth import dev_auth_bp
+    from src.routes.unified_auth import auth_bp
     from src.routes.business import business_bp
     from src.routes.dashboard import dashboard_bp
     from src.routes.health import health_bp
@@ -348,9 +346,7 @@ def after_request(response):
 
 
 # Register enhanced blueprints with rate limiting
-app.register_blueprint(auth_bp, url_prefix="/api/auth")
-app.register_blueprint(admin_auth_bp, url_prefix="/api/admin")
-app.register_blueprint(dev_auth_bp, url_prefix="/api/dev")
+app.register_blueprint(auth_bp)  # Unified auth handles all authentication
 app.register_blueprint(user_bp, url_prefix="/api/users")
 app.register_blueprint(service_bp, url_prefix="/api/services")
 app.register_blueprint(job_bp, url_prefix="/api/jobs")
