@@ -1,64 +1,23 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "Dockerfile"
-buildCommand = "docker system prune -af && docker builder prune -af && echo 'FORCE REBUILD at $(date)'"
+buildCommand = "echo Building Biped Platform..."
+watchPatterns = ["backend/**", "frontend/**", "Dockerfile", "railway.toml", "start.sh"]
 
 [deploy]
-startCommand = "./start.sh"
+startCommand = "sh start.sh"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+restartPolicyMaxRetries = 10
 
-[deploy.env]
-# FORCE COMPLETE REBUILD - Cache busting environment variables
-CACHE_BUST = "FORCE_REBUILD_20250703_134300"
-FLASK_STATIC_CACHE_TIMEOUT = "0"
-FLASK_ENV = "production"
-FLASK_APP = "src/main.py"
-PYTHONDONTWRITEBYTECODE = "1"
-PYTHONUNBUFFERED = "1"
+[deploy.envs]
+# Cache busting environment variables
+"X-Build-Timestamp" = "FORCE_REBUILD_20250703_140000"
 
-# Force cache clearing headers
-FLASK_SEND_FILE_MAX_AGE_DEFAULT = "0"
-STATIC_CACHE_TIMEOUT = "0"
-BUILD_TIMESTAMP = "FORCE_REBUILD_20250703_134300"
-
-[deploy.headers]
-# Aggressive cache control headers to prevent caching issues
-"Cache-Control" = "no-cache, no-store, must-revalidate, max-age=0"
-"Pragma" = "no-cache"
-"Expires" = "0"
-"X-Build-Timestamp" = "FORCE_REBUILD_20250703_134300"
+# Developer authentication variables
+DEV_EMAIL = "dev@biped.app"
+DEV_ACCESS_KEY = "dev_biped_2025"
 
 # Redirects removed - let Flask handle routing properly
 # Root URL should serve the public landing page, not dashboard
-
-[services.biped]
-source = "."
-build = { builder = "dockerfile" }
-
-[services.biped.variables]
-# Database configuration
-DATABASE_URL = "${{Postgres.DATABASE_URL}}"
-DATABASE_PRIVATE_URL = "${{Postgres.DATABASE_PRIVATE_URL}}"
-
-# Redis configuration  
-REDIS_URL = "${{Redis.REDIS_URL}}"
-REDIS_PRIVATE_URL = "${{Redis.REDIS_PRIVATE_URL}}"
-
-# Application configuration
-PORT = "8000"
-FLASK_SECRET_KEY = "${{secrets.FLASK_SECRET_KEY}}"
-JWT_SECRET_KEY = "${{secrets.JWT_SECRET_KEY}}"
-
-# Cache busting
-CACHE_VERSION = "${{timestamp}}"
-BUILD_ID = "${{build.id}}"
-
-[experimental]
-# Enable experimental features for better caching control
-incrementalBuilds = false
-buildCache = false
-staticOptimization = true
 

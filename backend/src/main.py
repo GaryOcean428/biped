@@ -193,7 +193,7 @@ def after_request(response):
 # Register enhanced blueprints with rate limiting
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(admin_auth_bp, url_prefix="/api/admin")
-app.register_blueprint(dev_auth_bp, url_prefix="/api/auth")
+app.register_blueprint(dev_auth_bp, url_prefix="/api/dev")
 app.register_blueprint(user_bp, url_prefix="/api/users")
 app.register_blueprint(service_bp, url_prefix="/api/services")
 app.register_blueprint(job_bp, url_prefix="/api/jobs")
