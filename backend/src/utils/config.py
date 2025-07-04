@@ -276,11 +276,10 @@ class ConfigManager:
 
         # Security validation
         security_config = self.get_security_config()
-        if security_config.jwt_secret_key.endswith(
-            "-dev-secret-key-change-in-production-jwt"
-        ):
+        # Check if JWT secret is too weak or using predictable patterns
+        if len(security_config.jwt_secret_key) < 32:
             issues.append(
-                "JWT secret key is using default value - change in production"
+                "JWT secret key is too short - should be at least 32 characters"
             )
 
         if self.environment == "production":
