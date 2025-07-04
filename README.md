@@ -1,10 +1,10 @@
-# TradeHub Platform
+# Biped Platform
 
 A modern, transparent marketplace connecting customers with trusted service providers. Built to address the pain points of existing platforms like HiPages and Airtasker.
 
 ## 🚀 Live Demo
 
-**Production URL:** https://mzhyi8cqe98j.manus.space
+**Production URL:** https://home.biped.app
 
 ## ✨ Key Features
 
@@ -59,8 +59,8 @@ tradehub-platform/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/GaryOcean428/tradehub-platform.git
-   cd tradehub-platform
+   git clone https://github.com/GaryOcean428/biped.git
+   cd biped
    ```
 
 2. **Set up the backend**
@@ -184,5 +184,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**TradeHub** - Connecting customers with trusted service providers, transparently and efficiently.
+**Biped** - Connecting customers with trusted service providers, transparently and efficiently.
 
