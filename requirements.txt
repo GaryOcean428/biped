@@ -1,0 +1,27 @@
+# Core Flask and web framework
+Flask==2.3.3
+gunicorn==21.2.0
+
+# Flask extensions
+flask-sqlalchemy==3.0.5
+flask-caching==2.0.2
+flask-compress==1.14
+flask-cors==4.0.0
+flask-migrate==4.0.5
+flask-socketio==5.3.6
+flask-limiter==3.5.0
+
+# Database and caching
+redis==5.0.1
+async-timeout==4.0.3
+psycopg2-binary==2.9.7
+
+# Payment processing
+stripe==6.6.0
+
+# Utilities and validation
+email-validator==2.0.0
+python-dotenv==1.0.0
+bcrypt==4.0.1
+eventlet==0.33.3
+
