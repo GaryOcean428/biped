@@ -63,37 +63,78 @@ def create_job():
         if validation_error:
             return jsonify({'error': validation_error}), 400
         
-        # Create new job
-        job = Job(
-            title=data['title'],
-            description=data['description'],
-            service_id=data['category_id'],  # Using service_id to match model
-            budget_min=float(data['budget']),
-            budget_max=float(data['budget']),
-            budget_type='fixed',
-            street_address=data['location'],  # Using street_address for location
-            city=data['location'],
-            state='NSW',  # Default state
-            postcode='2000',  # Default postcode
-            property_type='residential',  # Default property type
-            is_urgent=(data.get('urgency') == 'asap'),
-            special_requirements=data.get('requirements', ''),
-            customer_id=data.get('customer_id', 1),  # Default customer for demo
-            status='posted',
-            posted_at=datetime.utcnow()
-        )
+        # Use raw SQL as a workaround for SQLAlchemy issues
+        import sqlite3
+        import os
         
-        db.session.add(job)
-        db.session.commit()
+        # Get the database path
+        db_path = 'instance/biped_test.db'
+        if not os.path.exists(db_path):
+            os.makedirs('instance', exist_ok=True)
+            
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Create table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS job (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                service_id INTEGER,
+                title VARCHAR(200) NOT NULL,
+                description TEXT NOT NULL,
+                street_address VARCHAR(255),
+                city VARCHAR(100),
+                state VARCHAR(50),
+                postcode VARCHAR(10),
+                budget_min DECIMAL(10, 2),
+                budget_max DECIMAL(10, 2),
+                budget_type VARCHAR(20) DEFAULT 'fixed',
+                property_type VARCHAR(50) DEFAULT 'residential',
+                is_urgent BOOLEAN DEFAULT 0,
+                special_requirements TEXT,
+                status VARCHAR(20) DEFAULT 'posted',
+                posted_at DATETIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Insert the job
+        cursor.execute('''
+            INSERT INTO job (customer_id, service_id, title, description, street_address, 
+                           city, state, postcode, budget_min, budget_max, budget_type, 
+                           property_type, is_urgent, special_requirements, status, posted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data.get('customer_id', 1),  # Default customer
+            data['category_id'],
+            data['title'],
+            data['description'],
+            data['location'],
+            data['location'],
+            'NSW',  # Default state
+            '2000',  # Default postcode
+            float(data['budget']),
+            float(data['budget']),
+            'fixed',
+            'residential',
+            1 if data.get('urgency') == 'asap' else 0,
+            data.get('requirements', ''),
+            'posted',
+            datetime.utcnow().isoformat()
+        ))
+        
+        job_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
         
         return jsonify({
             'success': True,
-            'job_id': job.id,
+            'job_id': job_id,
             'message': 'Job posted successfully!'
         }), 201
         
     except Exception as e:
-        db.session.rollback()
         logging.error(f"Error creating job: {e}")
         return jsonify({'error': 'Failed to create job. Please try again.'}), 500
 
