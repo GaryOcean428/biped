@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Mode - Biped</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <style>
+        .maintenance-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .maintenance-content {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .maintenance-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .maintenance-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .maintenance-message {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .maintenance-description {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        .maintenance-status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .status-progress {
+            background: rgba(255, 255, 255, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .status-progress-bar {
+            background: #4ade80;
+            height: 100%;
+            width: 75%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .btn {
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 10px;
+        }
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .maintenance-content {
+                padding: 20px;
+            }
+            .maintenance-icon {
+                font-size: 3rem;
+            }
+            .maintenance-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-container">
+        <div class="maintenance-content">
+            <div class="maintenance-icon">🔧</div>
+            <h1 class="maintenance-title">System Maintenance</h1>
+            <p class="maintenance-message">
+                We're currently performing scheduled maintenance to improve your experience.
+            </p>
+            <p class="maintenance-description">
+                Our team is working hard to enhance the platform with new security features 
+                and performance improvements. We'll be back online shortly!
+            </p>
+            
+            <div class="maintenance-status">
+                <h3>Maintenance Progress</h3>
+                <div class="status-item">
+                    <span>Security Updates</span>
+                    <span>✅ Complete</span>
+                </div>
+                <div class="status-item">
+                    <span>Database Optimization</span>
+                    <span>🔄 In Progress</span>
+                </div>
+                <div class="status-item">
+                    <span>Performance Tuning</span>
+                    <span>⏳ Pending</span>
+                </div>
+                <div class="status-progress">
+                    <div class="status-progress-bar"></div>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9em;">Estimated completion: ~15 minutes</p>
+            </div>
+            
+            <div>
+                <a href="mailto:support@biped.app" class="btn">📧 Contact Support</a>
+                <a href="https://status.biped.app" class="btn" style="background: rgba(255,255,255,0.2);">📊 Status Page</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh every 30 seconds during maintenance
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+        
+        // Track maintenance page views
+        if (window.gtag) {
+            gtag('event', 'maintenance_page_view', {
+                'page_url': window.location.href,
+                'timestamp': new Date().toISOString()
+            });
+        }
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 
 from flask import Blueprint, jsonify, request
+from src.utils.error_handling import ErrorHandler
 
 jobs_api_bp = Blueprint("jobs_api", __name__)
 
@@ -291,7 +292,14 @@ def get_jobs():
         )
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        # Log the error for debugging but don't expose internal details
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching jobs: {str(e)}", exc_info=True)
+        
+        return ErrorHandler.handle_server_error(
+            "Failed to fetch jobs. Please try again later."
+        )
 
 
 @jobs_api_bp.route("/api/jobs/<int:job_id>", methods=["GET"])
@@ -301,12 +309,19 @@ def get_job(job_id):
         job = next((job for job in SAMPLE_JOBS if job["id"] == job_id), None)
 
         if not job:
-            return jsonify({"success": False, "error": "Job not found"}), 404
+            return ErrorHandler.handle_not_found_error("Job")
 
         return jsonify({"success": True, "job": job})
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        # Log the error for debugging but don't expose internal details
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching job {job_id}: {str(e)}", exc_info=True)
+        
+        return ErrorHandler.handle_server_error(
+            "Failed to fetch job details. Please try again later."
+        )
 
 
 @jobs_api_bp.route("/api/providers", methods=["GET"])
