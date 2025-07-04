@@ -1,13 +1,12 @@
 [build]
-builder = "dockerfile"
-buildCommand = "echo Building with Dockerfile..."
+builder = "nixpacks"
 
 [deploy]
-startCommand = "./start.sh"
+startCommand = "cd backend && python -m gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --access-logfile - --error-logfile - --log-level info src.main:app"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
+restartPolicyMaxRetries = 3
 
 [deploy.envs]
 # Cache busting environment variables
