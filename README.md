@@ -1,4 +1,4 @@
-# TradeHub Platform
+# Biped Platform
 
 A modern, transparent marketplace connecting customers with trusted service providers. Built to address the pain points of existing platforms like HiPages and Airtasker.
 
