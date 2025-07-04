@@ -109,6 +109,87 @@
             justify-content: center;
         }
         
+        /* Enhanced focus indicators for accessibility */
+        .modal input:focus,
+        .modal button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+        }
+        
+        /* Error state styling */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-message::before {
+            content: "⚠";
+            margin-right: 0.25rem;
+        }
+        
+        .border-red-500 {
+            border-color: #ef4444 !important;
+        }
+        
+        .border-green-500 {
+            border-color: #10b981 !important;
+        }
+        
+        /* Success state styling */
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .success-message::before {
+            content: "✓";
+            margin-right: 0.25rem;
+        }
+        
+        /* Loading state styling */
+        .loading-button {
+            position: relative;
+            color: transparent;
+        }
+        
+        .loading-button::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsive improvements */
+        @media (max-width: 640px) {
+            .modal {
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+            
+            .modal > div {
+                max-width: calc(100vw - 2rem);
+                margin: 0 1rem;
+            }
+        }
+        
         .ai-badge {
             background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
             animation: pulse 2s infinite;
@@ -274,27 +355,45 @@
                 <p class="text-gray-600">Sign in to your Biped account</p>
             </div>
             
-            <form class="space-y-4">
+            <form id="login-form" class="space-y-4" novalidate>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input 
+                        type="email" 
+                        id="login-email" 
+                        name="email"
+                        required
+                        aria-describedby="login-email-error"
+                        autocomplete="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your email address"
+                    >
                 </div>
                 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input 
+                        type="password" 
+                        id="login-password" 
+                        name="password"
+                        required
+                        aria-describedby="login-password-error"
+                        autocomplete="current-password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your password"
+                    >
                 </div>
                 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <input type="checkbox" id="remember-me" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        <input type="checkbox" id="remember-me" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
                         <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
                     </div>
                     
-                    <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                    <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">Forgot password?</a>
                 </div>
                 
-                <button type="button" class="w-full btn-primary text-white py-2 rounded-lg font-medium">
+                <button type="submit" class="w-full btn-primary text-white py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     Sign In
                 </button>
             </form>
@@ -341,39 +440,83 @@
                 </div>
             </div>
             
-            <form class="space-y-4">
+            <form id="signup-form" class="space-y-4" novalidate>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">First name</label>
-                        <input type="text" id="first-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <label for="signup-firstName" class="block text-sm font-medium text-gray-700 mb-1">First name</label>
+                        <input 
+                            type="text" 
+                            id="signup-firstName" 
+                            name="firstName"
+                            required
+                            aria-describedby="signup-firstName-error"
+                            autocomplete="given-name"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            placeholder="First name"
+                        >
                     </div>
                     <div>
-                        <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Last name</label>
-                        <input type="text" id="last-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <label for="signup-lastName" class="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                        <input 
+                            type="text" 
+                            id="signup-lastName" 
+                            name="lastName"
+                            required
+                            aria-describedby="signup-lastName-error"
+                            autocomplete="family-name"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            placeholder="Last name"
+                        >
                     </div>
                 </div>
                 
                 <div>
                     <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="signup-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <input 
+                        type="email" 
+                        id="signup-email" 
+                        name="email"
+                        required
+                        aria-describedby="signup-email-error"
+                        autocomplete="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your email address"
+                    >
                 </div>
                 
                 <div>
                     <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="signup-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <input 
+                        type="password" 
+                        id="signup-password" 
+                        name="password"
+                        required
+                        aria-describedby="signup-password-error"
+                        autocomplete="new-password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Create a strong password"
+                    >
+                    <div class="mt-1 text-xs text-gray-500">
+                        Password must contain at least 8 characters with uppercase, lowercase, and numbers
+                    </div>
                 </div>
                 
-                <div class="flex items-center">
-                    <input type="checkbox" id="terms" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                    <label for="terms" class="ml-2 block text-sm text-gray-700">
+                <div class="flex items-start">
+                    <input 
+                        type="checkbox" 
+                        id="signup-terms" 
+                        required
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 mt-1"
+                    >
+                    <label for="signup-terms" class="ml-2 block text-sm text-gray-700">
                         I agree to the 
-                        <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> 
+                        <a href="#" class="text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded">Terms of Service</a> 
                         and 
-                        <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                        <a href="#" class="text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded">Privacy Policy</a>
                     </label>
                 </div>
                 
-                <button type="button" class="w-full btn-primary text-white py-2 rounded-lg font-medium">
+                <button type="submit" class="w-full btn-primary text-white py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     Create Account
                 </button>
             </form>
@@ -531,6 +674,376 @@
                 hideProviderSignupModal();
             }
         });
+        
+        // Initialize form validation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create embedded validation instance
+            const validator = new FormValidator();
+            
+            // Set up real-time validation for all forms
+            validator.setupRealTimeValidation('login-form');
+            validator.setupRealTimeValidation('signup-form');
+            
+            // Handle login form submission
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(event) {
+                    handleLoginSubmit(event, validator);
+                });
+            }
+            
+            // Handle signup form submission  
+            const signupForm = document.getElementById('signup-form');
+            if (signupForm) {
+                signupForm.addEventListener('submit', function(event) {
+                    handleSignupSubmit(event, validator);
+                });
+            }
+        });
+        
+        // Form Validator Class (embedded)
+        class FormValidator {
+            constructor() {
+                this.emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                this.phoneRegex = /^\+?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+                this.passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            }
+
+            // Validation methods
+            validateEmail(email) {
+                if (!email || typeof email !== 'string') {
+                    return { valid: false, message: 'Email is required' };
+                }
+                
+                const trimmed = email.trim();
+                if (trimmed.length > 254) {
+                    return { valid: false, message: 'Email address too long' };
+                }
+                
+                if (!this.emailRegex.test(trimmed)) {
+                    return { valid: false, message: 'Please enter a valid email address' };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            validatePassword(password) {
+                if (!password || typeof password !== 'string') {
+                    return { valid: false, message: 'Password is required' };
+                }
+                
+                if (password.length < 8) {
+                    return { valid: false, message: 'Password must be at least 8 characters long' };
+                }
+                
+                if (password.length > 128) {
+                    return { valid: false, message: 'Password too long' };
+                }
+                
+                if (!/[A-Z]/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+                }
+                
+                if (!/[a-z]/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+                }
+                
+                if (!/\d/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one number' };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            validateName(name, fieldName = 'Name') {
+                if (!name || typeof name !== 'string') {
+                    return { valid: false, message: `${fieldName} is required` };
+                }
+                
+                const trimmed = name.trim();
+                if (trimmed.length < 1) {
+                    return { valid: false, message: `${fieldName} is required` };
+                }
+                
+                if (trimmed.length > 50) {
+                    return { valid: false, message: `${fieldName} is too long` };
+                }
+                
+                if (!/^[a-zA-Z\s-'\.]+$/.test(trimmed)) {
+                    return { valid: false, message: `${fieldName} contains invalid characters` };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            // Form validation methods
+            validateLoginForm(formData) {
+                const errors = {};
+                
+                // Validate email
+                const emailResult = this.validateEmail(formData.email);
+                if (!emailResult.valid) {
+                    errors.email = emailResult.message;
+                }
+                
+                // Validate password (just check if present for login)
+                if (!formData.password || formData.password.trim() === '') {
+                    errors.password = 'Password is required';
+                }
+                
+                return {
+                    valid: Object.keys(errors).length === 0,
+                    errors: errors
+                };
+            }
+
+            validateRegistrationForm(formData) {
+                const errors = {};
+                
+                // Validate email
+                const emailResult = this.validateEmail(formData.email);
+                if (!emailResult.valid) {
+                    errors.email = emailResult.message;
+                }
+                
+                // Validate password
+                const passwordResult = this.validatePassword(formData.password);
+                if (!passwordResult.valid) {
+                    errors.password = passwordResult.message;
+                }
+                
+                // Validate first name
+                const firstNameResult = this.validateName(formData.firstName, 'First name');
+                if (!firstNameResult.valid) {
+                    errors.firstName = firstNameResult.message;
+                }
+                
+                // Validate last name
+                const lastNameResult = this.validateName(formData.lastName, 'Last name');
+                if (!lastNameResult.valid) {
+                    errors.lastName = lastNameResult.message;
+                }
+                
+                return {
+                    valid: Object.keys(errors).length === 0,
+                    errors: errors
+                };
+            }
+
+            // UI validation helpers
+            showFieldError(fieldId, message) {
+                const field = document.getElementById(fieldId);
+                if (!field) return;
+                
+                // Remove existing error styling
+                field.classList.remove('border-red-500', 'border-green-500');
+                
+                // Remove existing error message
+                const existingError = field.parentNode.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                if (message) {
+                    // Add error styling
+                    field.classList.add('border-red-500');
+                    
+                    // Create error message element
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'error-message text-red-500 text-sm mt-1';
+                    errorElement.textContent = message;
+                    
+                    // Insert error message after the field
+                    field.parentNode.insertBefore(errorElement, field.nextSibling);
+                } else {
+                    // Add success styling
+                    field.classList.add('border-green-500');
+                }
+            }
+
+            clearFieldErrors(formId) {
+                const form = document.getElementById(formId);
+                if (!form) return;
+                
+                // Remove all error styling and messages
+                const fields = form.querySelectorAll('input, select, textarea');
+                fields.forEach(field => {
+                    field.classList.remove('border-red-500', 'border-green-500');
+                });
+                
+                const errorMessages = form.querySelectorAll('.error-message');
+                errorMessages.forEach(error => error.remove());
+            }
+
+            // Real-time validation
+            setupRealTimeValidation(formId) {
+                const form = document.getElementById(formId);
+                if (!form) return;
+                
+                const fields = form.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], input[type="tel"]');
+                
+                fields.forEach(field => {
+                    let timeout;
+                    field.addEventListener('input', () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            this.validateField(field);
+                        }, 500); // Debounce validation
+                    });
+                    
+                    field.addEventListener('blur', () => {
+                        this.validateField(field);
+                    });
+                });
+            }
+
+            validateField(field) {
+                const fieldType = field.type;
+                const fieldName = field.name || field.id;
+                const fieldValue = field.value;
+                
+                let result = { valid: true, message: '' };
+                
+                switch (fieldType) {
+                    case 'email':
+                        result = this.validateEmail(fieldValue);
+                        break;
+                    case 'password':
+                        result = this.validatePassword(fieldValue);
+                        break;
+                    case 'text':
+                        if (fieldName.includes('firstName') || fieldName.includes('lastName')) {
+                            result = this.validateName(fieldValue, fieldName.includes('firstName') ? 'First name' : 'Last name');
+                        }
+                        break;
+                }
+                
+                this.showFieldError(field.id, result.valid ? '' : result.message);
+                return result.valid;
+            }
+        }
+        
+        // Show loading state
+        function showLoadingState(button) {
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+            button.setAttribute('data-original-text', originalText);
+        }
+        
+        // Hide loading state
+        function hideLoadingState(button) {
+            const originalText = button.getAttribute('data-original-text');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Handle login form submission
+        function handleLoginSubmit(event, validator) {
+            event.preventDefault();
+            const button = event.target.querySelector('button[type="submit"]');
+            
+            // Clear previous errors
+            validator.clearFieldErrors('login-form');
+            
+            // Get form data
+            const formData = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            
+            // Validate form
+            const validation = validator.validateLoginForm(formData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    validator.showFieldError(`login-${field}`, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState(button);
+            
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                hideLoadingState(button);
+                hideLoginModal();
+                showNotification('Welcome back! You have been successfully signed in.');
+                // In real app, redirect to dashboard or update UI state
+            }, 1500);
+        }
+        
+        // Handle signup form submission
+        function handleSignupSubmit(event, validator) {
+            event.preventDefault();
+            const button = event.target.querySelector('button[type="submit"]');
+            
+            // Clear previous errors
+            validator.clearFieldErrors('signup-form');
+            
+            // Get form data
+            const formData = {
+                firstName: document.getElementById('signup-firstName').value,
+                lastName: document.getElementById('signup-lastName').value,
+                email: document.getElementById('signup-email').value,
+                password: document.getElementById('signup-password').value
+            };
+            
+            // Validate form
+            const validation = validator.validateRegistrationForm(formData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    validator.showFieldError(`signup-${field}`, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Check terms acceptance
+            const termsCheckbox = document.getElementById('signup-terms');
+            if (!termsCheckbox.checked) {
+                showNotification('Please accept the Terms of Service and Privacy Policy to continue.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState(button);
+            
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                hideLoadingState(button);
+                hideSignupModal();
+                showNotification('Account created successfully! Please check your email to verify your account.');
+                // In real app, redirect to dashboard or show email verification step
+            }, 2000);
+        }
     </script>
     
     <!-- Cookie Consent Script -->
