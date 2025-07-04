@@ -90,11 +90,13 @@ def create_app():
     # Register blueprints
     try:
         from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp
+        from src.routes.integration import integration_bp
         
         app.register_blueprint(health_bp)
         app.register_blueprint(auth_bp, url_prefix='/auth')
         app.register_blueprint(admin_bp, url_prefix='/admin')
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+        app.register_blueprint(integration_bp)
         
         logger.info("✅ Blueprints registered successfully")
         
