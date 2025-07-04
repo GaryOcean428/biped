@@ -55,3 +55,7 @@ flask-caching==2.0.2
 flask-compress==1.14
 flask-migrate==4.0.5
 
+# Additional critical dependencies for Flask app startup
+async-timeout==5.0.1
+stripe==12.3.0
+
