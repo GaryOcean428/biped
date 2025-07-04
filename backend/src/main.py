@@ -83,6 +83,75 @@ def create_app():
                 db.session.add(admin)
                 db.session.commit()
                 logger.info("✅ Default admin user created")
+            
+            # Initialize sample data for services and categories
+            from src.models import ServiceCategory, Service, User, CustomerProfile
+            from werkzeug.security import generate_password_hash
+            
+            # Create service categories if they don't exist
+            if ServiceCategory.query.count() == 0:
+                categories_data = [
+                    {'name': 'Construction & Renovation', 'slug': 'construction-renovation', 'description': 'General contractors, carpenters, painters, and renovation specialists'},
+                    {'name': 'Plumbing & Electrical', 'slug': 'plumbing-electrical', 'description': 'Licensed plumbers, electricians, and HVAC specialists'},
+                    {'name': 'Tech & Digital', 'slug': 'tech-digital', 'description': 'Web developers, designers, IT support, and digital marketing'},
+                    {'name': 'Automotive', 'slug': 'automotive', 'description': 'Mechanics, auto electricians, and vehicle specialists'},
+                    {'name': 'Landscaping', 'slug': 'landscaping', 'description': 'Gardeners, landscapers, and outdoor maintenance specialists'},
+                    {'name': 'Cleaning & Maintenance', 'slug': 'cleaning-maintenance', 'description': 'Professional cleaners, maintenance, and facility management'}
+                ]
+                
+                for cat_data in categories_data:
+                    category = ServiceCategory(**cat_data)
+                    db.session.add(category)
+                
+                db.session.commit()
+                logger.info("✅ Service categories created")
+                
+                # Create sample services
+                services_data = [
+                    {'category_id': 1, 'name': 'Kitchen Renovation', 'slug': 'kitchen-renovation', 'typical_price_min': 5000, 'typical_price_max': 25000, 'price_unit': 'job'},
+                    {'category_id': 1, 'name': 'Bathroom Renovation', 'slug': 'bathroom-renovation', 'typical_price_min': 3000, 'typical_price_max': 15000, 'price_unit': 'job'},
+                    {'category_id': 1, 'name': 'House Painting', 'slug': 'house-painting', 'typical_price_min': 2000, 'typical_price_max': 8000, 'price_unit': 'job'},
+                    {'category_id': 2, 'name': 'Plumbing Repair', 'slug': 'plumbing-repair', 'typical_price_min': 100, 'typical_price_max': 500, 'price_unit': 'job'},
+                    {'category_id': 2, 'name': 'Electrical Installation', 'slug': 'electrical-installation', 'typical_price_min': 150, 'typical_price_max': 1000, 'price_unit': 'job'},
+                    {'category_id': 3, 'name': 'Website Development', 'slug': 'website-development', 'typical_price_min': 1000, 'typical_price_max': 10000, 'price_unit': 'job'},
+                    {'category_id': 3, 'name': 'IT Support', 'slug': 'it-support', 'typical_price_min': 80, 'typical_price_max': 200, 'price_unit': 'hour'},
+                    {'category_id': 4, 'name': 'Car Service', 'slug': 'car-service', 'typical_price_min': 200, 'typical_price_max': 800, 'price_unit': 'job'},
+                    {'category_id': 5, 'name': 'Garden Maintenance', 'slug': 'garden-maintenance', 'typical_price_min': 50, 'typical_price_max': 200, 'price_unit': 'hour'},
+                    {'category_id': 6, 'name': 'House Cleaning', 'slug': 'house-cleaning', 'typical_price_min': 80, 'typical_price_max': 300, 'price_unit': 'job'}
+                ]
+                
+                for service_data in services_data:
+                    service = Service(**service_data)
+                    db.session.add(service)
+                
+                db.session.commit()
+                logger.info("✅ Sample services created")
+            
+            # Create sample customer if doesn't exist
+            if not User.query.filter_by(email='customer@biped.app').first():
+                sample_user = User(
+                    email='customer@biped.app',
+                    password_hash=generate_password_hash('password123'),
+                    user_type='customer',
+                    is_active=True,
+                    is_verified=True
+                )
+                db.session.add(sample_user)
+                db.session.commit()
+                
+                customer_profile = CustomerProfile(
+                    user_id=sample_user.id,
+                    first_name='John',
+                    last_name='Doe',
+                    phone='+61400000000',
+                    street_address='123 Test Street',
+                    city='Sydney',
+                    state='NSW',
+                    postcode='2000'
+                )
+                db.session.add(customer_profile)
+                db.session.commit()
+                logger.info("✅ Sample customer created")
                 
         except Exception as e:
             logger.error(f"❌ Database initialization error: {e}")
