@@ -55,7 +55,9 @@ def login():
             "id": 1,
             "email": email,
             "role": "admin",
-            "password_hash": security_manager.hash_password("demo123!"),  # Demo password
+            "password_hash": security_manager.hash_password(
+                "demo123!"
+            ),  # Demo password
         }
 
         # Verify password
@@ -63,7 +65,9 @@ def login():
             return jsonify({"error": "Invalid credentials"}), 401
 
         # Generate JWT token
-        token = security_manager.generate_jwt_token(user_id=user_data["id"], role=user_data["role"])
+        token = security_manager.generate_jwt_token(
+            user_id=user_data["id"], role=user_data["role"]
+        )
 
         # Generate CSRF token
         csrf_token = security_manager.generate_csrf_token()
@@ -135,7 +139,13 @@ def register():
         }
 
         return (
-            jsonify({"success": True, "message": "Registration successful", "user": user_data}),
+            jsonify(
+                {
+                    "success": True,
+                    "message": "Registration successful",
+                    "user": user_data,
+                }
+            ),
             201,
         )
 
@@ -177,7 +187,9 @@ def get_projects():
         if status:
             filtered_projects = [p for p in filtered_projects if p["status"] == status]
         if category:
-            filtered_projects = [p for p in filtered_projects if p["category"] == category]
+            filtered_projects = [
+                p for p in filtered_projects if p["category"] == category
+            ]
 
         # Simulate pagination
         total = len(filtered_projects)
@@ -229,7 +241,10 @@ def create_project():
 
         # Validate input
         if not all([title, description, category]):
-            return jsonify({"error": "Title, description, and category are required"}), 400
+            return (
+                jsonify({"error": "Title, description, and category are required"}),
+                400,
+            )
 
         if budget <= 0:
             return jsonify({"error": "Budget must be greater than 0"}), 400
@@ -495,9 +510,15 @@ def not_found(error):
 
 @secure_api_bp.errorhandler(429)
 def rate_limit_exceeded(error):
-    return jsonify({"error": "Rate limit exceeded", "message": "Too many requests"}), 429
+    return (
+        jsonify({"error": "Rate limit exceeded", "message": "Too many requests"}),
+        429,
+    )
 
 
 @secure_api_bp.errorhandler(500)
 def internal_error(error):
-    return jsonify({"error": "Internal server error", "message": "Something went wrong"}), 500
+    return (
+        jsonify({"error": "Internal server error", "message": "Something went wrong"}),
+        500,
+    )

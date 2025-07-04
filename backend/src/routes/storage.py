@@ -86,7 +86,12 @@ def delete_file(relative_path):
             return jsonify({"success": True, "message": "File deleted successfully"})
         else:
             return (
-                jsonify({"success": False, "error": "File not found or could not be deleted"}),
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "File not found or could not be deleted",
+                    }
+                ),
                 404,
             )
 
@@ -102,7 +107,10 @@ def list_files():
         files = storage_manager.list_files(category)
 
         return jsonify(
-            {"success": True, "data": {"files": files, "count": len(files), "category": category}}
+            {
+                "success": True,
+                "data": {"files": files, "count": len(files), "category": category},
+            }
         )
 
     except Exception as e:
@@ -133,10 +141,18 @@ def create_backup():
                     }
                 )
             else:
-                return jsonify({"success": False, "error": "Failed to create backup"}), 500
+                return (
+                    jsonify({"success": False, "error": "Failed to create backup"}),
+                    500,
+                )
         else:
             return (
-                jsonify({"success": False, "error": "Database backup only supported for SQLite"}),
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Database backup only supported for SQLite",
+                    }
+                ),
                 400,
             )
 
@@ -157,7 +173,8 @@ def storage_health():
                 f.write("health_check")
             os.remove(test_file)
             write_access = True
-        except:
+        except (IOError, OSError, PermissionError) as e:
+            logger.warning(f"Storage write test failed: {e}")
             write_access = False
 
         return jsonify(
@@ -173,4 +190,7 @@ def storage_health():
         )
 
     except Exception as e:
-        return jsonify({"success": False, "error": str(e), "storage_accessible": False}), 500
+        return (
+            jsonify({"success": False, "error": str(e), "storage_accessible": False}),
+            500,
+        )

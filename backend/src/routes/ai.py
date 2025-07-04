@@ -191,7 +191,13 @@ def optimize_pricing():
     try:
         data = request.get_json()
 
-        required_fields = ["provider_id", "category", "current_rate", "rating", "completed_jobs"]
+        required_fields = [
+            "provider_id",
+            "category",
+            "current_rate",
+            "rating",
+            "completed_jobs",
+        ]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -274,24 +280,42 @@ def _generate_title_suggestions(analysis):
     if "electrical" in skills:
         if complexity == "simple":
             suggestions.extend(
-                ["Electrical Outlet Installation", "Light Fixture Replacement", "Switch Repair"]
+                [
+                    "Electrical Outlet Installation",
+                    "Light Fixture Replacement",
+                    "Switch Repair",
+                ]
             )
         elif complexity == "complex":
             suggestions.extend(
-                ["Complete Home Rewiring", "Electrical Panel Upgrade", "Smart Home Installation"]
+                [
+                    "Complete Home Rewiring",
+                    "Electrical Panel Upgrade",
+                    "Smart Home Installation",
+                ]
             )
         else:
-            suggestions.extend(["Electrical Repair", "Wiring Installation", "Circuit Installation"])
+            suggestions.extend(
+                ["Electrical Repair", "Wiring Installation", "Circuit Installation"]
+            )
 
     if "plumbing" in skills:
         if complexity == "simple":
-            suggestions.extend(["Leaky Faucet Repair", "Toilet Installation", "Drain Cleaning"])
+            suggestions.extend(
+                ["Leaky Faucet Repair", "Toilet Installation", "Drain Cleaning"]
+            )
         elif complexity == "complex":
             suggestions.extend(
-                ["Bathroom Renovation Plumbing", "Pipe Replacement", "Water Heater Installation"]
+                [
+                    "Bathroom Renovation Plumbing",
+                    "Pipe Replacement",
+                    "Water Heater Installation",
+                ]
             )
         else:
-            suggestions.extend(["Plumbing Repair", "Pipe Installation", "Fixture Replacement"])
+            suggestions.extend(
+                ["Plumbing Repair", "Pipe Installation", "Fixture Replacement"]
+            )
 
     return suggestions[:3]
 
@@ -553,7 +577,11 @@ def _generate_scheduling_recommendations(data):
     """Generate scheduling recommendations"""
     return {
         "optimal_times": [
-            {"day": "Tuesday", "time": "10:00 AM", "reason": "High customer availability"},
+            {
+                "day": "Tuesday",
+                "time": "10:00 AM",
+                "reason": "High customer availability",
+            },
             {"day": "Wednesday", "time": "2:00 PM", "reason": "Low competition"},
             {"day": "Thursday", "time": "9:00 AM", "reason": "Best conversion rates"},
         ],

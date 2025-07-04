@@ -100,9 +100,13 @@ class AdvancedSearchEngine:
 
         # Budget range filter
         if min_budget is not None:
-            filters.append(or_(Job.budget_min >= min_budget, Job.budget_max >= min_budget))
+            filters.append(
+                or_(Job.budget_min >= min_budget, Job.budget_max >= min_budget)
+            )
         if max_budget is not None:
-            filters.append(or_(Job.budget_min <= max_budget, Job.budget_max <= max_budget))
+            filters.append(
+                or_(Job.budget_min <= max_budget, Job.budget_max <= max_budget)
+            )
 
         # Status filter
         if status:
@@ -169,7 +173,9 @@ class AdvancedSearchEngine:
         results = []
         for job in jobs:
             customer = db.session.query(User).filter(User.id == job.customer_id).first()
-            service = db.session.query(Service).filter(Service.id == job.service_id).first()
+            service = (
+                db.session.query(Service).filter(Service.id == job.service_id).first()
+            )
             category = (
                 db.session.query(ServiceCategory)
                 .filter(ServiceCategory.id == service.category_id)
@@ -193,12 +199,18 @@ class AdvancedSearchEngine:
                 "property_type": job.property_type,
                 "created_at": job.created_at.isoformat(),
                 "customer": (
-                    {"id": customer.id, "name": customer.full_name, "email": customer.email}
+                    {
+                        "id": customer.id,
+                        "name": customer.full_name,
+                        "email": customer.email,
+                    }
                     if customer
                     else None
                 ),
                 "relevance_score": (
-                    self._calculate_relevance_score(job, service, category, query) if query else 1.0
+                    self._calculate_relevance_score(job, service, category, query)
+                    if query
+                    else 1.0
                 ),
             }
             results.append(job_data)
@@ -295,18 +307,23 @@ class AdvancedSearchEngine:
         if min_rating is not None:
             # Subquery for average rating
             avg_rating_subquery = (
-                db.session.query(Review.reviewee_id, func.avg(Review.rating).label("avg_rating"))
+                db.session.query(
+                    Review.reviewee_id, func.avg(Review.rating).label("avg_rating")
+                )
                 .group_by(Review.reviewee_id)
                 .subquery()
             )
 
             base_query = base_query.outerjoin(
-                avg_rating_subquery, ProviderProfile.user_id == avg_rating_subquery.c.reviewee_id
+                avg_rating_subquery,
+                ProviderProfile.user_id == avg_rating_subquery.c.reviewee_id,
             )
             filters.append(
                 or_(
                     avg_rating_subquery.c.avg_rating >= min_rating,
-                    avg_rating_subquery.c.avg_rating.is_(None),  # Include providers with no ratings
+                    avg_rating_subquery.c.avg_rating.is_(
+                        None
+                    ),  # Include providers with no ratings
                 )
             )
 
@@ -325,13 +342,16 @@ class AdvancedSearchEngine:
         elif sort_by == "rating":
             # Sort by average rating
             avg_rating_subquery = (
-                db.session.query(Review.reviewee_id, func.avg(Review.rating).label("avg_rating"))
+                db.session.query(
+                    Review.reviewee_id, func.avg(Review.rating).label("avg_rating")
+                )
                 .group_by(Review.reviewee_id)
                 .subquery()
             )
 
             base_query = base_query.outerjoin(
-                avg_rating_subquery, ProviderProfile.user_id == avg_rating_subquery.c.reviewee_id
+                avg_rating_subquery,
+                ProviderProfile.user_id == avg_rating_subquery.c.reviewee_id,
             )
 
             if sort_order == "desc":
@@ -373,7 +393,9 @@ class AdvancedSearchEngine:
 
             # Get review count
             review_count = (
-                db.session.query(Review).filter(Review.reviewee_id == provider.user_id).count()
+                db.session.query(Review)
+                .filter(Review.reviewee_id == provider.user_id)
+                .count()
             )
 
             provider_data = {
@@ -413,13 +435,16 @@ class AdvancedSearchEngine:
             },
             "search_info": {
                 "query": query,
-                "filters_applied": len(filters) - 1,  # Subtract 1 for the is_active filter
+                "filters_applied": len(filters)
+                - 1,  # Subtract 1 for the is_active filter
                 "sort_by": sort_by,
                 "sort_order": sort_order,
             },
         }
 
-    def get_search_suggestions(self, query: str, search_type: str = "jobs") -> List[str]:
+    def get_search_suggestions(
+        self, query: str, search_type: str = "jobs"
+    ) -> List[str]:
         """Get intelligent search suggestions"""
         if not query or len(query) < 2:
             return []
@@ -493,7 +518,8 @@ class AdvancedSearchEngine:
             # Get most common categories through Service relationship
             category_counts = (
                 db.session.query(
-                    ServiceCategory.name, func.count(ServiceCategory.name).label("count")
+                    ServiceCategory.name,
+                    func.count(ServiceCategory.name).label("count"),
                 )
                 .join(Service, ServiceCategory.id == Service.category_id)
                 .join(Job, Service.id == Job.service_id)
@@ -520,14 +546,19 @@ class AdvancedSearchEngine:
 
             for skill_row in skills_data:
                 if skill_row[0]:
-                    skills = [skill.strip().lower() for skill in skill_row[0].split(",")]
+                    skills = [
+                        skill.strip().lower() for skill in skill_row[0].split(",")
+                    ]
                     for skill in skills:
                         skill_counts[skill] = skill_counts.get(skill, 0) + 1
 
             # Sort by count and take top items
-            sorted_skills = sorted(skill_counts.items(), key=lambda x: x[1], reverse=True)[:limit]
+            sorted_skills = sorted(
+                skill_counts.items(), key=lambda x: x[1], reverse=True
+            )[:limit]
             popular_items = [
-                {"term": skill, "count": count, "type": "skill"} for skill, count in sorted_skills
+                {"term": skill, "count": count, "type": "skill"}
+                for skill, count in sorted_skills
             ]
 
         return popular_items
@@ -632,7 +663,9 @@ def search_jobs():
         sort_by = request.args.get("sort_by", "relevance")
         sort_order = request.args.get("sort_order", "desc")
         page = request.args.get("page", 1, type=int)
-        per_page = min(request.args.get("per_page", 20, type=int), 100)  # Max 100 per page
+        per_page = min(
+            request.args.get("per_page", 20, type=int), 100
+        )  # Max 100 per page
 
         # Perform search
         results = search_engine.search_jobs(
@@ -673,7 +706,9 @@ def search_providers():
         sort_by = request.args.get("sort_by", "relevance")
         sort_order = request.args.get("sort_order", "desc")
         page = request.args.get("page", 1, type=int)
-        per_page = min(request.args.get("per_page", 20, type=int), 100)  # Max 100 per page
+        per_page = min(
+            request.args.get("per_page", 20, type=int), 100
+        )  # Max 100 per page
 
         # Perform search
         results = search_engine.search_providers(
@@ -721,7 +756,9 @@ def get_popular_searches():
 
         popular_items = search_engine.get_popular_searches(search_type, limit)
 
-        return jsonify({"success": True, "popular_searches": popular_items, "type": search_type})
+        return jsonify(
+            {"success": True, "popular_searches": popular_items, "type": search_type}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

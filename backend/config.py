@@ -9,8 +9,13 @@ from datetime import timedelta
 class Config:
     """Base configuration with Railway internal networking"""
     
-    # Basic Flask Configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    # Basic Flask Configuration - Secure secret key generation
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        import secrets
+        SECRET_KEY = secrets.token_urlsafe(32)
+        import logging
+        logging.warning("⚠️ SECRET_KEY not set. Using random key. Set SECRET_KEY environment variable for production.")
     
     # Railway Internal Service References (Preferred)
     DATABASE_URL = os.environ.get('DATABASE_PRIVATE_URL') or os.environ.get('DATABASE_URL')

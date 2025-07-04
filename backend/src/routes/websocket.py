@@ -26,7 +26,11 @@ def init_socketio(app):
     """Initialize SocketIO with the Flask app"""
     global socketio
     socketio = SocketIO(
-        app, cors_allowed_origins="*", async_mode="threading", logger=True, engineio_logger=True
+        app,
+        cors_allowed_origins="*",
+        async_mode="threading",
+        logger=True,
+        engineio_logger=True,
     )
 
     # Register event handlers
@@ -54,7 +58,8 @@ def register_socketio_events():
 
                 # Store user session info in Redis
                 redis_client.set_session(
-                    request.sid, {"user_id": user_id, "connected_at": datetime.utcnow().isoformat()}
+                    request.sid,
+                    {"user_id": user_id, "connected_at": datetime.utcnow().isoformat()},
                 )
 
                 # Send welcome message
@@ -159,7 +164,10 @@ def register_socketio_events():
 
             # Create message in database
             message = Message(
-                job_id=job_id, sender_id=user_id, content=message_text, timestamp=datetime.utcnow()
+                job_id=job_id,
+                sender_id=user_id,
+                content=message_text,
+                timestamp=datetime.utcnow(),
             )
 
             # Save to database (you'll need to implement this)
@@ -229,7 +237,9 @@ def register_socketio_events():
                 job_id, user_id, f"Job #{job_id} status updated to {new_status}"
             )
 
-            logger.info(f"Job {job_id} status updated to {new_status} by user {user_id}")
+            logger.info(
+                f"Job {job_id} status updated to {new_status} by user {user_id}"
+            )
 
         except Exception as e:
             logger.error(f"Job status update error: {e}")
@@ -245,7 +255,11 @@ def register_socketio_events():
             if user_id and job_id and verify_job_access(user_id, job_id):
                 socketio.emit(
                     "user_typing",
-                    {"user_id": user_id, "user_name": get_user_name(user_id), "job_id": job_id},
+                    {
+                        "user_id": user_id,
+                        "user_name": get_user_name(user_id),
+                        "job_id": job_id,
+                    },
                     room=f"job_{job_id}",
                     include_self=False,
                 )
@@ -445,7 +459,9 @@ def websocket_stats():
     try:
         # Get connected users count from Redis
         connected_users = (
-            len(redis_client.redis_client.keys("session:*")) if redis_client.is_connected() else 0
+            len(redis_client.redis_client.keys("session:*"))
+            if redis_client.is_connected()
+            else 0
         )
 
         return {

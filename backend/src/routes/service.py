@@ -15,7 +15,10 @@ def get_categories():
             .order_by(ServiceCategory.sort_order)
             .all()
         )
-        return jsonify({"categories": [category.to_dict() for category in categories]}), 200
+        return (
+            jsonify({"categories": [category.to_dict() for category in categories]}),
+            200,
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -28,7 +31,9 @@ def get_services_by_category(category_id):
         if not category:
             return jsonify({"error": "Category not found"}), 404
 
-        services = Service.query.filter_by(category_id=category_id, is_active=True).all()
+        services = Service.query.filter_by(
+            category_id=category_id, is_active=True
+        ).all()
         return (
             jsonify(
                 {
@@ -55,7 +60,9 @@ def search_services():
         per_page = min(request.args.get("per_page", 20, type=int), 100)
 
         # Build base query for provider services
-        provider_services_query = db.session.query(ProviderService).join(ProviderProfile).join(User)
+        provider_services_query = (
+            db.session.query(ProviderService).join(ProviderProfile).join(User)
+        )
 
         # Filter by category
         if category_id:
@@ -78,7 +85,9 @@ def search_services():
 
         # Filter by location (postcode)
         if postcode:
-            provider_services_query = provider_services_query.filter(User.postcode == postcode)
+            provider_services_query = provider_services_query.filter(
+                User.postcode == postcode
+            )
 
         # Filter by price
         if max_price:
@@ -110,7 +119,9 @@ def search_services():
         )
 
         # Paginate results
-        pagination = provider_services_query.paginate(page=page, per_page=per_page, error_out=False)
+        pagination = provider_services_query.paginate(
+            page=page, per_page=per_page, error_out=False
+        )
 
         # Format results
         results = []
@@ -168,7 +179,9 @@ def get_provider_details(provider_id):
             return jsonify({"error": "Provider not available"}), 404
 
         # Get provider services
-        services = ProviderService.query.filter_by(provider_id=provider_id, is_available=True).all()
+        services = ProviderService.query.filter_by(
+            provider_id=provider_id, is_available=True
+        ).all()
 
         # Get portfolio items
         portfolio = (
@@ -278,7 +291,10 @@ def add_provider_service():
 
         return (
             jsonify(
-                {"message": "Service added successfully", "service": provider_service.to_dict()}
+                {
+                    "message": "Service added successfully",
+                    "service": provider_service.to_dict(),
+                }
             ),
             201,
         )
@@ -333,7 +349,10 @@ def update_provider_service(service_id):
 
         return (
             jsonify(
-                {"message": "Service updated successfully", "service": provider_service.to_dict()}
+                {
+                    "message": "Service updated successfully",
+                    "service": provider_service.to_dict(),
+                }
             ),
             200,
         )
@@ -360,11 +379,15 @@ def get_price_estimate():
             return jsonify({"error": "Service not found"}), 404
 
         # Get provider services for this service
-        query = ProviderService.query.filter_by(service_id=service_id, is_available=True)
+        query = ProviderService.query.filter_by(
+            service_id=service_id, is_available=True
+        )
 
         # Filter by location if provided
         if postcode:
-            query = query.join(ProviderProfile).join(User).filter(User.postcode == postcode)
+            query = (
+                query.join(ProviderProfile).join(User).filter(User.postcode == postcode)
+            )
 
         provider_services = query.all()
 
@@ -389,10 +412,14 @@ def get_price_estimate():
             # Fall back to service defaults
             estimate = {
                 "min_price": (
-                    float(service.typical_price_min) if service.typical_price_min else None
+                    float(service.typical_price_min)
+                    if service.typical_price_min
+                    else None
                 ),
                 "max_price": (
-                    float(service.typical_price_max) if service.typical_price_max else None
+                    float(service.typical_price_max)
+                    if service.typical_price_max
+                    else None
                 ),
                 "average_price": None,
                 "provider_count": 0,

@@ -295,4 +295,3 @@ def job_detail_page(job_id):
         logging.error(f"Error loading job detail page: {e}")
         return render_template('error.html', 
                              error="Job not found."), 404
-
