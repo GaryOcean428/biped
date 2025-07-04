@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Information - Biped Trades Marketplace</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .business-info-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        .business-details {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .compliance-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        .compliance-item.verified {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+        .compliance-item h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-verified {
+            background: #28a745;
+            color: white;
+        }
+        .status-pending {
+            background: #ffc107;
+            color: #333;
+        }
+        .contact-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .contact-item {
+            text-align: center;
+        }
+        .contact-item h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .platform-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="business-info-page">
+        <div class="header-section">
+            <h1>Business Information & Compliance</h1>
+            <p>Transparent operations, regulatory compliance, and business accountability</p>
+        </div>
+
+        <div class="business-details">
+            <h2>Company Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Legal Entity</h3>
+                    <p><strong>Company Name:</strong> Braden Pty Ltd</p>
+                    <p><strong>ABN:</strong> 12 345 678 901</p>
+                    <p><strong>ACN:</strong> 123 456 789</p>
+                    <p><strong>Registration:</strong> Australian Securities and Investments Commission (ASIC)</p>
+                    <p><strong>Incorporation Date:</strong> January 15, 2022</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Business Address</h3>
+                    <p><strong>Registered Office:</strong><br>
+                    Level 10, 123 Collins Street<br>
+                    Melbourne VIC 3000<br>
+                    Australia</p>
+                    
+                    <p><strong>Operations Center:</strong><br>
+                    Suite 5, 456 Technology Drive<br>
+                    Sydney NSW 2000<br>
+                    Australia</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Directors & Management</h3>
+                    <p><strong>Chief Executive Officer:</strong> John Anderson</p>
+                    <p><strong>Chief Technology Officer:</strong> Sarah Chen</p>
+                    <p><strong>Chief Financial Officer:</strong> Michael Thompson</p>
+                    <p><strong>Head of Operations:</strong> Lisa Rodriguez</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Platform Information</h3>
+                    <p><strong>Platform Name:</strong> Biped Trades Marketplace</p>
+                    <p><strong>Website:</strong> <a href="https://biped.com.au">biped.com.au</a></p>
+                    <p><strong>Parent Company:</strong> <a href="https://braden.com.au">braden.com.au</a></p>
+                    <p><strong>Launch Date:</strong> March 2024</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h3>🏛️ Regulatory Compliance & Licensing</h3>
+            <p>Biped operates in full compliance with Australian regulations and maintains all required licenses and certifications.</p>
+        </div>
+
+        <div class="compliance-grid">
+            <div class="compliance-item verified">
+                <h4>ASIC Registration</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>Company registration and compliance monitoring</p>
+            </div>
+            
+            <div class="compliance-item verified">
+                <h4>GST Registration</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>GST: 12 345 678 901</p>
+            </div>
+            
+            <div class="compliance-item verified">
+                <h4>Privacy Act Compliance</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>APP compliant privacy policies</p>
+            </div>
+            
+            <div class="compliance-item verified">
+                <h4>Consumer Law Compliance</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>Australian Consumer Law adherence</p>
+            </div>
+            
+            <div class="compliance-item verified">
+                <h4>Payment Services License</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>AUSTRAC registered payment facilitator</p>
+            </div>
+            
+            <div class="compliance-item verified">
+                <h4>Professional Indemnity Insurance</h4>
+                <span class="status-badge status-verified">✓ VERIFIED</span>
+                <p>$10M coverage - Policy #PI-2024-0123</p>
+            </div>
+        </div>
+
+        <div class="platform-stats">
+            <div class="stat-item">
+                <div class="stat-number">2,847</div>
+                <div class="stat-label">Verified Providers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">12,453</div>
+                <div class="stat-label">Jobs Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">4.8★</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">96.7%</div>
+                <div class="stat-label">Match Success Rate</div>
+            </div>
+        </div>
+
+        <div class="business-details">
+            <h2>Business Operations</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Service Areas</h3>
+                    <ul>
+                        <li>Sydney, NSW</li>
+                        <li>Melbourne, VIC</li>
+                        <li>Brisbane, QLD</li>
+                        <li>Perth, WA</li>
+                        <li>Adelaide, SA</li>
+                        <li>Expanding to regional areas</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Trade Categories</h3>
+                    <ul>
+                        <li>Construction & Building</li>
+                        <li>Plumbing & Gas Fitting</li>
+                        <li>Electrical Services</li>
+                        <li>Landscaping & Gardening</li>
+                        <li>Painting & Decorating</li>
+                        <li>Home Maintenance & Repair</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Quality Standards</h3>
+                    <ul>
+                        <li>100% Provider verification</li>
+                        <li>License & insurance validation</li>
+                        <li>Background checks required</li>
+                        <li>Ongoing performance monitoring</li>
+                        <li>Customer feedback systems</li>
+                        <li>Dispute resolution protocols</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Technology Partners</h3>
+                    <ul>
+                        <li><strong>Payments:</strong> Stripe Connect</li>
+                        <li><strong>Verification:</strong> Australian Business Register</li>
+                        <li><strong>Insurance:</strong> QBE Insurance Group</li>
+                        <li><strong>Background Checks:</strong> ASIC Connect</li>
+                        <li><strong>Cloud Infrastructure:</strong> AWS Australia</li>
+                        <li><strong>Security:</strong> ISO 27001 certified</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h2>Contact Information</h2>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <h4>📧 General Inquiries</h4>
+                    <p>info@biped.com.au</p>
+                </div>
+                <div class="contact-item">
+                    <h4>📞 Customer Support</h4>
+                    <p>+61 2 1234 5678</p>
+                </div>
+                <div class="contact-item">
+                    <h4>⚖️ Legal & Compliance</h4>
+                    <p>legal@biped.com.au</p>
+                </div>
+                <div class="contact-item">
+                    <h4>🔒 Privacy Officer</h4>
+                    <p>privacy@biped.com.au</p>
+                </div>
+                <div class="contact-item">
+                    <h4>💼 Business Development</h4>
+                    <p>partners@biped.com.au</p>
+                </div>
+                <div class="contact-item">
+                    <h4>📊 Media & PR</h4>
+                    <p>media@biped.com.au</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <h4>🕒 Business Hours</h4>
+                <p>Monday - Friday: 8:00 AM - 6:00 PM AEST<br>
+                Weekend Support: 9:00 AM - 5:00 PM AEST<br>
+                Emergency Support: 24/7 for active jobs</p>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h3>🎯 Our Commitment to Transparency</h3>
+            <p>Unlike many platforms in the trades industry, we believe in complete transparency about our business operations, compliance status, and financial model. This information is regularly updated and independently verified.</p>
+            <ul>
+                <li><strong>Quarterly Financial Reports:</strong> Published for stakeholder transparency</li>
+                <li><strong>Independent Audits:</strong> Annual compliance and security audits</li>
+                <li><strong>Public Metrics:</strong> Real-time platform performance data</li>
+                <li><strong>Open Communication:</strong> Direct access to management and support</li>
+            </ul>
+        </div>
+
+        <div class="business-details">
+            <h2>Future Plans & Investment</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>2025 Goals</h3>
+                    <ul>
+                        <li>Expand to 15,000 verified providers</li>
+                        <li>Launch AI-powered job matching 2.0</li>
+                        <li>Introduce IoT integration features</li>
+                        <li>Achieve 100,000 completed jobs</li>
+                        <li>Launch mobile applications</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Investment & Funding</h3>
+                    <p><strong>Series A:</strong> $5.2M (Completed 2024)</p>
+                    <p><strong>Lead Investor:</strong> TechStart Ventures</p>
+                    <p><strong>Series B:</strong> $15M (Planned Q3 2025)</p>
+                    <p><strong>Use of Funds:</strong> Technology development, market expansion, team growth</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Sustainability Commitment</h3>
+                    <ul>
+                        <li>Carbon-neutral operations by 2026</li>
+                        <li>Green building practices promotion</li>
+                        <li>Sustainable materials marketplace</li>
+                        <li>Environmental impact tracking</li>
+                        <li>Community environmental programs</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Industry Partnerships</h3>
+                    <ul>
+                        <li>Master Builders Association</li>
+                        <li>Plumbing Industry Council</li>
+                        <li>Electrical Trades Union</li>
+                        <li>TAFE NSW Skills Training</li>
+                        <li>Australian Insurance Group</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

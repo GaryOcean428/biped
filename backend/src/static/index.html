@@ -16,22 +16,7 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
     
-    <title>Biped - AI-Powered Trades Marketplace | Connect with Verified Professionals</title>
-    <meta name="description" content="Find qualified tradespeople instantly with AI-powered matching. Post jobs, get matched in 24 hours, and track quality with computer vision. Join 10K+ verified professionals.">
-    <meta name="keywords" content="trades marketplace, AI matching, tradespeople, contractors, plumbers, electricians, home improvement, professional services">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Biped - AI-Powered Trades Marketplace">
-    <meta property="og:description" content="Connect with skilled tradespeople through intelligent AI matching. Get quality work done faster and smarter.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://biped.app">
-    <meta property="og:image" content="/biped-logo.png">
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Biped - AI-Powered Trades Marketplace">
-    <meta name="twitter:description" content="Connect with skilled tradespeople through intelligent AI matching.">
-    <meta name="twitter:image" content="/biped-logo.png">
+    <title>Biped - AI-Powered Trades Marketplace</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -42,25 +27,6 @@
         
         .hero-gradient {
             background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
-            position: relative;
-        }
-        
-        .hero-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            z-index: 1;
-        }
-        
-        .hero-gradient > * {
-            position: relative;
-            z-index: 2;
         }
         
         .glass-effect {
@@ -180,70 +146,6 @@
         .cta-section {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
-        
-        /* Navigation Active States */
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link.active {
-            color: #1e40af !important;
-            font-weight: 600;
-        }
-        
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #1e40af;
-            border-radius: 1px;
-        }
-        
-        .nav-link:hover {
-            color: #1e40af;
-        }
-        
-        /* Sticky Mobile CTA */
-        .mobile-cta {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-cta {
-                display: block;
-            }
-        }
-        
-        .mobile-cta-button {
-            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 50px;
-            box-shadow: 0 8px 32px rgba(30, 64, 175, 0.3);
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            animation: pulse-cta 2s infinite;
-        }
-        
-        .mobile-cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(30, 64, 175, 0.4);
-        }
-        
-        @keyframes pulse-cta {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -252,16 +154,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <img src="biped-logo.png" alt="Biped" class="h-10 w-10" loading="lazy">
+                    <img src="biped-logo.png" alt="Biped" class="h-8 w-8">
                     <span class="text-2xl font-bold text-gray-900">Biped</span>
                     <span class="ai-badge text-xs px-2 py-1 rounded-full text-white font-medium">AI-Powered</span>
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#services" class="nav-link text-gray-700 hover:text-blue-600 font-medium transition-colors">Services</a>
-                    <a href="#how-it-works" class="nav-link text-gray-700 hover:text-blue-600 font-medium transition-colors">How It Works</a>
-                    <a href="#providers" class="nav-link text-gray-700 hover:text-blue-600 font-medium transition-colors">For Providers</a>
-                    <a href="#about" class="nav-link text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
+                    <a href="#services" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Services</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">How It Works</a>
+                    <a href="#providers" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">For Providers</a>
+                    <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -315,7 +217,7 @@
                 
                 <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                     Connect with
-                    <span class="block text-yellow-300 font-extrabold">
+                    <span class="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                         Trusted Professionals
                     </span>
                 </h1>
@@ -339,20 +241,20 @@
                 <!-- Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
                     <div class="text-center">
-                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2 text-white">10K+</div>
-                        <div class="text-white opacity-90 font-medium">Verified Providers</div>
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">10K+</div>
+                        <div class="text-white opacity-80">Verified Providers</div>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2 text-white">50K+</div>
-                        <div class="text-white opacity-90 font-medium">Jobs Completed</div>
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">50K+</div>
+                        <div class="text-white opacity-80">Jobs Completed</div>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2 text-white">98%</div>
-                        <div class="text-white opacity-90 font-medium">Match Accuracy</div>
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">98%</div>
+                        <div class="text-white opacity-80">Match Accuracy</div>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2 text-white">4.9★</div>
-                        <div class="text-white opacity-90 font-medium">Average Rating</div>
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">4.9★</div>
+                        <div class="text-white opacity-80">Average Rating</div>
                     </div>
                 </div>
             </div>
@@ -422,7 +324,7 @@
             </div>
             
             <div class="service-grid">
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-blue-600 text-3xl mb-4">
                         <i class="fas fa-hammer"></i>
                     </div>
@@ -432,9 +334,9 @@
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
                         <span>4.9 avg rating • 2,500+ providers</span>
                     </div>
-                </a>
+                </div>
                 
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-green-600 text-3xl mb-4">
                         <i class="fas fa-wrench"></i>
                     </div>
@@ -444,9 +346,9 @@
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
                         <span>4.8 avg rating • 1,800+ providers</span>
                     </div>
-                </a>
+                </div>
                 
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-purple-600 text-3xl mb-4">
                         <i class="fas fa-laptop-code"></i>
                     </div>
@@ -456,9 +358,9 @@
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
                         <span>4.9 avg rating • 3,200+ providers</span>
                     </div>
-                </a>
+                </div>
                 
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-orange-600 text-3xl mb-4">
                         <i class="fas fa-car"></i>
                     </div>
@@ -468,9 +370,9 @@
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
                         <span>4.7 avg rating • 1,200+ providers</span>
                     </div>
-                </a>
+                </div>
                 
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-teal-600 text-3xl mb-4">
                         <i class="fas fa-leaf"></i>
                     </div>
@@ -480,9 +382,9 @@
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
                         <span>4.8 avg rating • 900+ providers</span>
                     </div>
-                </a>
+                </div>
                 
-                <a href="#" class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100 block cursor-pointer transition-all hover:shadow-xl">
+                <div class="card-hover bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
                     <div class="text-red-600 text-3xl mb-4">
                         <i class="fas fa-broom"></i>
                     </div>
@@ -490,10 +392,6 @@
                     <p class="text-gray-600 mb-4">Professional cleaners, maintenance, and facility management</p>
                     <div class="flex items-center text-sm text-gray-500">
                         <i class="fas fa-star text-yellow-400 mr-1"></i>
-                        <span>4.9 avg rating • 1,500+ providers</span>
-                    </div>
-                </a>
-            </div>
                         <span>4.9 avg rating • 1,500+ providers</span>
                     </div>
                 </div>
@@ -515,45 +413,41 @@
             
             <div class="grid md:grid-cols-4 gap-8">
                 <div class="text-center">
-                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <i class="fas fa-edit text-2xl text-white"></i>
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl font-bold text-blue-600">1</span>
                     </div>
-                    <div class="bg-blue-100 text-blue-600 text-sm font-bold px-3 py-1 rounded-full inline-block mb-4">STEP 1</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Describe Your Project</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                    <p class="text-gray-600">
                         Tell us what you need done. Our AI guides you through the process and suggests optimal project details.
                     </p>
                 </div>
                 
                 <div class="text-center">
-                    <div class="bg-gradient-to-br from-green-400 to-green-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <i class="fas fa-magic text-2xl text-white"></i>
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl font-bold text-green-600">2</span>
                     </div>
-                    <div class="bg-green-100 text-green-600 text-sm font-bold px-3 py-1 rounded-full inline-block mb-4">STEP 2</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Get Matched Instantly</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                    <p class="text-gray-600">
                         AI analyzes thousands of providers and instantly matches you with the best candidates for your specific needs.
                     </p>
                 </div>
                 
                 <div class="text-center">
-                    <div class="bg-gradient-to-br from-purple-400 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <i class="fas fa-shield-alt text-2xl text-white"></i>
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl font-bold text-purple-600">3</span>
                     </div>
-                    <div class="bg-purple-100 text-purple-600 text-sm font-bold px-3 py-1 rounded-full inline-block mb-4">STEP 3</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Secure & Track</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                    <p class="text-gray-600">
                         Funds are held in escrow while work progresses. Computer vision tracks quality and completion automatically.
                     </p>
                 </div>
                 
                 <div class="text-center">
-                    <div class="bg-gradient-to-br from-orange-400 to-orange-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <i class="fas fa-thumbs-up text-2xl text-white"></i>
+                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-2xl font-bold text-orange-600">4</span>
                     </div>
-                    <div class="bg-orange-100 text-orange-600 text-sm font-bold px-3 py-1 rounded-full inline-block mb-4">STEP 4</div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Payment & Review</h3>
-                    <p class="text-gray-600 leading-relaxed">
+                    <p class="text-gray-600">
                         Once satisfied with the work, payment is released automatically. Rate your experience to help others.
                     </p>
                 </div>
@@ -566,47 +460,42 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <div class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold inline-block mb-4">
-                        💰 BOOST YOUR INCOME
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-4">
-                        Get Qualified Leads in 24 Hours
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                        Grow Your Business with Biped
                     </h2>
-                    <p class="text-2xl font-semibold text-blue-300 mb-6">
-                        Join 5,000+ professionals earning more with AI-powered leads
-                    </p>
                     <p class="text-xl opacity-90 mb-8 leading-relaxed">
-                        Stop chasing leads. Our AI matches you with customers who need your exact skills and are ready to hire immediately.
+                        Join thousands of professionals who use Biped to find quality leads, 
+                        manage their business, and grow their income with AI-powered tools.
                     </p>
                     
                     <div class="space-y-6 mb-8">
                         <div class="flex items-start space-x-4">
-                            <div class="bg-green-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                <i class="fas fa-dollar-sign text-white"></i>
+                            <div class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fas fa-check text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="font-semibold mb-2">Average $4,500/month Extra Income</h4>
-                                <p class="opacity-80">Our providers earn 60% more than industry average through high-quality, pre-qualified leads.</p>
+                                <h4 class="font-semibold mb-2">Quality Leads</h4>
+                                <p class="opacity-80">AI matches you with customers who need your exact skills and are ready to hire.</p>
                             </div>
                         </div>
                         
                         <div class="flex items-start space-x-4">
-                            <div class="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                <i class="fas fa-shield-alt text-white"></i>
+                            <div class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fas fa-check text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="font-semibold mb-2">100% Payment Protection</h4>
-                                <p class="opacity-80">Escrow system ensures you get paid. Automatic dispute resolution and same-day payouts.</p>
+                                <h4 class="font-semibold mb-2">Business Tools</h4>
+                                <p class="opacity-80">Comprehensive dashboard with scheduling, invoicing, customer management, and analytics.</p>
                             </div>
                         </div>
                         
                         <div class="flex items-start space-x-4">
-                            <div class="bg-purple-500 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                <i class="fas fa-clock text-white"></i>
+                            <div class="bg-blue-500 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <i class="fas fa-check text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="font-semibold mb-2">Get Started in 5 Minutes</h4>
-                                <p class="opacity-80">Simple verification process. Start receiving leads within 24 hours of approval.</p>
+                                <h4 class="font-semibold mb-2">Secure Payments</h4>
+                                <p class="opacity-80">Get paid fast and securely with automatic escrow protection and dispute resolution.</p>
                             </div>
                         </div>
                     </div>
@@ -755,7 +644,7 @@
             <div class="grid md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center space-x-3 mb-6">
-                        <img src="biped-logo-horizontal.png" alt="Biped" class="h-8" loading="lazy">
+                        <img src="biped-logo-horizontal.png" alt="Biped" class="h-8">
                     </div>
                     <p class="text-gray-400 mb-6 leading-relaxed">
                         The AI-powered marketplace connecting customers with verified professionals. 
@@ -792,46 +681,42 @@
                     <h4 class="font-semibold mb-6">For Providers</h4>
                     <ul class="space-y-3 text-gray-400">
                         <li><a href="#" class="hover:text-white transition-colors">Join as Provider</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Business Tools</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Success Tips</a></li>
+                        <li><a href="pricing" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="provider-verification" class="hover:text-white transition-colors">Verification Process</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Provider Support</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Verification</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Business Tools</a></li>
                     </ul>
                 </div>
                 
                 <div>
                     <h4 class="font-semibold mb-6">Company</h4>
                     <ul class="space-y-3 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="business-info" class="hover:text-white transition-colors">Business Info</a></li>
+                        <li><a href="pricing" class="hover:text-white transition-colors">Pricing Model</a></li>
                         <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Press</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Accessibility Statement</a></li>
+                        <li><a href="privacy-policy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms-of-service" class="hover:text-white transition-colors">Terms of Service</a></li>
                     </ul>
-                    
-                    <div class="mt-8">
-                        <h5 class="font-semibold mb-4">Stay Updated</h5>
-                        <div class="flex">
-                            <input type="email" placeholder="Your email" class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-l-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500">
-                            <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg transition-colors">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <div class="text-gray-400 text-sm text-center md:text-left">
-                    <p>© 2025 Biped. All rights reserved.</p>
-                    <p class="mt-1">Operated by Braden Pty Ltd | ABN: 45 123 456 789</p>
-                </div>
-                <div class="flex items-center space-x-6 mt-4 md:mt-0">
-                    <span class="text-gray-400 text-sm">Powered by AI</span>
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-shield-alt text-green-400"></i>
-                        <span class="text-gray-400 text-sm">Secure & Trusted</span>
+            <div class="border-t border-gray-800 mt-12 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <div class="text-gray-400 text-sm mb-4 md:mb-0">
+                        <p>© 2025 Braden Pty Ltd. All rights reserved.</p>
+                        <p>ABN: 12 345 678 901 | Level 10, 123 Collins Street, Melbourne VIC 3000</p>
+                        <p>Email: info@biped.com.au | Phone: +61 2 1234 5678</p>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <span class="text-gray-400 text-sm">Powered by AI</span>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-alt text-green-400"></i>
+                            <span class="text-gray-400 text-sm">100% Verified</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-certificate text-blue-400"></i>
+                            <span class="text-gray-400 text-sm">Fully Licensed</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -986,41 +871,6 @@
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
-        
-        // Navigation active states
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('section[id]');
-            
-            // Intersection Observer for active navigation
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${id}`) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            }, { threshold: 0.3 });
-            
-            sections.forEach(section => observer.observe(section));
-            
-            // Smooth scrolling for navigation links
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-            });
-        });
 
         // Modal functions
         function showModal(modalId) {
@@ -1117,16 +967,8 @@
                         console.log('SW registration failed: ', registrationError);
                     });
             });
-            }
+        }
     </script>
-    
-    <!-- Sticky Mobile CTA -->
-    <div class="mobile-cta">
-        <button onclick="window.location.href='/post-job'" class="mobile-cta-button">
-            <i class="fas fa-plus mr-2"></i>
-            Post Job
-        </button>
-    </div>
     
     <!-- Load validation and loading utilities -->
     <script src="/validation.js"></script>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Verification Standards - Biped Trades Marketplace</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .verification-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .verification-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-left: 5px solid #28a745;
+        }
+        .verification-card h3 {
+            color: #28a745;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        .step-number {
+            background: #28a745;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .process-timeline {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .requirements-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 40px 0;
+        }
+        .requirements-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .requirements-table th {
+            background: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: left;
+        }
+        .requirements-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .check-icon {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .warning-icon {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .highlight {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        .quality-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .ongoing-requirements {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-page">
+        <div class="hero-section">
+            <h1>🛡️ Provider Verification Standards</h1>
+            <p>The most comprehensive verification system in the Australian trades industry</p>
+            <div class="quality-badge">100% Verification Required</div>
+            <div class="quality-badge">Zero Tolerance Policy</div>
+            <div class="quality-badge">Continuous Monitoring</div>
+        </div>
+
+        <div class="highlight">
+            <h3>🎯 Our Verification Promise</h3>
+            <p>Every provider on Biped undergoes our rigorous 7-step verification process. We verify more credentials than any other platform to ensure your safety, quality, and peace of mind.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div>Providers Verified</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div>Verification Steps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">48hrs</div>
+                <div>Average Process Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99.2%</div>
+                <div>Customer Satisfaction</div>
+            </div>
+        </div>
+
+        <div class="process-timeline">
+            <h2>7-Step Verification Process</h2>
+            <p>Our comprehensive verification process ensures only qualified, trustworthy professionals join our platform.</p>
+            
+            <div class="timeline-item">
+                <span class="step-number">1</span>
+                <div>
+                    <h4>Identity Verification</h4>
+                    <p><strong>Required Documents:</strong> Government-issued photo ID (driver's license or passport) + proof of residential address</p>
+                    <p><strong>Process:</strong> Real-time ID verification using advanced document authentication technology</p>
+                    <p><strong>Checks:</strong> Document authenticity, photo matching, address validation</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">2</span>
+                <div>
+                    <h4>Business Registration Verification</h4>
+                    <p><strong>Required:</strong> Valid Australian Business Number (ABN) and business registration</p>
+                    <p><strong>Process:</strong> Direct verification with Australian Business Register (ABR)</p>
+                    <p><strong>Checks:</strong> Active business status, GST registration, business structure validation</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">3</span>
+                <div>
+                    <h4>Professional License Verification</h4>
+                    <p><strong>Required:</strong> Trade-specific licenses and certifications (where applicable)</p>
+                    <p><strong>Process:</strong> Direct verification with relevant state licensing bodies</p>
+                    <p><strong>Checks:</strong> License validity, expiry dates, disciplinary history, specialization areas</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">4</span>
+                <div>
+                    <h4>Insurance Verification</h4>
+                    <p><strong>Required:</strong> Public liability insurance (minimum $2M), workers' compensation (if applicable)</p>
+                    <p><strong>Process:</strong> Direct verification with insurance providers</p>
+                    <p><strong>Checks:</strong> Coverage amounts, policy validity, premium payment status</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">5</span>
+                <div>
+                    <h4>Background Checks</h4>
+                    <p><strong>Scope:</strong> Criminal history, bankruptcy records, court judgments</p>
+                    <p><strong>Process:</strong> National police check and financial background screening</p>
+                    <p><strong>Checks:</strong> Relevant criminal history, financial stability, legal compliance</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">6</span>
+                <div>
+                    <h4>Reference and Work History Verification</h4>
+                    <p><strong>Required:</strong> 3 recent customer references, previous employer verification</p>
+                    <p><strong>Process:</strong> Direct contact with references, work quality assessment</p>
+                    <p><strong>Checks:</strong> Work quality, professionalism, reliability, customer satisfaction</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <span class="step-number">7</span>
+                <div>
+                    <h4>Skills and Portfolio Assessment</h4>
+                    <p><strong>Required:</strong> Portfolio of recent work, skills demonstration</p>
+                    <p><strong>Process:</strong> Expert review of work samples, practical skills assessment</p>
+                    <p><strong>Checks:</strong> Technical competency, work quality standards, safety compliance</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="requirements-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trade Category</th>
+                        <th>Specific License Requirements</th>
+                        <th>Insurance Minimum</th>
+                        <th>Additional Checks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Electrical</strong></td>
+                        <td>Electrical Worker License, REC License</td>
+                        <td>$5M Public Liability</td>
+                        <td>Safety training certification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Plumbing</strong></td>
+                        <td>Plumbing License, Gas Fitting License</td>
+                        <td>$5M Public Liability</td>
+                        <td>Water authority registration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Building/Construction</strong></td>
+                        <td>Builder's License, Contractor License</td>
+                        <td>$10M Public Liability</td>
+                        <td>Building code compliance training</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HVAC</strong></td>
+                        <td>HVAC License, Refrigeration License</td>
+                        <td>$2M Public Liability</td>
+                        <td>Environmental compliance certification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Landscaping</strong></td>
+                        <td>Landscaping Certification</td>
+                        <td>$2M Public Liability</td>
+                        <td>Horticulture qualifications</td>
+                    </tr>
+                    <tr>
+                        <td><strong>General Maintenance</strong></td>
+                        <td>Trade-specific certifications</td>
+                        <td>$2M Public Liability</td>
+                        <td>Multi-trade competency assessment</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ongoing-requirements">
+            <h2>🔄 Ongoing Monitoring & Compliance</h2>
+            <p>Verification doesn't stop after initial approval. We continuously monitor all providers to maintain our high standards.</p>
+            
+            <div class="verification-grid">
+                <div style="color: white;">
+                    <h4>📅 Annual Re-verification</h4>
+                    <ul>
+                        <li>License renewal verification</li>
+                        <li>Insurance policy updates</li>
+                        <li>Criminal background rechecks</li>
+                        <li>Customer feedback review</li>
+                    </ul>
+                </div>
+                
+                <div style="color: white;">
+                    <h4>📊 Performance Monitoring</h4>
+                    <ul>
+                        <li>Customer rating tracking (min 4.0★)</li>
+                        <li>Job completion rate monitoring</li>
+                        <li>Response time analysis</li>
+                        <li>Quality standards compliance</li>
+                    </ul>
+                </div>
+                
+                <div style="color: white;">
+                    <h4>⚠️ Compliance Alerts</h4>
+                    <ul>
+                        <li>License expiry notifications</li>
+                        <li>Insurance renewal reminders</li>
+                        <li>Performance improvement plans</li>
+                        <li>Immediate suspension for violations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="verification-grid">
+            <div class="verification-card">
+                <h3>📋 Required Documentation Checklist</h3>
+                <ul>
+                    <li><span class="check-icon">✓</span> Government-issued photo ID</li>
+                    <li><span class="check-icon">✓</span> Proof of residential address</li>
+                    <li><span class="check-icon">✓</span> ABN registration certificate</li>
+                    <li><span class="check-icon">✓</span> Trade license(s) and certifications</li>
+                    <li><span class="check-icon">✓</span> Public liability insurance certificate</li>
+                    <li><span class="check-icon">✓</span> Workers' compensation certificate</li>
+                    <li><span class="check-icon">✓</span> National police check (under 6 months)</li>
+                    <li><span class="check-icon">✓</span> Three customer references</li>
+                    <li><span class="check-icon">✓</span> Portfolio of recent work</li>
+                </ul>
+            </div>
+            
+            <div class="verification-card">
+                <h3>⏱️ Verification Timeframes</h3>
+                <ul>
+                    <li><strong>Document Review:</strong> 24-48 hours</li>
+                    <li><strong>License Verification:</strong> 1-3 business days</li>
+                    <li><strong>Insurance Verification:</strong> 1-2 business days</li>
+                    <li><strong>Background Checks:</strong> 3-5 business days</li>
+                    <li><strong>Reference Checks:</strong> 2-4 business days</li>
+                    <li><strong>Skills Assessment:</strong> 1-2 business days</li>
+                    <li><strong>Final Approval:</strong> Same day after completion</li>
+                </ul>
+                <p><strong>Total Time:</strong> 5-10 business days on average</p>
+            </div>
+            
+            <div class="verification-card">
+                <h3>🚫 Automatic Disqualifications</h3>
+                <ul>
+                    <li><span class="warning-icon">⚠</span> Expired or invalid licenses</li>
+                    <li><span class="warning-icon">⚠</span> Insufficient insurance coverage</li>
+                    <li><span class="warning-icon">⚠</span> Relevant criminal convictions</li>
+                    <li><span class="warning-icon">⚠</span> Recent bankruptcy proceedings</li>
+                    <li><span class="warning-icon">⚠</span> Poor customer references</li>
+                    <li><span class="warning-icon">⚠</span> Failed skills assessment</li>
+                    <li><span class="warning-icon">⚠</span> Misrepresentation of qualifications</li>
+                    <li><span class="warning-icon">⚠</span> Safety compliance violations</li>
+                </ul>
+            </div>
+            
+            <div class="verification-card">
+                <h3>🎯 Quality Standards</h3>
+                <ul>
+                    <li>Minimum 4.0★ customer rating</li>
+                    <li>95% job completion rate</li>
+                    <li>4-hour maximum response time</li>
+                    <li>Zero tolerance for safety violations</li>
+                    <li>Professional communication standards</li>
+                    <li>Accurate quote and timeline delivery</li>
+                    <li>Continuous professional development</li>
+                    <li>Customer service excellence</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h3>🏆 Why Our Verification is Superior</h3>
+            <div class="verification-grid">
+                <div>
+                    <h4>🆚 Competitor Comparison</h4>
+                    <ul>
+                        <li><strong>HiPages:</strong> Basic ID check only</li>
+                        <li><strong>Airtasker:</strong> Self-reported credentials</li>
+                        <li><strong>ServiceSeeking:</strong> Minimal verification</li>
+                        <li><strong>Biped:</strong> 7-step comprehensive process</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>✅ What Sets Us Apart</h4>
+                    <ul>
+                        <li>Direct license verification with authorities</li>
+                        <li>Insurance policy validation</li>
+                        <li>Criminal background screening</li>
+                        <li>Skills and portfolio assessment</li>
+                        <li>Ongoing performance monitoring</li>
+                        <li>Annual re-verification requirements</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0; padding: 40px; background: #f8f9fa; border-radius: 15px;">
+            <h2>Ready to Join Our Verified Provider Network?</h2>
+            <p>Start your comprehensive verification process today and become part of Australia's most trusted trades marketplace.</p>
+            <button style="background: #28a745; color: white; padding: 15px 40px; border: none; border-radius: 25px; font-size: 1.2em; cursor: pointer; margin: 10px;">Begin Verification Process</button>
+            <br><br>
+            <p style="color: #666; font-size: 0.9em;">Questions about verification? Contact our provider support team at <strong>providers@biped.com.au</strong> or <strong>+61 2 1234 5678</strong></p>
+        </div>
+    </div>
+</body>
+</html>

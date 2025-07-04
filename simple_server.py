@@ -31,17 +31,26 @@ def dashboard():
 def provider_dashboard():
     return send_from_directory('backend/src/static', 'provider-dashboard.html')
 
-@app.route('/privacy')
+# Legal and Business Pages
+@app.route('/privacy-policy')
 def privacy_policy():
-    return send_from_directory('backend/src/static', 'privacy.html')
+    return send_from_directory('backend/src/static', 'privacy-policy.html')
 
-@app.route('/terms')
+@app.route('/terms-of-service')
 def terms_of_service():
-    return send_from_directory('backend/src/static', 'terms.html')
+    return send_from_directory('backend/src/static', 'terms-of-service.html')
 
-@app.errorhandler(404)
-def not_found_error(error):
-    return send_from_directory('backend/src/static', '404.html'), 404
+@app.route('/pricing')
+def pricing():
+    return send_from_directory('backend/src/static', 'pricing.html')
+
+@app.route('/business-info')
+def business_info():
+    return send_from_directory('backend/src/static', 'business-info.html')
+
+@app.route('/provider-verification')
+def provider_verification():
+    return send_from_directory('backend/src/static', 'provider-verification.html')
 
 @app.route('/<path:filename>')
 def static_files(filename):

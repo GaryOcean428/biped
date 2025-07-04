@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing & Business Model - Biped Trades Marketplace</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .pricing-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        .hero-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .hero-section p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+        .pricing-card.featured {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+        .pricing-card h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .price {
+            font-size: 2.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .price-period {
+            font-size: 0.4em;
+            color: #666;
+        }
+        .features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .features li:last-child {
+            border-bottom: none;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .business-model-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+        .revenue-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .revenue-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .revenue-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 40px 0;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: left;
+        }
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .highlight {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .guarantee-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pricing-page">
+        <div class="hero-section">
+            <h1>Transparent Pricing, Fair Business Model</h1>
+            <p>No hidden fees, no subscription traps, just honest pricing that benefits everyone</p>
+        </div>
+
+        <div class="highlight">
+            <h3>🎯 Our Promise: Complete Transparency</h3>
+            <p>Unlike competitors who use confusing subscription models and hidden fees, Biped operates on a simple, fair commission structure that aligns our success with yours.</p>
+        </div>
+
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Customers</h3>
+                <div class="price">FREE<span class="price-period"> to post jobs</span></div>
+                <ul class="features">
+                    <li>✓ Post unlimited jobs</li>
+                    <li>✓ AI-powered provider matching</li>
+                    <li>✓ Secure escrow payments</li>
+                    <li>✓ Quality guarantee protection</li>
+                    <li>✓ Dispute resolution support</li>
+                    <li>✓ 24/7 customer support</li>
+                </ul>
+                <button class="btn-primary">Post a Job</button>
+            </div>
+
+            <div class="pricing-card">
+                <h3>Basic Provider</h3>
+                <div class="price">5-8%<span class="price-period"> commission only</span></div>
+                <ul class="features">
+                    <li>✓ No monthly subscription fees</li>
+                    <li>✓ Commission only on completed jobs</li>
+                    <li>✓ Standard profile listing</li>
+                    <li>✓ Basic job notifications</li>
+                    <li>✓ Payment protection</li>
+                    <li>✓ Customer communication tools</li>
+                </ul>
+                <button class="btn-primary">Join as Provider</button>
+            </div>
+
+            <div class="pricing-card featured">
+                <h3>Premium Provider <span class="guarantee-badge">Most Popular</span></h3>
+                <div class="price">$49<span class="price-period"> /month + 3% commission</span></div>
+                <ul class="features">
+                    <li>✓ Reduced commission rate (3% vs 8%)</li>
+                    <li>✓ Priority job matching</li>
+                    <li>✓ Featured profile placement</li>
+                    <li>✓ Advanced analytics dashboard</li>
+                    <li>✓ Instant job notifications</li>
+                    <li>✓ Premium customer support</li>
+                    <li>✓ Marketing tools and insights</li>
+                </ul>
+                <button class="btn-primary">Upgrade to Premium</button>
+            </div>
+        </div>
+
+        <div class="business-model-section">
+            <h2>Sustainable Revenue Model</h2>
+            <p>Our diversified revenue model ensures platform sustainability while keeping costs fair for users:</p>
+            
+            <div class="revenue-breakdown">
+                <div class="revenue-item">
+                    <h4>Transaction Commissions</h4>
+                    <p><strong>60% of Revenue</strong></p>
+                    <p>Fair commissions on completed jobs, aligned with user success</p>
+                </div>
+                <div class="revenue-item">
+                    <h4>Premium Subscriptions</h4>
+                    <p><strong>25% of Revenue</strong></p>
+                    <p>Enhanced features for professional providers</p>
+                </div>
+                <div class="revenue-item">
+                    <h4>Featured Listings</h4>
+                    <p><strong>10% of Revenue</strong></p>
+                    <p>Optional boost for increased visibility</p>
+                </div>
+                <div class="revenue-item">
+                    <h4>Partner Services</h4>
+                    <p><strong>5% of Revenue</strong></p>
+                    <p>Insurance, equipment, and training partnerships</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Biped</th>
+                        <th>HiPages</th>
+                        <th>Airtasker</th>
+                        <th>ServiceSeeking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Customer Job Posting</strong></td>
+                        <td>FREE</td>
+                        <td>FREE</td>
+                        <td>FREE</td>
+                        <td>FREE</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Provider Monthly Fee</strong></td>
+                        <td>$0 (Basic) / $49 (Premium)</td>
+                        <td>$129-$429+GST</td>
+                        <td>$0</td>
+                        <td>$0-$99</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Commission Rate</strong></td>
+                        <td>3-8%</td>
+                        <td>15-20%</td>
+                        <td>10-15%</td>
+                        <td>5-10%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lead Fees</strong></td>
+                        <td>$0</td>
+                        <td>$5-50 per lead</td>
+                        <td>$0</td>
+                        <td>$0-25 per lead</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Protection</strong></td>
+                        <td>✓ Full escrow system</td>
+                        <td>❌ Limited</td>
+                        <td>✓ Basic escrow</td>
+                        <td>❌ None</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quality Verification</strong></td>
+                        <td>✓ AI + Manual review</td>
+                        <td>❌ Basic checks</td>
+                        <td>❌ Basic checks</td>
+                        <td>❌ Self-reported</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dispute Resolution</strong></td>
+                        <td>✓ Structured process</td>
+                        <td>❌ Limited support</td>
+                        <td>✓ Basic mediation</td>
+                        <td>❌ None</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight">
+            <h3>💡 Why Our Model Works Better</h3>
+            <ul>
+                <li><strong>No Subscription Traps:</strong> Unlike HiPages, we don't lock providers into expensive monthly fees</li>
+                <li><strong>Success-Based Pricing:</strong> We only make money when you complete jobs successfully</li>
+                <li><strong>Transparent Costs:</strong> All fees clearly disclosed upfront, no hidden charges</li>
+                <li><strong>Quality Focus:</strong> Our verification system ensures better matches and outcomes</li>
+                <li><strong>Fair Dispute Resolution:</strong> Structured process protects both customers and providers</li>
+            </ul>
+        </div>
+
+        <div class="business-model-section">
+            <h2>Financial Projections & Growth Strategy</h2>
+            <div class="revenue-breakdown">
+                <div class="revenue-item">
+                    <h4>Year 1 Target</h4>
+                    <p><strong>$2.5M Revenue</strong></p>
+                    <p>5,000 providers, 25,000 jobs completed</p>
+                </div>
+                <div class="revenue-item">
+                    <h4>Year 3 Target</h4>
+                    <p><strong>$25M Revenue</strong></p>
+                    <p>50,000 providers, 500,000 jobs completed</p>
+                </div>
+                <div class="revenue-item">
+                    <h4>Year 5 Target</h4>
+                    <p><strong>$100M Revenue</strong></p>
+                    <p>Market leadership in Australian trades</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h3>🚀 Future Revenue Opportunities</h3>
+            <p>Our platform is designed for scalable growth with additional revenue streams:</p>
+            <ul>
+                <li><strong>Insurance Products:</strong> Integrated coverage options for jobs and providers</li>
+                <li><strong>Equipment Marketplace:</strong> Tools and materials sourcing</li>
+                <li><strong>Training & Certification:</strong> Professional development programs</li>
+                <li><strong>Financial Services:</strong> Lending and cash flow solutions</li>
+                <li><strong>International Expansion:</strong> Replicating success in similar markets</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0;">
+            <h2>Ready to Join the Future of Trades?</h2>
+            <p>Start with our transparent pricing model today</p>
+            <button class="btn-primary" style="margin: 10px;">Get Started as Customer</button>
+            <button class="btn-primary" style="margin: 10px;">Join as Provider</button>
+        </div>
+    </div>
+</body>
+</html>
