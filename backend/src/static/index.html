@@ -119,13 +119,6 @@
             50% { opacity: 0.8; }
         }
         
-        .hero-bg {
-            background-image: url('biped-hero-bg.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
         .service-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -154,7 +147,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <img src="biped-logo.png" alt="Biped" class="h-8 w-8">
+                    <img src="/biped-logo.png" alt="Biped" class="h-8 w-8">
                     <span class="text-2xl font-bold text-gray-900">Biped</span>
                     <span class="ai-badge text-xs px-2 py-1 rounded-full text-white font-medium">AI-Powered</span>
                 </div>
@@ -204,8 +197,8 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-gradient hero-bg min-h-screen flex items-center relative overflow-hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+    <section class="hero-gradient min-h-screen flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-teal-900/30"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center">
                 <div class="floating-element mb-8">
