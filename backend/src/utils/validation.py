@@ -203,3 +203,25 @@ def validate_registration_data(data: Dict[str, Any]) -> Tuple[bool, Optional[str
         data[field] = validator.sanitize_html(data[field])
 
     return True, None
+
+
+# Module-level convenience functions for backward compatibility
+def validate_email(email: str) -> Tuple[bool, Optional[str]]:
+    """Validate email format - module level function"""
+    return InputValidator.validate_email(email)
+
+
+def validate_password(password: str) -> Tuple[bool, Optional[str]]:
+    """Validate password strength - module level function"""
+    return InputValidator.validate_password(password)
+
+
+def validate_required_fields(data: Dict[str, Any], required_fields: List[str]) -> Optional[str]:
+    """Validate required fields - returns error message or None"""
+    is_valid, error = InputValidator.validate_required_fields(data, required_fields)
+    return error if not is_valid else None
+
+
+def validate_phone(phone: str) -> Tuple[bool, Optional[str]]:
+    """Validate phone number format - module level function"""
+    return InputValidator.validate_phone(phone)

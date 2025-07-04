@@ -155,6 +155,8 @@ def create_app():
                 
         except Exception as e:
             logger.error(f"❌ Database initialization error: {e}")
+            # Don't fail the app startup due to database issues
+            pass
     
     # Register blueprints
     try:
