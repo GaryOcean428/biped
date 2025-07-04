@@ -430,14 +430,47 @@ def serve_static_files(path):
 @app.route('/health')
 def health_check():
     """Health check endpoint for Railway"""
-    return jsonify({"status": "ok", "timestamp": time.time()})
+    try:
+        # Check database connection
+        with app.app_context():
+            db.session.execute('SELECT 1')
+            db_status = 'healthy'
+    except Exception as e:
+        print(f"Database health check failed: {e}")
+        db_status = 'unhealthy'
+    
+    # Check Redis connection if available
+    try:
+        from src.utils.redis_client import redis_client
+        redis_status = 'healthy' if redis_client.is_connected() else 'disconnected'
+    except Exception:
+        redis_status = 'unavailable'
+    
+    return jsonify({
+        "status": "healthy",
+        "timestamp": time.time(),
+        "database": db_status,
+        "redis": redis_status,
+        "version": "2.0.0"
+    })
 
 if __name__ == '__main__':
+    print("🚀 Starting Enhanced Biped Platform v2.0")
+    print(f"📊 Environment: {os.environ.get('FLASK_ENV', 'development')}")
+    print(f"🗄️ Database: {'PostgreSQL (Railway)' if os.environ.get('DATABASE_URL', '').startswith('postgresql') else 'SQLite (Local)'}")
+    print(f"🔄 Redis: {'Available (Railway)' if os.environ.get('REDIS_URL') else 'Not configured'}")
+    
     # Create database tables if they don't exist
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("✅ Database tables initialized")
+        except Exception as e:
+            print(f"⚠️ Database initialization warning: {e}")
         
+    # Get port from environment or default
+    port = int(os.environ.get('PORT', 8000))
+    
     # Start the Flask application
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False)
 
