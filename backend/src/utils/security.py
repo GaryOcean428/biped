@@ -131,6 +131,12 @@ class SecurityEnhancer:
             referrer_policy="strict-origin-when-cross-origin",
             feature_policy={"geolocation": "'none'", "microphone": "'none'", "camera": "'none'"},
         )
+        
+        # Add X-XSS-Protection header manually since Talisman doesn't include it by default
+        @self.app.after_request
+        def add_xss_protection(response):
+            response.headers['X-XSS-Protection'] = '1; mode=block'
+            return response
 
     def _setup_csrf_protection(self):
         """Configure CSRF protection"""
