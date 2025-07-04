@@ -128,5 +128,131 @@ def create_success_response(
     }, status_code
 
 
+def handle_error(error):
+    """Handle various types of errors and return appropriate JSON responses"""
+    from flask import jsonify
+    from werkzeug.exceptions import HTTPException
+    from sqlalchemy.exc import SQLAlchemyError
+    
+    if isinstance(error, HTTPException):
+        response = jsonify({
+            'error': error.description,
+            'status_code': error.code
+        })
+        response.status_code = error.code
+        return response
+    
+    elif isinstance(error, SQLAlchemyError):
+        logger = logging.getLogger(__name__)
+        logger.error(f"Database error: {str(error)}")
+        response = jsonify({
+            'error': 'Database error occurred',
+            'status_code': 500
+        })
+        response.status_code = 500
+        return response
+    
+    elif isinstance(error, ValueError):
+        response = jsonify({
+            'error': str(error),
+            'status_code': 400
+        })
+        response.status_code = 400
+        return response
+    
+    elif isinstance(error, PermissionError):
+        response = jsonify({
+            'error': str(error),
+            'status_code': 403
+        })
+        response.status_code = 403
+        return response
+    
+    else:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Unexpected error: {str(error)}")
+        response = jsonify({
+            'error': 'An unexpected error occurred',
+            'status_code': 500
+        })
+        response.status_code = 500
+        return response
+
+
+def error_handler(f):
+    """Decorator to handle errors in route functions"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            return handle_error(e)
+    return decorated_function
+
+
+def validation_error(message, field=None):
+    """Create a validation error response"""
+    from flask import jsonify
+    
+    payload = {'field': field} if field else None
+    response = jsonify({
+        'error': message,
+        'status_code': 422,
+        'payload': payload
+    })
+    response.status_code = 422
+    return response
+
+
+def not_found_error(resource='Resource'):
+    """Create a not found error response"""
+    from flask import jsonify
+    
+    response = jsonify({
+        'error': f"{resource} not found",
+        'status_code': 404
+    })
+    response.status_code = 404
+    return response
+
+
+def unauthorized_error(message='Unauthorized access'):
+    """Create an unauthorized error response"""
+    from flask import jsonify
+    
+    response = jsonify({
+        'error': message,
+        'status_code': 401
+    })
+    response.status_code = 401
+    return response
+
+
+def forbidden_error(message='Access forbidden'):
+    """Create a forbidden error response"""
+    from flask import jsonify
+    
+    response = jsonify({
+        'error': message,
+        'status_code': 403
+    })
+    response.status_code = 403
+    return response
+
+
+def conflict_error(message='Resource conflict'):
+    """Create a conflict error response"""
+    from flask import jsonify
+    
+    response = jsonify({
+        'error': message,
+        'status_code': 409
+    })
+    response.status_code = 409
+    return response
+
+
 # Global logger instance
 app_logger = ErrorHandler.setup_logging()

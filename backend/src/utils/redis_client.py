@@ -14,3 +14,4 @@ def get_redis_client():
         except Exception as e:
             logger.error(f"Redis error: {e}")
     return None
+
