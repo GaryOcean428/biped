@@ -4,7 +4,7 @@ A modern, transparent marketplace connecting customers with trusted service prov
 
 ## 🚀 Live Demo
 
-**Production URL:** https://mzhyi8cqe98j.manus.space
+**Production URL:** https://home.biped.app
 
 ## ✨ Key Features
 
@@ -59,7 +59,7 @@ tradehub-platform/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/GaryOcean428/tradehub-platform.git
+   git clone https://github.com/GaryOcean428/biped.git
    cd tradehub-platform
    ```
 
@@ -184,5 +184,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**TradeHub** - Connecting customers with trusted service providers, transparently and efficiently.
+**Biped** - Connecting customers with trusted service providers, transparently and efficiently.
 
