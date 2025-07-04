@@ -26,7 +26,8 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+    # Use SQLite for development if no DATABASE_URL is provided
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///biped_dev.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_size': 10,
@@ -36,6 +37,22 @@ def create_app():
     
     # CORS configuration
     CORS(app, resources={r"/*": {"origins": "*"}})
+    
+    # Security configuration
+    try:
+        from src.utils.security import SecurityEnhancer
+        security = SecurityEnhancer(app)
+        logger.info("✅ Security enhancements configured")
+    except ImportError as e:
+        logger.warning(f"⚠️ Security module not available: {e}")
+        # Add basic security headers manually
+        @app.after_request
+        def add_security_headers(response):
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+            response.headers['X-XSS-Protection'] = '1; mode=block'
+            response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+            return response
     
     # Initialize extensions
     from src.models import db
@@ -199,14 +216,40 @@ def create_app():
             'version': '2.0'
         })
     
+    # Legal compliance routes
+    @app.route('/privacy')
+    def privacy_policy():
+        """Privacy Policy page"""
+        from datetime import datetime
+        return render_template('privacy.html', current_date=datetime.now().strftime('%B %d, %Y'))
+    
+    @app.route('/terms')
+    def terms_of_service():
+        """Terms of Service page"""
+        from datetime import datetime
+        return render_template('terms.html', current_date=datetime.now().strftime('%B %d, %Y'))
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({'error': 'Not found'}), 404
+        """Custom 404 error page"""
+        try:
+            return render_template('404.html'), 404
+        except:
+            return jsonify({'error': 'Not found', 'status_code': 404}), 404
     
     @app.errorhandler(500)
     def internal_error(error):
-        return jsonify({'error': 'Internal server error'}), 500
+        """Custom 500 error page"""
+        try:
+            import uuid
+            from datetime import datetime
+            error_id = str(uuid.uuid4())[:8]
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+            logger.error(f"Internal server error {error_id}: {error}")
+            return render_template('500.html', error_id=error_id, timestamp=timestamp), 500
+        except:
+            return jsonify({'error': 'Internal server error', 'status_code': 500}), 500
     
     logger.info("🚀 Biped Platform initialized successfully")
     return app
