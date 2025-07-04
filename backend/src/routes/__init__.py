@@ -8,6 +8,7 @@ from .unified_auth import auth_bp
 from .admin import admin_bp  
 from .dashboard import dashboard_bp
 from .health import health_bp
+from .jobs import jobs_bp
 
 # Create aliases for backward compatibility
 auth = auth_bp
@@ -18,6 +19,7 @@ __all__ = [
     'auth',  # alias
     'admin_bp',
     'dashboard_bp', 
-    'health_bp'
+    'health_bp',
+    'jobs_bp'
 ]
 
