@@ -41,7 +41,9 @@ class EmailService:
                     to_emails, subject, html_content, text_content, attachments
                 )
             elif self.provider == "smtp":
-                return self._send_smtp(to_emails, subject, html_content, text_content, attachments)
+                return self._send_smtp(
+                    to_emails, subject, html_content, text_content, attachments
+                )
             else:
                 logger.error(f"Unsupported email provider: {self.provider}")
                 return False
@@ -116,7 +118,8 @@ class EmailService:
                 part.set_payload(attachment["content"])
                 encoders.encode_base64(part)
                 part.add_header(
-                    "Content-Disposition", f'attachment; filename= {attachment["filename"]}'
+                    "Content-Disposition",
+                    f'attachment; filename= {attachment["filename"]}',
                 )
                 msg.attach(part)
 
@@ -243,7 +246,9 @@ class NotificationService:
         The Biped Team
         """
 
-        return self.email_service.send_email([user_email], subject, html_content, text_content)
+        return self.email_service.send_email(
+            [user_email], subject, html_content, text_content
+        )
 
     def send_job_notification(
         self, provider_email: str, provider_name: str, job_title: str, job_id: str

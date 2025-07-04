@@ -26,7 +26,11 @@ class InputValidator:
             return False, "Invalid data format - expected JSON object"
 
         for field in required_fields:
-            if field not in data or data[field] is None or str(data[field]).strip() == "":
+            if (
+                field not in data
+                or data[field] is None
+                or str(data[field]).strip() == ""
+            ):
                 return False, f"Field '{field}' is required"
         return True, None
 
@@ -100,7 +104,10 @@ class InputValidator:
             return False, f"{field_name} must be at least {min_length} characters long"
 
         if len(text) > max_length:
-            return False, f"{field_name} must be no more than {max_length} characters long"
+            return (
+                False,
+                f"{field_name} must be no more than {max_length} characters long",
+            )
 
         return True, None
 
@@ -137,7 +144,15 @@ class InputValidator:
             return str(text)
 
         # Remove potentially dangerous HTML tags
-        dangerous_tags = ["<script", "<iframe", "<object", "<embed", "<link", "<meta", "<style"]
+        dangerous_tags = [
+            "<script",
+            "<iframe",
+            "<object",
+            "<embed",
+            "<link",
+            "<meta",
+            "<style",
+        ]
         sanitized = text
 
         for tag in dangerous_tags:
@@ -216,7 +231,9 @@ def validate_password(password: str) -> Tuple[bool, Optional[str]]:
     return InputValidator.validate_password(password)
 
 
-def validate_required_fields(data: Dict[str, Any], required_fields: List[str]) -> Optional[str]:
+def validate_required_fields(
+    data: Dict[str, Any], required_fields: List[str]
+) -> Optional[str]:
     """Validate required fields - returns error message or None"""
     is_valid, error = InputValidator.validate_required_fields(data, required_fields)
     return error if not is_valid else None

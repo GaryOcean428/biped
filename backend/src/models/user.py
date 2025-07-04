@@ -20,7 +20,9 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Address information
     street_address = db.Column(db.String(200), nullable=True)
@@ -40,7 +42,10 @@ class User(db.Model):
         "ProviderProfile", backref="user", uselist=False, cascade="all, delete-orphan"
     )
     sent_messages = db.relationship(
-        "Message", foreign_keys="Message.sender_id", backref="sender", cascade="all, delete-orphan"
+        "Message",
+        foreign_keys="Message.sender_id",
+        backref="sender",
+        cascade="all, delete-orphan",
     )
     received_messages = db.relationship(
         "Message",
@@ -92,7 +97,9 @@ class CustomerProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     # Preferences
-    preferred_contact_method = db.Column(db.String(20), default="email")  # email, phone, app
+    preferred_contact_method = db.Column(
+        db.String(20), default="email"
+    )  # email, phone, app
     notification_preferences = db.Column(db.JSON, nullable=True)
 
     # History and stats
@@ -101,7 +108,9 @@ class CustomerProfile(db.Model):
     average_rating_given = db.Column(db.Float, default=0.0)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def to_dict(self):
         return {
@@ -154,10 +163,14 @@ class ProviderProfile(db.Model):
     auto_accept_jobs = db.Column(db.Boolean, default=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    services = db.relationship("ProviderService", backref="provider", cascade="all, delete-orphan")
+    services = db.relationship(
+        "ProviderService", backref="provider", cascade="all, delete-orphan"
+    )
     portfolio_items = db.relationship(
         "PortfolioItem", backref="provider", cascade="all, delete-orphan"
     )
@@ -191,7 +204,9 @@ class ProviderProfile(db.Model):
             "is_available": self.is_available,
             "availability_schedule": self.availability_schedule,
             "total_jobs_completed": self.total_jobs_completed,
-            "total_earnings": float(self.total_earnings) if self.total_earnings else 0.0,
+            "total_earnings": (
+                float(self.total_earnings) if self.total_earnings else 0.0
+            ),
             "average_rating": self.average_rating,
             "response_time_hours": self.response_time_hours,
             "completion_rate": self.completion_rate,

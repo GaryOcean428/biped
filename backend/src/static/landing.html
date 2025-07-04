@@ -532,6 +532,55 @@
             }
         });
     </script>
+    
+    <!-- Cookie Consent Script -->
+    <script src="/js/cookie-consent.js"></script>
+    
+    <!-- Footer with Legal Disclosures -->
+    <footer id="footer" class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">Biped Platform</h3>
+                    <p class="text-gray-300 mb-4">
+                        Australia's premier AI-powered trades marketplace connecting customers with verified trade professionals.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <p><strong>ABN:</strong> [To be updated]</p>
+                        <p><strong>Address:</strong> [Business Address - To be updated]</p>
+                        <p><strong>Phone:</strong> [Business Phone - To be updated]</p>
+                        <p><strong>Email:</strong> support@biped.app</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="/" class="hover:text-white transition duration-300">Home</a></li>
+                        <li><a href="/dashboard" class="hover:text-white transition duration-300">Dashboard</a></li>
+                        <li><a href="/auth/login" class="hover:text-white transition duration-300">Login</a></li>
+                        <li><a href="/auth/register" class="hover:text-white transition duration-300">Sign Up</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="/privacy" class="hover:text-white transition duration-300">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition duration-300">Terms of Service</a></li>
+                        <li><button onclick="window.cookieConsent?.revokeConsent()" class="hover:text-white transition duration-300 text-left">Cookie Settings</button></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Biped Platform. All rights reserved.</p>
+                <p class="mt-2 text-sm">
+                    This platform operates under Australian Consumer Law and relevant trade regulations.
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
 

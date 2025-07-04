@@ -39,11 +39,17 @@ class Review(db.Model):
     response_date = db.Column(db.DateTime, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
-    reviewer = db.relationship("User", foreign_keys=[reviewer_id], backref="reviews_given")
-    reviewee = db.relationship("User", foreign_keys=[reviewee_id], backref="reviews_received")
+    reviewer = db.relationship(
+        "User", foreign_keys=[reviewer_id], backref="reviews_given"
+    )
+    reviewee = db.relationship(
+        "User", foreign_keys=[reviewee_id], backref="reviews_received"
+    )
 
     def __repr__(self):
         return f"<Review {self.id} - {self.overall_rating} stars>"
@@ -81,7 +87,9 @@ class Review(db.Model):
             "is_public": self.is_public,
             "is_featured": self.is_featured,
             "response": self.response,
-            "response_date": self.response_date.isoformat() if self.response_date else None,
+            "response_date": (
+                self.response_date.isoformat() if self.response_date else None
+            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "reviewer_name": self.reviewer.get_full_name() if self.reviewer else None,
             "reviewee_name": self.reviewee.get_full_name() if self.reviewee else None,
@@ -107,14 +115,18 @@ class Message(db.Model):
     is_system_message = db.Column(db.Boolean, default=False)
 
     # Threading
-    thread_id = db.Column(db.String(100), nullable=True)  # For grouping related messages
+    thread_id = db.Column(
+        db.String(100), nullable=True
+    )  # For grouping related messages
     reply_to_id = db.Column(db.Integer, db.ForeignKey("message.id"), nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     read_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
-    replies = db.relationship("Message", backref=db.backref("reply_to", remote_side=[id]))
+    replies = db.relationship(
+        "Message", backref=db.backref("reply_to", remote_side=[id])
+    )
 
     def __repr__(self):
         return f"<Message {self.id}>"
@@ -141,7 +153,9 @@ class Message(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "read_at": self.read_at.isoformat() if self.read_at else None,
             "sender_name": self.sender.get_full_name() if self.sender else None,
-            "recipient_name": self.recipient.get_full_name() if self.recipient else None,
+            "recipient_name": (
+                self.recipient.get_full_name() if self.recipient else None
+            ),
         }
 
 

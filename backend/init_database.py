@@ -38,7 +38,14 @@ def init_database():
                     is_super_admin=True,
                     is_active=True
                 )
-                admin.set_password('biped_admin_2025')
+                # Use environment variable for admin password, generate secure random if not set
+                admin_password = os.environ.get('ADMIN_PASSWORD')
+                if not admin_password:
+                    import secrets
+                    admin_password = secrets.token_urlsafe(32)
+                    print("⚠️ ADMIN_PASSWORD not set. Generated random password. Set ADMIN_PASSWORD environment variable for production.")
+                
+                admin.set_password(admin_password)
                 db.session.add(admin)
                 print("✅ Default admin user created")
             else:

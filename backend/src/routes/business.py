@@ -165,7 +165,9 @@ def get_customers():
                 "total": len(customers),
                 "summary": {
                     "total_customers": len(customers),
-                    "active_customers": len([c for c in customers if c["status"] == "active"]),
+                    "active_customers": len(
+                        [c for c in customers if c["status"] == "active"]
+                    ),
                     "average_rating": 4.5,
                     "total_revenue": sum(c["total_spent"] for c in customers),
                 },
@@ -405,7 +407,11 @@ def get_provider_profile():
                     "issuer": "State Licensing Board",
                     "expires": "2026-12-31",
                 },
-                {"name": "OSHA Safety Certification", "issuer": "OSHA", "expires": "2025-08-15"},
+                {
+                    "name": "OSHA Safety Certification",
+                    "issuer": "OSHA",
+                    "expires": "2025-08-15",
+                },
             ],
             "portfolio": [
                 {
@@ -482,7 +488,10 @@ def add_service():
             "created_at": datetime.now().isoformat(),
         }
 
-        return jsonify({"message": "Service added successfully", "service": new_service}), 201
+        return (
+            jsonify({"message": "Service added successfully", "service": new_service}),
+            201,
+        )
 
     except Exception as e:
         logger.error(f"Error adding service: {str(e)}")

@@ -16,13 +16,19 @@ class ServiceCategory(db.Model):
     sort_order = db.Column(db.Integer, default=0)
 
     # Parent-child relationship for subcategories
-    parent_id = db.Column(db.Integer, db.ForeignKey("service_category.id"), nullable=True)
-    children = db.relationship("ServiceCategory", backref=db.backref("parent", remote_side=[id]))
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey("service_category.id"), nullable=True
+    )
+    children = db.relationship(
+        "ServiceCategory", backref=db.backref("parent", remote_side=[id])
+    )
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
-    services = db.relationship("Service", backref="category", cascade="all, delete-orphan")
+    services = db.relationship(
+        "Service", backref="category", cascade="all, delete-orphan"
+    )
     provider_services = db.relationship(
         "ProviderService", backref="category", cascade="all, delete-orphan"
     )
@@ -40,7 +46,9 @@ class ServiceCategory(db.Model):
             "is_active": self.is_active,
             "sort_order": self.sort_order,
             "parent_id": self.parent_id,
-            "children": [child.to_dict() for child in self.children] if self.children else [],
+            "children": (
+                [child.to_dict() for child in self.children] if self.children else []
+            ),
         }
 
 
@@ -48,7 +56,9 @@ class Service(db.Model):
     """Specific services within categories"""
 
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey("service_category.id"), nullable=False)
+    category_id = db.Column(
+        db.Integer, db.ForeignKey("service_category.id"), nullable=False
+    )
     name = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -85,8 +95,12 @@ class Service(db.Model):
             "name": self.name,
             "slug": self.slug,
             "description": self.description,
-            "typical_price_min": float(self.typical_price_min) if self.typical_price_min else None,
-            "typical_price_max": float(self.typical_price_max) if self.typical_price_max else None,
+            "typical_price_min": (
+                float(self.typical_price_min) if self.typical_price_min else None
+            ),
+            "typical_price_max": (
+                float(self.typical_price_max) if self.typical_price_max else None
+            ),
             "price_unit": self.price_unit,
             "typical_duration_hours": self.typical_duration_hours,
             "complexity_level": self.complexity_level,
@@ -99,8 +113,12 @@ class ProviderService(db.Model):
     """Services offered by specific providers"""
 
     id = db.Column(db.Integer, primary_key=True)
-    provider_id = db.Column(db.Integer, db.ForeignKey("provider_profile.id"), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey("service_category.id"), nullable=False)
+    provider_id = db.Column(
+        db.Integer, db.ForeignKey("provider_profile.id"), nullable=False
+    )
+    category_id = db.Column(
+        db.Integer, db.ForeignKey("service_category.id"), nullable=False
+    )
     service_id = db.Column(db.Integer, db.ForeignKey("service.id"), nullable=False)
 
     # Provider-specific pricing
@@ -121,7 +139,9 @@ class ProviderService(db.Model):
     average_rating = db.Column(db.Float, default=0.0)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def __repr__(self):
         return f"<ProviderService {self.provider_id}-{self.service_id}>"
@@ -136,7 +156,9 @@ class ProviderService(db.Model):
             "service_name": self.service.name if self.service else None,
             "hourly_rate": float(self.hourly_rate) if self.hourly_rate else None,
             "fixed_price": float(self.fixed_price) if self.fixed_price else None,
-            "minimum_charge": float(self.minimum_charge) if self.minimum_charge else None,
+            "minimum_charge": (
+                float(self.minimum_charge) if self.minimum_charge else None
+            ),
             "description": self.description,
             "experience_years": self.experience_years,
             "is_available": self.is_available,
@@ -150,7 +172,9 @@ class PortfolioItem(db.Model):
     """Portfolio items for service providers"""
 
     id = db.Column(db.Integer, primary_key=True)
-    provider_id = db.Column(db.Integer, db.ForeignKey("provider_profile.id"), nullable=False)
+    provider_id = db.Column(
+        db.Integer, db.ForeignKey("provider_profile.id"), nullable=False
+    )
     service_id = db.Column(db.Integer, db.ForeignKey("service.id"), nullable=True)
 
     title = db.Column(db.String(200), nullable=False)
@@ -172,7 +196,9 @@ class PortfolioItem(db.Model):
     sort_order = db.Column(db.Integer, default=0)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     def __repr__(self):
         return f"<PortfolioItem {self.title}>"
@@ -190,7 +216,9 @@ class PortfolioItem(db.Model):
             "additional_images": self.additional_images,
             "project_cost": float(self.project_cost) if self.project_cost else None,
             "project_duration_days": self.project_duration_days,
-            "completion_date": self.completion_date.isoformat() if self.completion_date else None,
+            "completion_date": (
+                self.completion_date.isoformat() if self.completion_date else None
+            ),
             "is_featured": self.is_featured,
             "is_public": self.is_public,
             "sort_order": self.sort_order,

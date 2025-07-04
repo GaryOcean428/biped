@@ -86,11 +86,15 @@ def analyze_image():
             "progress_indicators": analysis.progress_indicators,
             "safety_compliance": {
                 "compliant": analysis.safety_compliance.get("overall_compliant", False),
-                "score": round(analysis.safety_compliance.get("compliance_score", 0) * 100, 1),
+                "score": round(
+                    analysis.safety_compliance.get("compliance_score", 0) * 100, 1
+                ),
                 "issues": analysis.safety_compliance.get("issues", []),
             },
             "professional_assessment": {
-                "score": round(analysis.professional_assessment.get("score", 0) * 100, 1),
+                "score": round(
+                    analysis.professional_assessment.get("score", 0) * 100, 1
+                ),
                 "grade": analysis.professional_assessment.get("grade", "Unknown"),
                 "notes": analysis.professional_assessment.get("notes", []),
             },
@@ -122,7 +126,9 @@ def compare_progress():
         if before_file.filename == "" or after_file.filename == "":
             return jsonify({"error": "No files selected"}), 400
 
-        if not (allowed_file(before_file.filename) and allowed_file(after_file.filename)):
+        if not (
+            allowed_file(before_file.filename) and allowed_file(after_file.filename)
+        ):
             return jsonify({"error": "Invalid file types"}), 400
 
         # Read image data
@@ -187,7 +193,9 @@ def batch_analyze():
                     "quality_score": round(analysis.quality_score * 100, 1),
                     "quality_grade": _get_quality_grade(analysis.quality_score),
                     "defects_count": len(analysis.defects_detected),
-                    "safety_compliant": analysis.safety_compliance.get("overall_compliant", False),
+                    "safety_compliant": analysis.safety_compliance.get(
+                        "overall_compliant", False
+                    ),
                     "recommendations_count": len(analysis.recommendations),
                     "confidence": round(analysis.confidence * 100, 1),
                 }
@@ -197,7 +205,10 @@ def batch_analyze():
             except Exception as e:
                 logger.error(f"Error analyzing {file.filename}: {str(e)}")
                 results.append(
-                    {"filename": secure_filename(file.filename), "error": "Failed to analyze image"}
+                    {
+                        "filename": secure_filename(file.filename),
+                        "error": "Failed to analyze image",
+                    }
                 )
 
         # Calculate batch summary
@@ -208,7 +219,9 @@ def batch_analyze():
                 successful_analyses
             )
             total_defects = sum(r["defects_count"] for r in successful_analyses)
-            compliant_count = sum(1 for r in successful_analyses if r["safety_compliant"])
+            compliant_count = sum(
+                1 for r in successful_analyses if r["safety_compliant"]
+            )
         else:
             avg_quality = 0
             total_defects = 0
@@ -336,11 +349,15 @@ def safety_inspection():
             "image_id": analysis.image_id,
             "overall_compliant": safety_data.get("overall_compliant", False),
             "compliance_score": round(safety_data.get("compliance_score", 0) * 100, 1),
-            "compliance_grade": _get_compliance_grade(safety_data.get("compliance_score", 0)),
+            "compliance_grade": _get_compliance_grade(
+                safety_data.get("compliance_score", 0)
+            ),
             "individual_items": safety_data.get("individual_items", {}),
             "safety_issues": safety_data.get("issues", []),
             "critical_violations": [
-                issue for issue in safety_data.get("issues", []) if issue.get("severity") == "high"
+                issue
+                for issue in safety_data.get("issues", [])
+                if issue.get("severity") == "high"
             ],
             "recommendations": analysis.recommendations,
             "inspection_timestamp": datetime.now().isoformat(),
@@ -421,7 +438,10 @@ def _assess_defect_risk(defects_by_severity):
             "description": f"{major_count} major defects should be addressed soon",
         }
     elif major_count > 0 or minor_count > 5:
-        return {"level": "low", "description": "Some defects present but not immediately critical"}
+        return {
+            "level": "low",
+            "description": "Some defects present but not immediately critical",
+        }
     else:
         return {"level": "minimal", "description": "No significant defects detected"}
 

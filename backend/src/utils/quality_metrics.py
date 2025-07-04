@@ -42,7 +42,9 @@ class QualityMetrics:
             "security_headers": 4 if features["security_headers"] else 0,
             "jwt_security": 3 if features["jwt_security"] else 0,
             "rate_limiting": 3 if features["rate_limiting"] else 0,
-            "sql_injection_prevention": 2 if features["sql_injection_prevention"] else 0,
+            "sql_injection_prevention": (
+                2 if features["sql_injection_prevention"] else 0
+            ),
         }
 
         total_score = sum(scores.values())
@@ -75,7 +77,9 @@ class QualityMetrics:
             "response_compression": 6 if features["response_compression"] else 0,
             "caching_system": 5 if features["caching_system"] else 0,
             "database_optimization": 5 if features["database_optimization"] else 0,
-            "static_asset_optimization": 4 if features["static_asset_optimization"] else 0,
+            "static_asset_optimization": (
+                4 if features["static_asset_optimization"] else 0
+            ),
             "performance_monitoring": 3 if features["performance_monitoring"] else 0,
             "memory_optimization": 2 if features["memory_optimization"] else 0,
         }
@@ -269,7 +273,9 @@ class QualityMetrics:
 
         # Calculate summary statistics
         category_grades = [scores[cat]["grade"] for cat in scores]
-        total_features_implemented = sum(scores[cat]["implemented_features"] for cat in scores)
+        total_features_implemented = sum(
+            scores[cat]["implemented_features"] for cat in scores
+        )
         total_features_possible = sum(scores[cat]["total_features"] for cat in scores)
 
         return {
@@ -285,8 +291,12 @@ class QualityMetrics:
                     (total_features_implemented / total_features_possible) * 100, 1
                 ),
                 "category_grades": category_grades,
-                "excellent_categories": len([g for g in category_grades if g.startswith("A")]),
-                "good_categories": len([g for g in category_grades if g.startswith("B")]),
+                "excellent_categories": len(
+                    [g for g in category_grades if g.startswith("A")]
+                ),
+                "good_categories": len(
+                    [g for g in category_grades if g.startswith("B")]
+                ),
                 "needs_improvement": len(
                     [g for g in category_grades if g.startswith("C") or g in ["D", "F"]]
                 ),

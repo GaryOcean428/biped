@@ -72,7 +72,8 @@ def create_payment_intent():
             provider_amount=provider_amount,
             status="pending",
             description=f"Payment for job: {job.title}",
-            auto_release_date=datetime.utcnow() + timedelta(days=7),  # Auto-release after 7 days
+            auto_release_date=datetime.utcnow()
+            + timedelta(days=7),  # Auto-release after 7 days
         )
 
         db.session.add(payment)
@@ -105,7 +106,9 @@ def confirm_payment():
             return jsonify({"error": "Payment intent ID is required"}), 400
 
         # Get payment record
-        payment = Payment.query.filter_by(stripe_payment_intent_id=payment_intent_id).first()
+        payment = Payment.query.filter_by(
+            stripe_payment_intent_id=payment_intent_id
+        ).first()
         if not payment:
             return jsonify({"error": "Payment not found"}), 404
 
@@ -115,18 +118,28 @@ def confirm_payment():
         if intent.status == "succeeded":
             payment.status = "paid"
             payment.paid_at = datetime.utcnow()
-            payment.stripe_charge_id = intent.charges.data[0].id if intent.charges.data else None
+            payment.stripe_charge_id = (
+                intent.charges.data[0].id if intent.charges.data else None
+            )
             payment.payment_method = (
-                intent.charges.data[0].payment_method_details.type if intent.charges.data else None
+                intent.charges.data[0].payment_method_details.type
+                if intent.charges.data
+                else None
             )
 
             db.session.commit()
 
             return jsonify(
-                {"message": "Payment confirmed successfully", "payment": payment.to_dict()}
+                {
+                    "message": "Payment confirmed successfully",
+                    "payment": payment.to_dict(),
+                }
             )
         else:
-            return jsonify({"error": f"Payment not successful. Status: {intent.status}"}), 400
+            return (
+                jsonify({"error": f"Payment not successful. Status: {intent.status}"}),
+                400,
+            )
 
     except stripe.error.StripeError as e:
         return jsonify({"error": f"Stripe error: {str(e)}"}), 400
@@ -162,9 +175,14 @@ def release_escrow():
             return jsonify({"error": "Escrow already released"}), 400
 
         # Get provider's Stripe account
-        provider_stripe_account = StripeAccount.query.filter_by(user_id=payment.provider_id).first()
+        provider_stripe_account = StripeAccount.query.filter_by(
+            user_id=payment.provider_id
+        ).first()
         if not provider_stripe_account or not provider_stripe_account.payouts_enabled:
-            return jsonify({"error": "Provider Stripe account not ready for payouts"}), 400
+            return (
+                jsonify({"error": "Provider Stripe account not ready for payouts"}),
+                400,
+            )
 
         # Create transfer to provider
         transfer = stripe.Transfer.create(
@@ -199,7 +217,10 @@ def release_escrow():
         db.session.commit()
 
         return jsonify(
-            {"message": "Escrow released successfully", "transfer": transfer_record.to_dict()}
+            {
+                "message": "Escrow released successfully",
+                "transfer": transfer_record.to_dict(),
+            }
         )
 
     except stripe.error.StripeError as e:
@@ -293,7 +314,9 @@ def get_account_status(user_id):
         stripe_account.payouts_enabled = account.payouts_enabled
         stripe_account.details_submitted = account.details_submitted
         stripe_account.requirements_due = (
-            json.dumps(account.requirements.currently_due) if account.requirements else None
+            json.dumps(account.requirements.currently_due)
+            if account.requirements
+            else None
         )
         stripe_account.updated_at = datetime.utcnow()
 
@@ -306,10 +329,14 @@ def get_account_status(user_id):
                     "payouts_enabled": account.payouts_enabled,
                     "details_submitted": account.details_submitted,
                     "requirements_due": (
-                        account.requirements.currently_due if account.requirements else []
+                        account.requirements.currently_due
+                        if account.requirements
+                        else []
                     ),
                     "disabled_reason": (
-                        account.requirements.disabled_reason if account.requirements else None
+                        account.requirements.disabled_reason
+                        if account.requirements
+                        else None
                     ),
                 },
                 "stripe_account": stripe_account.to_dict(),
@@ -359,7 +386,9 @@ def stripe_webhook():
         if event["type"] == "payment_intent.succeeded":
             payment_intent = event["data"]["object"]
             # Update payment status
-            payment = Payment.query.filter_by(stripe_payment_intent_id=payment_intent["id"]).first()
+            payment = Payment.query.filter_by(
+                stripe_payment_intent_id=payment_intent["id"]
+            ).first()
             if payment:
                 payment.status = "paid"
                 payment.paid_at = datetime.utcnow()
@@ -368,7 +397,9 @@ def stripe_webhook():
         elif event["type"] == "transfer.paid":
             transfer = event["data"]["object"]
             # Update transfer status
-            transfer_record = Transfer.query.filter_by(stripe_transfer_id=transfer["id"]).first()
+            transfer_record = Transfer.query.filter_by(
+                stripe_transfer_id=transfer["id"]
+            ).first()
             if transfer_record:
                 transfer_record.status = "paid"
                 transfer_record.transferred_at = datetime.utcnow()
@@ -377,7 +408,9 @@ def stripe_webhook():
         elif event["type"] == "charge.dispute.created":
             dispute = event["data"]["object"]
             # Create dispute record
-            payment = Payment.query.filter_by(stripe_charge_id=dispute["charge"]).first()
+            payment = Payment.query.filter_by(
+                stripe_charge_id=dispute["charge"]
+            ).first()
             if payment:
                 dispute_record = Dispute(
                     payment_id=payment.id,

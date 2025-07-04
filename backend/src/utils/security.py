@@ -114,7 +114,11 @@ class SecurityEnhancer:
                 "https://fonts.googleapis.com",
             ],
             "img-src": ["'self'", "data:", "https:", "blob:"],
-            "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+            "font-src": [
+                "'self'",
+                "https://fonts.gstatic.com",
+                "https://cdnjs.cloudflare.com",
+            ],
             "connect-src": ["'self'", "wss:", "ws:"],
             "frame-ancestors": "'none'",
             "base-uri": "'self'",
@@ -123,13 +127,19 @@ class SecurityEnhancer:
 
         Talisman(
             self.app,
-            force_https=self.app.config.get("FORCE_HTTPS", False),  # Disable for development
+            force_https=self.app.config.get(
+                "FORCE_HTTPS", False
+            ),  # Disable for development
             strict_transport_security=False,  # Disable for development
             strict_transport_security_max_age=31536000,
             content_security_policy=csp,
             content_security_policy_nonce_in=[],  # Disable nonce to allow unsafe-inline
             referrer_policy="strict-origin-when-cross-origin",
-            feature_policy={"geolocation": "'none'", "microphone": "'none'", "camera": "'none'"},
+            feature_policy={
+                "geolocation": "'none'",
+                "microphone": "'none'",
+                "camera": "'none'",
+            },
         )
 
     def _setup_csrf_protection(self):
@@ -139,15 +149,21 @@ class SecurityEnhancer:
         # Exempt API endpoints that use JWT
         @self.csrf.exempt
         def csrf_exempt_api():
-            return request.path.startswith("/api/") and "Authorization" in request.headers
+            return (
+                request.path.startswith("/api/") and "Authorization" in request.headers
+            )
 
     def _setup_jwt(self):
         """Configure JWT with blacklisting"""
         self.jwt = JWTManager(self.app)
 
         # Configure JWT settings
-        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = self.config.jwt_access_token_expires
-        self.app.config["JWT_REFRESH_TOKEN_EXPIRES"] = self.config.jwt_refresh_token_expires
+        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = (
+            self.config.jwt_access_token_expires
+        )
+        self.app.config["JWT_REFRESH_TOKEN_EXPIRES"] = (
+            self.config.jwt_refresh_token_expires
+        )
         self.app.config["JWT_BLACKLIST_ENABLED"] = True
         self.app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
 
@@ -276,7 +292,9 @@ class SecurityEnhancer:
         secret = pyotp.random_base32()
 
         # Store secret temporarily until confirmed
-        self.redis_client.set_cache(f"2fa_setup:{user_id}", secret, ttl=600)  # 10 minutes
+        self.redis_client.set_cache(
+            f"2fa_setup:{user_id}", secret, ttl=600
+        )  # 10 minutes
 
         # Generate QR code
         totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(
@@ -373,7 +391,9 @@ class SecurityEnhancer:
         errors = []
 
         if len(password) < self.config.password_min_length:
-            errors.append(f"Password must be at least {self.config.password_min_length} characters")
+            errors.append(
+                f"Password must be at least {self.config.password_min_length} characters"
+            )
 
         if self.config.password_require_uppercase and not re.search(r"[A-Z]", password):
             errors.append("Password must contain at least one uppercase letter")
@@ -409,7 +429,9 @@ class SecurityEnhancer:
         return password.lower() in common_passwords
 
     # API Key Management
-    def generate_api_key(self, user_id: str, name: str, permissions: List[str] = None) -> dict:
+    def generate_api_key(
+        self, user_id: str, name: str, permissions: List[str] = None
+    ) -> dict:
         """Generate API key for user"""
         api_key = f"bpd_{secrets.token_urlsafe(32)}"
         key_hash = hashlib.sha256(api_key.encode()).hexdigest()
@@ -456,7 +478,9 @@ class SecurityEnhancer:
 
         # Store in Redis for real-time monitoring
         self.redis_client.redis_client.lpush("security_events", str(event))
-        self.redis_client.redis_client.ltrim("security_events", 0, 1000)  # Keep last 1000 events
+        self.redis_client.redis_client.ltrim(
+            "security_events", 0, 1000
+        )  # Keep last 1000 events
 
     # Helper methods (implement based on your user model)
     def _get_user_by_email(self, email: str) -> Optional[dict]:

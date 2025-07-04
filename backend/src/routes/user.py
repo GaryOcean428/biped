@@ -254,7 +254,9 @@ def get_dashboard():
                 dashboard_data = {
                     "total_jobs_completed": provider.total_jobs_completed,
                     "total_earnings": (
-                        float(provider.total_earnings) if provider.total_earnings else 0.0
+                        float(provider.total_earnings)
+                        if provider.total_earnings
+                        else 0.0
                     ),
                     "average_rating": provider.average_rating,
                     "active_jobs": Job.query.filter_by(assigned_provider_id=user_id)
@@ -264,7 +266,9 @@ def get_dashboard():
                         Job.status == JobStatus.POSTED,
                         Job.postcode == user.postcode,  # Simple location filter
                     ).count(),
-                    "pending_quotes": Job.query.filter_by(status=JobStatus.MATCHED).count(),
+                    "pending_quotes": Job.query.filter_by(
+                        status=JobStatus.MATCHED
+                    ).count(),
                     "unread_messages": Message.query.filter_by(
                         recipient_id=user_id, is_read=False
                     ).count(),
@@ -313,13 +317,19 @@ def search_users():
                 )
             else:
                 users_query = users_query.filter(
-                    db.or_(User.first_name.ilike(f"%{query}%"), User.last_name.ilike(f"%{query}%"))
+                    db.or_(
+                        User.first_name.ilike(f"%{query}%"),
+                        User.last_name.ilike(f"%{query}%"),
+                    )
                 )
 
         # Filter by location
         if location:
             users_query = users_query.filter(
-                db.or_(User.city.ilike(f"%{location}%"), User.postcode.ilike(f"%{location}%"))
+                db.or_(
+                    User.city.ilike(f"%{location}%"),
+                    User.postcode.ilike(f"%{location}%"),
+                )
             )
 
         # Paginate

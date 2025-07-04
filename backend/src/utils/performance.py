@@ -159,7 +159,9 @@ class DatabaseOptimizer:
                 query_time = (time.time() - start_time) * 1000
 
                 if query_time > threshold_ms:
-                    current_app.logger.warning(f"Slow query in {f.__name__}: {query_time:.2f}ms")
+                    current_app.logger.warning(
+                        f"Slow query in {f.__name__}: {query_time:.2f}ms"
+                    )
 
                 return result
 
@@ -207,7 +209,9 @@ class PerformanceMonitor:
         return {
             "request_count": self.metrics["request_count"],
             "error_count": self.metrics["error_count"],
-            "error_rate": (self.metrics["error_count"] / max(1, self.metrics["request_count"]))
+            "error_rate": (
+                self.metrics["error_count"] / max(1, self.metrics["request_count"])
+            )
             * 100,
             "average_response_time": (
                 sum(response_times) / len(response_times) if response_times else 0

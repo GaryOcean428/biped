@@ -7,7 +7,17 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 from src.models.user import db
 
@@ -91,13 +101,16 @@ class Invoice(db.Model):
         from datetime import datetime
 
         timestamp = datetime.now().strftime("%Y%m%d")
-        count = Invoice.query.filter(Invoice.invoice_number.like(f"INV-{timestamp}%")).count()
+        count = Invoice.query.filter(
+            Invoice.invoice_number.like(f"INV-{timestamp}%")
+        ).count()
         return f"INV-{timestamp}-{count + 1:04d}"
 
     def calculate_totals(self):
         """Calculate invoice totals from line items"""
         self.subtotal = sum(
-            Decimal(str(item["quantity"])) * Decimal(str(item["rate"])) for item in self.line_items
+            Decimal(str(item["quantity"])) * Decimal(str(item["rate"]))
+            for item in self.line_items
         )
         self.tax_amount = self.subtotal * (self.tax_rate / 100)
         self.total_amount = self.subtotal + self.tax_amount
@@ -111,7 +124,10 @@ class Invoice(db.Model):
 
     def is_overdue(self):
         """Check if invoice is overdue"""
-        return self.status != InvoiceStatus.PAID.value and self.due_date < datetime.utcnow()
+        return (
+            self.status != InvoiceStatus.PAID.value
+            and self.due_date < datetime.utcnow()
+        )
 
     def to_dict(self):
         """Convert to dictionary for API responses"""
@@ -126,7 +142,9 @@ class Invoice(db.Model):
             "subtotal": float(self.subtotal),
             "tax_amount": float(self.tax_amount),
             "total_amount": float(self.total_amount),
-            "payment_date": self.payment_date.isoformat() if self.payment_date else None,
+            "payment_date": (
+                self.payment_date.isoformat() if self.payment_date else None
+            ),
             "line_items": self.line_items,
             "is_overdue": self.is_overdue(),
         }
@@ -151,7 +169,9 @@ class FinancialQuote(db.Model):
     # Quote Details
     issue_date = Column(DateTime, default=datetime.utcnow)
     valid_until = Column(DateTime, nullable=False)
-    status = Column(String(20), default="draft")  # draft, sent, accepted, rejected, expired
+    status = Column(
+        String(20), default="draft"
+    )  # draft, sent, accepted, rejected, expired
 
     # Project Information
     project_title = Column(String(200), nullable=False)
@@ -201,7 +221,8 @@ class FinancialQuote(db.Model):
     def calculate_totals(self):
         """Calculate quote totals from items"""
         self.subtotal = sum(
-            Decimal(str(item["quantity"])) * Decimal(str(item["rate"])) for item in self.quote_items
+            Decimal(str(item["quantity"])) * Decimal(str(item["rate"]))
+            for item in self.quote_items
         )
         self.tax_amount = self.subtotal * (self.tax_rate / 100)
         self.total_amount = self.subtotal + self.tax_amount
@@ -230,7 +251,9 @@ class FinancialQuote(db.Model):
             "total_amount": float(self.total_amount),
             "quote_items": self.quote_items,
             "is_expired": self.is_expired(),
-            "confidence_score": float(self.confidence_score) if self.confidence_score else None,
+            "confidence_score": (
+                float(self.confidence_score) if self.confidence_score else None
+            ),
         }
 
 
@@ -304,7 +327,9 @@ class PlatformRevenue(db.Model):
     id = Column(Integer, primary_key=True)
 
     # Transaction Details
-    transaction_type = Column(String(50), nullable=False)  # commission, subscription, service_fee
+    transaction_type = Column(
+        String(50), nullable=False
+    )  # commission, subscription, service_fee
     source_type = Column(String(50), nullable=False)  # job, subscription, marketplace
     source_id = Column(Integer, nullable=False)  # ID of the source record
 
@@ -341,7 +366,9 @@ class PlatformRevenue(db.Model):
         if end_date:
             query = query.filter(cls.payment_date <= end_date)
 
-        return query.with_entities(db.func.sum(cls.commission_amount)).scalar() or Decimal("0")
+        return query.with_entities(
+            db.func.sum(cls.commission_amount)
+        ).scalar() or Decimal("0")
 
     @classmethod
     def get_revenue_breakdown(cls, start_date=None, end_date=None):
@@ -378,7 +405,9 @@ class PlatformRevenue(db.Model):
             "commission_rate": float(self.commission_rate),
             "commission_amount": float(self.commission_amount),
             "payment_status": self.payment_status,
-            "payment_date": self.payment_date.isoformat() if self.payment_date else None,
+            "payment_date": (
+                self.payment_date.isoformat() if self.payment_date else None
+            ),
             "created_at": self.created_at.isoformat(),
         }
 
@@ -392,7 +421,9 @@ class FinancialReport(db.Model):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     # Report Details
-    report_type = Column(String(50), nullable=False)  # monthly, quarterly, annual, custom
+    report_type = Column(
+        String(50), nullable=False
+    )  # monthly, quarterly, annual, custom
     report_period_start = Column(DateTime, nullable=False)
     report_period_end = Column(DateTime, nullable=False)
 

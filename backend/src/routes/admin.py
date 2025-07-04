@@ -93,14 +93,19 @@ def admin_login():
             return jsonify({"error": "Username and password required"}), 400
 
         # Find admin by username or email
-        admin = Admin.query.filter((Admin.username == username) | (Admin.email == username)).first()
+        admin = Admin.query.filter(
+            (Admin.username == username) | (Admin.email == username)
+        ).first()
 
         if not admin:
             return jsonify({"error": "Invalid credentials"}), 401
 
         # Check if account is locked
         if admin.is_locked():
-            return jsonify({"error": "Account is locked due to too many failed attempts"}), 403
+            return (
+                jsonify({"error": "Account is locked due to too many failed attempts"}),
+                403,
+            )
 
         # Check if account is active
         if not admin.is_active:
@@ -125,7 +130,13 @@ def admin_login():
         log_admin_action("admin_login")
 
         return (
-            jsonify({"message": "Login successful", "admin": admin.to_dict(), "token": token}),
+            jsonify(
+                {
+                    "message": "Login successful",
+                    "admin": admin.to_dict(),
+                    "token": token,
+                }
+            ),
             200,
         )
 
@@ -253,7 +264,13 @@ def update_user(user_id):
         data = request.get_json()
 
         # Update allowed fields
-        allowed_fields = ["first_name", "last_name", "phone", "is_verified", "is_active"]
+        allowed_fields = [
+            "first_name",
+            "last_name",
+            "phone",
+            "is_verified",
+            "is_active",
+        ]
         for field in allowed_fields:
             if field in data:
                 setattr(user, field, data[field])
@@ -264,7 +281,10 @@ def update_user(user_id):
         # Log action
         log_admin_action("user_updated", "user", user_id, data)
 
-        return jsonify({"message": "User updated successfully", "user": user.to_dict()}), 200
+        return (
+            jsonify({"message": "User updated successfully", "user": user.to_dict()}),
+            200,
+        )
 
     except Exception as e:
         logger.error(f"Update user error: {e}")
@@ -346,7 +366,12 @@ def create_service():
         log_admin_action("service_created", "service", service.id, data)
 
         return (
-            jsonify({"message": "Service created successfully", "service": service.to_dict()}),
+            jsonify(
+                {
+                    "message": "Service created successfully",
+                    "service": service.to_dict(),
+                }
+            ),
             201,
         )
 
@@ -493,7 +518,12 @@ def create_admin():
             {"username": admin.username, "email": admin.email, "role": admin.role},
         )
 
-        return jsonify({"message": "Admin created successfully", "admin": admin.to_dict()}), 201
+        return (
+            jsonify(
+                {"message": "Admin created successfully", "admin": admin.to_dict()}
+            ),
+            201,
+        )
 
     except Exception as e:
         logger.error(f"Create admin error: {e}")

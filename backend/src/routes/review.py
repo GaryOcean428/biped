@@ -39,16 +39,25 @@ def create_review():
 
         # Check if user is involved in this job
         if job.customer_id != user_id and job.assigned_provider_id != user_id:
-            return jsonify({"error": "You can only review jobs you were involved in"}), 403
+            return (
+                jsonify({"error": "You can only review jobs you were involved in"}),
+                403,
+            )
 
         # Check if reviewee is the other party
         if data["reviewee_id"] == user_id:
             return jsonify({"error": "Cannot review yourself"}), 400
 
-        if job.customer_id == user_id and data["reviewee_id"] != job.assigned_provider_id:
+        if (
+            job.customer_id == user_id
+            and data["reviewee_id"] != job.assigned_provider_id
+        ):
             return jsonify({"error": "Invalid reviewee"}), 400
 
-        if job.assigned_provider_id == user_id and data["reviewee_id"] != job.customer_id:
+        if (
+            job.assigned_provider_id == user_id
+            and data["reviewee_id"] != job.customer_id
+        ):
             return jsonify({"error": "Invalid reviewee"}), 400
 
         # Check if review already exists
@@ -84,13 +93,21 @@ def create_review():
             # Calculate new average rating
             all_reviews = Review.query.filter_by(reviewee_id=data["reviewee_id"]).all()
             if all_reviews:
-                total_rating = sum([r.overall_rating for r in all_reviews]) + data["overall_rating"]
+                total_rating = (
+                    sum([r.overall_rating for r in all_reviews])
+                    + data["overall_rating"]
+                )
                 count = len(all_reviews) + 1
                 reviewee.provider_profile.average_rating = total_rating / count
 
         db.session.commit()
 
-        return jsonify({"message": "Review created successfully", "review": review.to_dict()}), 201
+        return (
+            jsonify(
+                {"message": "Review created successfully", "review": review.to_dict()}
+            ),
+            201,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -126,9 +143,9 @@ def get_user_reviews(user_id):
         }
 
         if all_reviews:
-            stats["average_rating"] = sum([r.overall_rating for r in all_reviews]) / len(
-                all_reviews
-            )
+            stats["average_rating"] = sum(
+                [r.overall_rating for r in all_reviews]
+            ) / len(all_reviews)
             for review in all_reviews:
                 stats["rating_distribution"][review.overall_rating] += 1
 
@@ -187,7 +204,10 @@ def respond_to_review(review_id):
             return jsonify({"error": "Review not found"}), 404
 
         if review.reviewee_id != user_id:
-            return jsonify({"error": "Only the reviewee can respond to this review"}), 403
+            return (
+                jsonify({"error": "Only the reviewee can respond to this review"}),
+                403,
+            )
 
         if review.response:
             return jsonify({"error": "Response already exists"}), 409
@@ -202,7 +222,12 @@ def respond_to_review(review_id):
 
         db.session.commit()
 
-        return jsonify({"message": "Response added successfully", "review": review.to_dict()}), 200
+        return (
+            jsonify(
+                {"message": "Response added successfully", "review": review.to_dict()}
+            ),
+            200,
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -268,7 +293,9 @@ def get_pending_reviews():
         for job in completed_jobs:
             # Determine who to review
             reviewee_id = (
-                job.assigned_provider_id if job.customer_id == user_id else job.customer_id
+                job.assigned_provider_id
+                if job.customer_id == user_id
+                else job.customer_id
             )
 
             if reviewee_id:

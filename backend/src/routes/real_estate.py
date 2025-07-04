@@ -27,7 +27,9 @@ def get_properties():
         # This would integrate with property management systems
         properties = get_agent_properties(current_user.id)
 
-        return jsonify({"success": True, "properties": properties, "total_count": len(properties)})
+        return jsonify(
+            {"success": True, "properties": properties, "total_count": len(properties)}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -94,7 +96,9 @@ def create_pre_sale_assessment(property_id):
         improvements = generate_improvement_recommendations(assessment)
 
         # Calculate ROI for improvements
-        roi_analysis = calculate_improvement_roi(improvements, data.get("target_sale_price"))
+        roi_analysis = calculate_improvement_roi(
+            improvements, data.get("target_sale_price")
+        )
 
         return jsonify(
             {
@@ -124,7 +128,9 @@ def create_staging_package(property_id):
             "target_market": data["target_market"],
             "budget": data.get("budget", 5000),
             "timeline": data.get("timeline", "2 weeks"),
-            "rooms_to_stage": data.get("rooms_to_stage", ["living", "kitchen", "master_bedroom"]),
+            "rooms_to_stage": data.get(
+                "rooms_to_stage", ["living", "kitchen", "master_bedroom"]
+            ),
         }
 
         # Find staging professionals
@@ -139,7 +145,9 @@ def create_staging_package(property_id):
                 "staging_package": staging_package,
                 "providers": staging_providers,
                 "quote": staging_quote,
-                "expected_value_increase": calculate_staging_value_increase(staging_package),
+                "expected_value_increase": calculate_staging_value_increase(
+                    staging_package
+                ),
             }
         )
 
@@ -269,7 +277,9 @@ def get_commission_tracking():
         start_date = request.args.get("start_date")
         end_date = request.args.get("end_date")
 
-        commission_data = calculate_service_commissions(current_user.id, start_date, end_date)
+        commission_data = calculate_service_commissions(
+            current_user.id, start_date, end_date
+        )
 
         return jsonify({"success": True, "commission_data": commission_data})
 
@@ -523,7 +533,11 @@ def generate_staging_quote(package, providers):
 
 def calculate_staging_value_increase(package):
     """Calculate expected value increase from staging"""
-    return {"estimated_increase": 25000, "roi_percentage": 312, "faster_sale_probability": 85}
+    return {
+        "estimated_increase": 25000,
+        "roi_percentage": 312,
+        "faster_sale_probability": 85,
+    }
 
 
 def get_agent_vendor_network(agent_id):
@@ -573,7 +587,11 @@ def calculate_maintenance_plan_cost(plan):
     num_properties = len(plan["properties"])
     frequency_multiplier = {"monthly": 12, "quarterly": 4, "biannual": 2, "annual": 1}
 
-    return base_cost_per_property * num_properties * frequency_multiplier.get(plan["frequency"], 4)
+    return (
+        base_cost_per_property
+        * num_properties
+        * frequency_multiplier.get(plan["frequency"], 4)
+    )
 
 
 def create_maintenance_schedule(plan):

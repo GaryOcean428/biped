@@ -149,7 +149,9 @@ class RealTimeDataProcessor:
                         }
                         # Store in cache (simplified for compatibility)
                         try:
-                            self.cache_service.set(cache_key, market_data_dict, timeout=60)
+                            self.cache_service.set(
+                                cache_key, market_data_dict, timeout=60
+                            )
                         except Exception as cache_error:
                             logger.debug(f"Cache storage failed: {cache_error}")
 
@@ -207,7 +209,9 @@ class RealTimeDataProcessor:
         """Detect if a job is anomalous (returns score 0-1)"""
         try:
             # Simple anomaly detection based on job value
-            if hasattr(job, "job_value") and job.job_value > 10000:  # Large job threshold
+            if (
+                hasattr(job, "job_value") and job.job_value > 10000
+            ):  # Large job threshold
                 return 0.9
             elif hasattr(job, "job_value") and job.job_value > 5000:
                 return 0.6
@@ -240,7 +244,9 @@ class RealTimeDataProcessor:
                 "anomaly_score": anomaly_score,
                 "timestamp": (
                     getattr(job, "timestamp", datetime.utcnow()).isoformat()
-                    if hasattr(getattr(job, "timestamp", datetime.utcnow()), "isoformat")
+                    if hasattr(
+                        getattr(job, "timestamp", datetime.utcnow()), "isoformat"
+                    )
                     else str(getattr(job, "timestamp", datetime.utcnow()))
                 ),
                 "flagged_at": datetime.utcnow().isoformat(),
@@ -280,7 +286,9 @@ class RealTimeDataProcessor:
                             else None
                         )
                         if latest_data:
-                            metrics = self._calculate_symbol_metrics(symbol, latest_data)
+                            metrics = self._calculate_symbol_metrics(
+                                symbol, latest_data
+                            )
 
                             # Store metrics in cache
                             cache_key = f"metrics:{symbol}"
@@ -469,10 +477,15 @@ class RealTimeDataProcessor:
                     "Cleaning",
                 ]:
                     buffer_key = f"service:{service_category}"
-                    if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) > 10:
+                    if (
+                        buffer_key in self.data_buffer
+                        and len(self.data_buffer[buffer_key]) > 10
+                    ):
                         recent_data = self.data_buffer[buffer_key][-10:]
                         prices = [
-                            job.quote_price for job in recent_data if hasattr(job, "quote_price")
+                            job.quote_price
+                            for job in recent_data
+                            if hasattr(job, "quote_price")
                         ]
 
                         # Calculate price volatility for service quotes
@@ -484,7 +497,9 @@ class RealTimeDataProcessor:
                             avg_volatility = np.mean(price_changes)
 
                             # Flag if pricing volatility is unusually high (could indicate price manipulation)
-                            if avg_volatility > 0.25:  # 25% threshold for service pricing
+                            if (
+                                avg_volatility > 0.25
+                            ):  # 25% threshold for service pricing
                                 logger.warning(
                                     f"High pricing volatility detected for {service_category}: {avg_volatility:.2%}"
                                 )
@@ -500,10 +515,14 @@ class RealTimeDataProcessor:
                                 if self.cache_service:
                                     try:
                                         self.cache_service.set(
-                                            f"anomaly:{service_category}", anomaly, timeout=300
+                                            f"anomaly:{service_category}",
+                                            anomaly,
+                                            timeout=300,
                                         )
                                     except Exception as cache_error:
-                                        logger.debug(f"Cache storage failed: {cache_error}")
+                                        logger.debug(
+                                            f"Cache storage failed: {cache_error}"
+                                        )
 
             except Exception as e:
                 logger.error(f"Error detecting anomalies: {e}")
@@ -527,7 +546,9 @@ class RealTimeDataProcessor:
 
                 if self.cache_service:
                     try:
-                        self.cache_service.set("market_summary", market_summary, timeout=300)
+                        self.cache_service.set(
+                            "market_summary", market_summary, timeout=300
+                        )
                     except Exception as cache_error:
                         logger.debug(f"Cache storage failed: {cache_error}")
 
@@ -557,7 +578,10 @@ class RealTimeDataProcessor:
             "Cleaning",
         ]:
             buffer_key = f"service:{service_category}"
-            if buffer_key in self.data_buffer and len(self.data_buffer[buffer_key]) >= 2:
+            if (
+                buffer_key in self.data_buffer
+                and len(self.data_buffer[buffer_key]) >= 2
+            ):
                 recent_data = self.data_buffer[buffer_key][-2:]
                 if len(recent_data) >= 2:
                     price_change = (
@@ -610,7 +634,9 @@ class BusinessIntelligenceEngine:
                 "pricing_analysis": self._calculate_pricing_metrics(quotes),
                 "service_analysis": self._analyze_service_distribution(jobs),
                 "customer_patterns": self._analyze_customer_patterns(jobs),
-                "recommendations": self._generate_business_recommendations(jobs, quotes),
+                "recommendations": self._generate_business_recommendations(
+                    jobs, quotes
+                ),
             }
 
             # Cache analytics
@@ -642,9 +668,13 @@ class BusinessIntelligenceEngine:
         return {
             "total_value": total_value,
             "total_pnl": total_pnl,
-            "total_pnl_percent": (total_pnl / total_cost * 100) if total_cost > 0 else 0,
+            "total_pnl_percent": (
+                (total_pnl / total_cost * 100) if total_cost > 0 else 0
+            ),
             "position_count": len(positions),
-            "largest_position": max(positions, key=lambda x: x["current_value"])["symbol"],
+            "largest_position": max(positions, key=lambda x: x["current_value"])[
+                "symbol"
+            ],
             "daily_change": sum(pos.get("daily_change", 0) for pos in positions),
             "cash_balance": 0,  # Would come from account data
         }
@@ -685,7 +715,9 @@ class BusinessIntelligenceEngine:
             "trading_frequency": total_trades / 30,  # trades per day over 30 days
         }
 
-    def _calculate_risk_metrics(self, positions: List[Dict], trades: List[Dict]) -> Dict:
+    def _calculate_risk_metrics(
+        self, positions: List[Dict], trades: List[Dict]
+    ) -> Dict:
         """Calculate risk metrics"""
         if not trades:
             return {}
@@ -701,7 +733,9 @@ class BusinessIntelligenceEngine:
 
         # Risk metrics
         volatility = daily_returns.std() * np.sqrt(252)  # Annualized
-        sharpe_ratio = (daily_returns.mean() * 252) / volatility if volatility > 0 else 0
+        sharpe_ratio = (
+            (daily_returns.mean() * 252) / volatility if volatility > 0 else 0
+        )
 
         # Value at Risk (95% confidence)
         var_95 = np.percentile(daily_returns, 5)
@@ -726,7 +760,13 @@ class BusinessIntelligenceEngine:
         """Generate market intelligence report"""
         try:
             # Get service market data for analysis
-            service_categories = ["Plumbing", "Electrical", "Carpentry", "Painting", "Landscaping"]
+            service_categories = [
+                "Plumbing",
+                "Electrical",
+                "Carpentry",
+                "Painting",
+                "Landscaping",
+            ]
             market_analysis = {}
 
             for service_category in service_categories:
@@ -737,16 +777,24 @@ class BusinessIntelligenceEngine:
                         "change_24h": cached_data.get("change", 0),
                         "job_volume": cached_data.get("volume", 0),
                         "metrics": cached_data.get("metrics", {}),
-                        "demand_sentiment": self._analyze_demand_sentiment(service_category),
-                        "market_signals": self._get_market_signals(service_category, cached_data),
+                        "demand_sentiment": self._analyze_demand_sentiment(
+                            service_category
+                        ),
+                        "market_signals": self._get_market_signals(
+                            service_category, cached_data
+                        ),
                     }
 
             # Service market overview
             market_overview = {
                 "timestamp": datetime.utcnow().isoformat(),
                 "market_sentiment": self._calculate_market_sentiment(market_analysis),
-                "top_demand_categories": self._get_top_demand_categories(market_analysis),
-                "category_performance": self._analyze_category_performance(market_analysis),
+                "top_demand_categories": self._get_top_demand_categories(
+                    market_analysis
+                ),
+                "category_performance": self._analyze_category_performance(
+                    market_analysis
+                ),
                 "pricing_volatility_index": self._calculate_pricing_volatility_index(
                     market_analysis
                 ),
@@ -790,9 +838,13 @@ class BusinessIntelligenceEngine:
         # RSI signals
         rsi = metrics.get("rsi", 50)
         if rsi > 70:
-            signals.append({"type": "overbought", "strength": "strong", "indicator": "RSI"})
+            signals.append(
+                {"type": "overbought", "strength": "strong", "indicator": "RSI"}
+            )
         elif rsi < 30:
-            signals.append({"type": "oversold", "strength": "strong", "indicator": "RSI"})
+            signals.append(
+                {"type": "oversold", "strength": "strong", "indicator": "RSI"}
+            )
 
         # Bollinger Bands signals
         bb_upper = metrics.get("bollinger_upper", 0)
@@ -800,11 +852,19 @@ class BusinessIntelligenceEngine:
 
         if price > bb_upper:
             signals.append(
-                {"type": "overbought", "strength": "medium", "indicator": "Bollinger Bands"}
+                {
+                    "type": "overbought",
+                    "strength": "medium",
+                    "indicator": "Bollinger Bands",
+                }
             )
         elif price < bb_lower:
             signals.append(
-                {"type": "oversold", "strength": "medium", "indicator": "Bollinger Bands"}
+                {
+                    "type": "oversold",
+                    "strength": "medium",
+                    "indicator": "Bollinger Bands",
+                }
             )
 
         # Support/Resistance signals
@@ -813,11 +873,19 @@ class BusinessIntelligenceEngine:
 
         if price <= support * 1.02:  # Near support
             signals.append(
-                {"type": "support", "strength": "medium", "indicator": "Support/Resistance"}
+                {
+                    "type": "support",
+                    "strength": "medium",
+                    "indicator": "Support/Resistance",
+                }
             )
         elif price >= resistance * 0.98:  # Near resistance
             signals.append(
-                {"type": "resistance", "strength": "medium", "indicator": "Support/Resistance"}
+                {
+                    "type": "resistance",
+                    "strength": "medium",
+                    "indicator": "Support/Resistance",
+                }
             )
 
         return {
@@ -848,7 +916,9 @@ class BusinessIntelligenceEngine:
             },
         ]
 
-    async def _get_provider_quotes(self, provider_id: str, days: int = 30) -> List[Dict]:
+    async def _get_provider_quotes(
+        self, provider_id: str, days: int = 30
+    ) -> List[Dict]:
         """Get provider quotes (simulated)"""
         # In production, this would query the database
         quotes = []
@@ -867,7 +937,8 @@ class BusinessIntelligenceEngine:
                     "quote_type": np.random.choice(["fixed_price", "hourly_rate"]),
                     "quote_amount": np.random.uniform(100, 2000),
                     "job_value": np.random.uniform(150, 2500),
-                    "timestamp": datetime.utcnow() - timedelta(days=np.random.randint(0, days)),
+                    "timestamp": datetime.utcnow()
+                    - timedelta(days=np.random.randint(0, days)),
                     "accepted": np.random.choice([True, False], p=[0.3, 0.7]),
                 }
             )
@@ -891,7 +962,9 @@ def create_data_services(app, cache_service: TradingCacheService):
         loop.run_until_complete(processor.start_processing())
 
     # Start in background thread
-    processing_thread = threading.Thread(target=start_background_processing, daemon=True)
+    processing_thread = threading.Thread(
+        target=start_background_processing, daemon=True
+    )
     processing_thread.start()
 
     return {"processor": processor, "bi_engine": bi_engine}

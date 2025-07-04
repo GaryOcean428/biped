@@ -47,7 +47,9 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     type = db.Column(db.Enum(NotificationType), nullable=False)
-    priority = db.Column(db.Enum(NotificationPriority), default=NotificationPriority.MEDIUM)
+    priority = db.Column(
+        db.Enum(NotificationPriority), default=NotificationPriority.MEDIUM
+    )
     title = db.Column(db.String(200), nullable=False)
     message = db.Column(db.Text, nullable=False)
     data = db.Column(db.JSON)  # Additional data for the notification
@@ -119,7 +121,11 @@ class NotificationManager:
         """Mark notification as read"""
         notification = (
             db.session.query(Notification)
-            .filter(and_(Notification.id == notification_id, Notification.user_id == user_id))
+            .filter(
+                and_(
+                    Notification.id == notification_id, Notification.user_id == user_id
+                )
+            )
             .first()
         )
 
@@ -135,7 +141,9 @@ class NotificationManager:
         """Mark all notifications as read for a user"""
         count = (
             db.session.query(Notification)
-            .filter(and_(Notification.user_id == user_id, Notification.is_read == False))
+            .filter(
+                and_(Notification.user_id == user_id, Notification.is_read == False)
+            )
             .update({"is_read": True, "read_at": datetime.utcnow()})
         )
 
@@ -172,7 +180,9 @@ class NotificationManager:
         """Get count of unread notifications"""
         return (
             db.session.query(Notification)
-            .filter(and_(Notification.user_id == user_id, Notification.is_read == False))
+            .filter(
+                and_(Notification.user_id == user_id, Notification.is_read == False)
+            )
             .count()
         )
 
@@ -247,7 +257,9 @@ class NotificationManager:
                 data=notification_data["data"],
             )
 
-    def create_smart_match_notification(self, job_id: int, provider_id: int, match_score: float):
+    def create_smart_match_notification(
+        self, job_id: int, provider_id: int, match_score: float
+    ):
         """Create notification for smart matching results"""
         job = db.session.query(Job).filter(Job.id == job_id).first()
         if not job:
@@ -263,7 +275,9 @@ class NotificationManager:
             title=f"Perfect Job Match Found! ({confidence_level} Confidence)",
             message=f'We found a great match for you: "{job.title}". Match score: {match_score:.1%}',
             priority=(
-                NotificationPriority.HIGH if match_score >= 0.8 else NotificationPriority.MEDIUM
+                NotificationPriority.HIGH
+                if match_score >= 0.8
+                else NotificationPriority.MEDIUM
             ),
             data={
                 "job_id": job_id,
@@ -314,7 +328,9 @@ def mark_notification_read(notification_id):
     """Mark a specific notification as read"""
     try:
         user_id = (
-            request.json.get("user_id") if request.json else request.args.get("user_id", type=int)
+            request.json.get("user_id")
+            if request.json
+            else request.args.get("user_id", type=int)
         )
         if not user_id:
             return jsonify({"success": False, "error": "user_id is required"}), 400
@@ -325,7 +341,12 @@ def mark_notification_read(notification_id):
             return jsonify({"success": True, "message": "Notification marked as read"})
         else:
             return (
-                jsonify({"success": False, "error": "Notification not found or already read"}),
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Notification not found or already read",
+                    }
+                ),
                 404,
             )
 
@@ -338,14 +359,18 @@ def mark_all_notifications_read():
     """Mark all notifications as read for the current user"""
     try:
         user_id = (
-            request.json.get("user_id") if request.json else request.args.get("user_id", type=int)
+            request.json.get("user_id")
+            if request.json
+            else request.args.get("user_id", type=int)
         )
         if not user_id:
             return jsonify({"success": False, "error": "user_id is required"}), 400
 
         count = notification_manager.mark_all_as_read(user_id)
 
-        return jsonify({"success": True, "message": f"Marked {count} notifications as read"})
+        return jsonify(
+            {"success": True, "message": f"Marked {count} notifications as read"}
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -385,7 +410,10 @@ def create_notification():
     except ValueError as e:
         return (
             jsonify(
-                {"success": False, "error": f"Invalid notification type or priority: {str(e)}"}
+                {
+                    "success": False,
+                    "error": f"Invalid notification type or priority: {str(e)}",
+                }
             ),
             400,
         )
@@ -402,7 +430,9 @@ def get_notification_stats():
         if user_id:
             # User-specific stats
             total_notifications = (
-                db.session.query(Notification).filter(Notification.user_id == user_id).count()
+                db.session.query(Notification)
+                .filter(Notification.user_id == user_id)
+                .count()
             )
 
             unread_count = notification_manager.get_unread_count(user_id)
@@ -414,7 +444,8 @@ def get_notification_stats():
                     db.session.query(Notification)
                     .filter(
                         and_(
-                            Notification.user_id == user_id, Notification.type == notification_type
+                            Notification.user_id == user_id,
+                            Notification.type == notification_type,
                         )
                     )
                     .count()
@@ -436,13 +467,17 @@ def get_notification_stats():
             # Platform-wide stats
             total_notifications = db.session.query(Notification).count()
             total_unread = (
-                db.session.query(Notification).filter(Notification.is_read == False).count()
+                db.session.query(Notification)
+                .filter(Notification.is_read == False)
+                .count()
             )
 
             # Recent activity (last 24 hours)
             recent_notifications = (
                 db.session.query(Notification)
-                .filter(Notification.created_at >= datetime.utcnow() - timedelta(hours=24))
+                .filter(
+                    Notification.created_at >= datetime.utcnow() - timedelta(hours=24)
+                )
                 .count()
             )
 
@@ -455,7 +490,10 @@ def get_notification_stats():
                         "recent_24h": recent_notifications,
                         "read_rate_percent": (
                             round(
-                                (total_notifications - total_unread) / total_notifications * 100, 2
+                                (total_notifications - total_unread)
+                                / total_notifications
+                                * 100,
+                                2,
                             )
                             if total_notifications > 0
                             else 0

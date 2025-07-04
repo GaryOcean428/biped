@@ -10,40 +10,45 @@ db = SQLAlchemy()
 
 # Import all models to ensure they're registered
 from .admin import Admin, AdminAction
-from .user import User, CustomerProfile, ProviderProfile
-from .service import Service, ServiceCategory, ProviderService, PortfolioItem
-from .job import Job, Quote, JobMilestone, JobMessage
-from .payment import Payment, StripeAccount, Transfer, Dispute
-from .review import Review, Message, Notification
-from .financial import Invoice, FinancialQuote, Expense, PlatformRevenue, FinancialReport
+from .financial import (
+    Expense,
+    FinancialQuote,
+    FinancialReport,
+    Invoice,
+    PlatformRevenue,
+)
+from .job import Job, JobMessage, JobMilestone, Quote
+from .payment import Dispute, Payment, StripeAccount, Transfer
+from .review import Message, Notification, Review
+from .service import PortfolioItem, ProviderService, Service, ServiceCategory
+from .user import CustomerProfile, ProviderProfile, User
 
 # Export commonly used items
 __all__ = [
-    'db',
-    'Admin',
-    'AdminAction',
-    'User', 
-    'CustomerProfile',
-    'ProviderProfile',
-    'Service',
-    'ServiceCategory', 
-    'ProviderService',
-    'PortfolioItem',
-    'Job',
-    'Quote',
-    'JobMilestone',
-    'JobMessage',
-    'Payment',
-    'StripeAccount',
-    'Transfer',
-    'Dispute',
-    'Review',
-    'Message',
-    'Notification',
-    'Invoice',
-    'FinancialQuote',
-    'Expense',
-    'PlatformRevenue',
-    'FinancialReport'
+    "db",
+    "Admin",
+    "AdminAction",
+    "User",
+    "CustomerProfile",
+    "ProviderProfile",
+    "Service",
+    "ServiceCategory",
+    "ProviderService",
+    "PortfolioItem",
+    "Job",
+    "Quote",
+    "JobMilestone",
+    "JobMessage",
+    "Payment",
+    "StripeAccount",
+    "Transfer",
+    "Dispute",
+    "Review",
+    "Message",
+    "Notification",
+    "Invoice",
+    "FinancialQuote",
+    "Expense",
+    "PlatformRevenue",
+    "FinancialReport",
 ]
-

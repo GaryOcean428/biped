@@ -18,7 +18,13 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
-from src.models.financial import Expense, FinancialQuote, FinancialReport, Invoice, PlatformRevenue
+from src.models.financial import (
+    Expense,
+    FinancialQuote,
+    FinancialReport,
+    Invoice,
+    PlatformRevenue,
+)
 from src.models.user import db
 
 financial_bp = Blueprint("financial", __name__, url_prefix="/api/financial")
@@ -122,7 +128,9 @@ def create_invoice():
 def generate_invoice_pdf(invoice_id):
     """Generate professional PDF invoice"""
     try:
-        invoice = Invoice.query.filter_by(id=invoice_id, user_id=current_user.id).first()
+        invoice = Invoice.query.filter_by(
+            id=invoice_id, user_id=current_user.id
+        ).first()
         if not invoice:
             return jsonify({"success": False, "error": "Invoice not found"}), 404
 
@@ -197,7 +205,9 @@ def generate_invoice_pdf(invoice_id):
             ]
         )
 
-        items_table = Table(items_data, colWidths=[3 * inch, 1 * inch, 1 * inch, 1 * inch])
+        items_table = Table(
+            items_data, colWidths=[3 * inch, 1 * inch, 1 * inch, 1 * inch]
+        )
         items_table.setStyle(
             TableStyle(
                 [
@@ -242,7 +252,9 @@ def generate_invoice_pdf(invoice_id):
 def send_invoice(invoice_id):
     """Send invoice via email using N8N workflow"""
     try:
-        invoice = Invoice.query.filter_by(id=invoice_id, user_id=current_user.id).first()
+        invoice = Invoice.query.filter_by(
+            id=invoice_id, user_id=current_user.id
+        ).first()
         if not invoice:
             return jsonify({"success": False, "error": "Invoice not found"}), 404
 
@@ -384,10 +396,14 @@ def get_expenses():
             query = query.filter_by(category=category)
 
         if start_date:
-            query = query.filter(Expense.expense_date >= datetime.fromisoformat(start_date))
+            query = query.filter(
+                Expense.expense_date >= datetime.fromisoformat(start_date)
+            )
 
         if end_date:
-            query = query.filter(Expense.expense_date <= datetime.fromisoformat(end_date))
+            query = query.filter(
+                Expense.expense_date <= datetime.fromisoformat(end_date)
+            )
 
         expenses = query.order_by(Expense.expense_date.desc()).paginate(
             page=page, per_page=per_page, error_out=False
@@ -446,7 +462,9 @@ def create_expense():
                 "is_tax_deductible", data.get("is_tax_deductible", True)
             ),
             tax_category=ai_analysis.get("tax_category"),
-            gst_amount=Decimal(str(data["gst_amount"])) if data.get("gst_amount") else None,
+            gst_amount=(
+                Decimal(str(data["gst_amount"])) if data.get("gst_amount") else None
+            ),
             notes=data.get("notes"),
             tags=data.get("tags", []),
         )
@@ -462,7 +480,9 @@ def create_expense():
                 {
                     "success": True,
                     "expense": expense.to_dict(),
-                    "ai_suggestions": ai_analysis.get("suggestions", []) if ai_analysis else [],
+                    "ai_suggestions": (
+                        ai_analysis.get("suggestions", []) if ai_analysis else []
+                    ),
                     "message": "Expense recorded successfully",
                 }
             ),
@@ -551,7 +571,11 @@ def get_platform_analytics():
         }
 
         return jsonify(
-            {"success": True, "analytics": analytics, "generated_at": datetime.utcnow().isoformat()}
+            {
+                "success": True,
+                "analytics": analytics,
+                "generated_at": datetime.utcnow().isoformat(),
+            }
         )
 
     except Exception as e:
@@ -593,7 +617,9 @@ def generate_ai_quote(quote_data):
     """Generate quote using Flowise AI"""
     try:
         # Flowise API endpoint (adjust based on your anythingllm setup)
-        flowise_url = "https://anythingllm.up.railway.app/api/v1/prediction/quote-generator"
+        flowise_url = (
+            "https://anythingllm.up.railway.app/api/v1/prediction/quote-generator"
+        )
 
         payload = {
             "question": f"""
@@ -632,7 +658,9 @@ def generate_ai_quote(quote_data):
 def analyze_expense_with_ai(description):
     """Analyze expense using Flowise AI"""
     try:
-        flowise_url = "https://anythingllm.up.railway.app/api/v1/prediction/expense-analyzer"
+        flowise_url = (
+            "https://anythingllm.up.railway.app/api/v1/prediction/expense-analyzer"
+        )
 
         payload = {
             "question": f"""
@@ -672,7 +700,9 @@ def parse_ai_quote_response(ai_text):
     # This would parse the AI response and extract structured data
     # For now, return a basic structure
     return {
-        "quote_items": [{"description": "Labor and materials", "quantity": 1, "rate": 1500.00}],
+        "quote_items": [
+            {"description": "Labor and materials", "quantity": 1, "rate": 1500.00}
+        ],
         "estimated_duration": "2-3 weeks",
         "payment_terms": "50% deposit, 50% on completion",
         "terms_conditions": "Standard terms and conditions apply",
