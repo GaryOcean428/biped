@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Biped">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/biped-logo.png">
+    <link rel="apple-touch-icon" href="/biped-logo.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <title>Biped - AI-Powered Trades Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-counter {
+            background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Enhanced focus indicators for accessibility */
+        .modal input:focus,
+        .modal button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+        }
+        
+        /* Error state styling */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-message::before {
+            content: "⚠";
+            margin-right: 0.25rem;
+        }
+        
+        .border-red-500 {
+            border-color: #ef4444 !important;
+        }
+        
+        .border-green-500 {
+            border-color: #10b981 !important;
+        }
+        
+        /* Success state styling */
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .success-message::before {
+            content: "✓";
+            margin-right: 0.25rem;
+        }
+        
+        /* Loading state styling */
+        .loading-button {
+            position: relative;
+            color: transparent;
+        }
+        
+        .loading-button::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsive improvements */
+        @media (max-width: 640px) {
+            .modal {
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+            
+            .modal > div {
+                max-width: calc(100vw - 2rem);
+                margin: 0 1rem;
+            }
+        }
+        
+        .ai-badge {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .hero-bg {
+            background-image: url('biped-hero-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .testimonial-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img src="biped-logo.png" alt="Biped" class="h-8 w-8">
+                    <span class="text-2xl font-bold text-gray-900">Biped</span>
+                    <span class="ai-badge text-xs px-2 py-1 rounded-full text-white font-medium">AI-Powered</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#services" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Services</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">How It Works</a>
+                    <a href="#providers" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">For Providers</a>
+                    <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLoginModal()" class="btn-secondary px-4 py-2 rounded-lg font-medium">
+                        Sign In
+                    </button>
+                    <button onclick="showSignupModal()" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
+                        Get Started
+                    </button>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-4 py-4 space-y-4">
+                <a href="#services" class="block text-gray-700 hover:text-blue-600 font-medium">Services</a>
+                <a href="#how-it-works" class="block text-gray-700 hover:text-blue-600 font-medium">How It Works</a>
+                <a href="#providers" class="block text-gray-700 hover:text-blue-600 font-medium">For Providers</a>
+                <a href="#about" class="block text-gray-700 hover:text-blue-600 font-medium">About</a>
+                <div class="pt-4 space-y-2">
+                    <button onclick="showLoginModal()" class="w-full btn-secondary px-4 py-2 rounded-lg font-medium">
+                        Sign In
+                    </button>
+                    <button onclick="showSignupModal()" class="w-full btn-primary text-white px-4 py-2 rounded-lg font-medium">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient hero-bg min-h-screen flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <div class="floating-element mb-8">
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium glass-effect text-white">
+                        <i class="fas fa-robot mr-2"></i>
+                        AI-Powered Marketplace
+                    </span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                    Connect with
+                    <span class="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                        Trusted Professionals
+                    </span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-white opacity-90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Biped uses advanced AI to instantly match you with verified tradespeople and skilled professionals. 
+                    Get quality work done faster, smarter, and with complete confidence.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <a href="/post-job" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center hover:transform hover:scale-105 transition-all">
+                        <i class="fas fa-plus-circle mr-3"></i>
+                        Post a Job
+                    </a>
+                    <button onclick="showProviderSignup()" class="btn-secondary px-8 py-4 rounded-xl font-semibold text-lg flex items-center">
+                        <i class="fas fa-user-tie mr-3"></i>
+                        Join as Provider
+                    </button>
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                    <div class="text-center">
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">10K+</div>
+                        <div class="text-white opacity-80">Verified Providers</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">50K+</div>
+                        <div class="text-white opacity-80">Jobs Completed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">98%</div>
+                        <div class="text-white opacity-80">Match Accuracy</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter text-3xl md:text-4xl font-bold mb-2">4.9★</div>
+                        <div class="text-white opacity-80">Average Rating</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+            <button onclick="hideLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <img src="biped-logo.png" alt="Biped" class="h-12 w-12 mx-auto mb-2">
+                <h3 class="text-2xl font-bold text-gray-900">Welcome Back</h3>
+                <p class="text-gray-600">Sign in to your Biped account</p>
+            </div>
+            
+            <form id="login-form" class="space-y-4" novalidate>
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input 
+                        type="email" 
+                        id="login-email" 
+                        name="email"
+                        required
+                        aria-describedby="login-email-error"
+                        autocomplete="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your email address"
+                    >
+                </div>
+                
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input 
+                        type="password" 
+                        id="login-password" 
+                        name="password"
+                        required
+                        aria-describedby="login-password-error"
+                        autocomplete="current-password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your password"
+                    >
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember-me" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                    </div>
+                    
+                    <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="w-full btn-primary text-white py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="#" onclick="showSignupModal(); hideLoginModal();" class="font-medium text-blue-600 hover:text-blue-500">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+            <button onclick="hideSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <img src="biped-logo.png" alt="Biped" class="h-12 w-12 mx-auto mb-2">
+                <h3 class="text-2xl font-bold text-gray-900">Create an Account</h3>
+                <p class="text-gray-600">Join the Biped marketplace</p>
+            </div>
+            
+            <div class="flex space-x-4 mb-4">
+                <button class="w-1/2 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fab fa-google text-red-500 mr-2"></i>
+                    Google
+                </button>
+                <button class="w-1/2 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fab fa-apple mr-2"></i>
+                    Apple
+                </button>
+            </div>
+            
+            <div class="relative my-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+            </div>
+            
+            <form id="signup-form" class="space-y-4" novalidate>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="signup-firstName" class="block text-sm font-medium text-gray-700 mb-1">First name</label>
+                        <input 
+                            type="text" 
+                            id="signup-firstName" 
+                            name="firstName"
+                            required
+                            aria-describedby="signup-firstName-error"
+                            autocomplete="given-name"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            placeholder="First name"
+                        >
+                    </div>
+                    <div>
+                        <label for="signup-lastName" class="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                        <input 
+                            type="text" 
+                            id="signup-lastName" 
+                            name="lastName"
+                            required
+                            aria-describedby="signup-lastName-error"
+                            autocomplete="family-name"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            placeholder="Last name"
+                        >
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input 
+                        type="email" 
+                        id="signup-email" 
+                        name="email"
+                        required
+                        aria-describedby="signup-email-error"
+                        autocomplete="email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Enter your email address"
+                    >
+                </div>
+                
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input 
+                        type="password" 
+                        id="signup-password" 
+                        name="password"
+                        required
+                        aria-describedby="signup-password-error"
+                        autocomplete="new-password"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        placeholder="Create a strong password"
+                    >
+                    <div class="mt-1 text-xs text-gray-500">
+                        Password must contain at least 8 characters with uppercase, lowercase, and numbers
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <input 
+                        type="checkbox" 
+                        id="signup-terms" 
+                        required
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 mt-1"
+                    >
+                    <label for="signup-terms" class="ml-2 block text-sm text-gray-700">
+                        I agree to the 
+                        <a href="#" class="text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded">Terms of Service</a> 
+                        and 
+                        <a href="#" class="text-blue-600 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="w-full btn-primary text-white py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="#" onclick="showLoginModal(); hideSignupModal();" class="font-medium text-blue-600 hover:text-blue-500">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Provider Signup Modal -->
+    <div id="provider-signup-modal" class="modal">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative">
+            <button onclick="hideProviderSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <img src="biped-logo.png" alt="Biped" class="h-12 w-12 mx-auto mb-2">
+                <h3 class="text-2xl font-bold text-gray-900">Join as a Provider</h3>
+                <p class="text-gray-600">Start offering your services on Biped</p>
+            </div>
+            
+            <form class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="provider-first-name" class="block text-sm font-medium text-gray-700 mb-1">First name</label>
+                        <input type="text" id="provider-first-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="provider-last-name" class="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                        <input type="text" id="provider-last-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="provider-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="provider-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="provider-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
+                    <input type="tel" id="provider-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="provider-service" class="block text-sm font-medium text-gray-700 mb-1">Primary service</label>
+                    <select id="provider-service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled selected>Select your primary service</option>
+                        <option value="construction">Construction & Renovation</option>
+                        <option value="plumbing">Plumbing & Electrical</option>
+                        <option value="tech">Technology & IT</option>
+                        <option value="automotive">Automotive</option>
+                        <option value="landscaping">Landscaping & Gardening</option>
+                        <option value="cleaning">Cleaning & Maintenance</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="provider-experience" class="block text-sm font-medium text-gray-700 mb-1">Years of experience</label>
+                    <select id="provider-experience" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled selected>Select your experience level</option>
+                        <option value="1-2">1-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5-10">5-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="provider-terms" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                    <label for="provider-terms" class="ml-2 block text-sm text-gray-700">
+                        I agree to the 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a>, 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>, 
+                        and 
+                        <a href="#" class="text-blue-600 hover:text-blue-500">Provider Agreement</a>
+                    </label>
+                </div>
+                
+                <button type="button" class="w-full btn-primary text-white py-2 rounded-lg font-medium">
+                    Apply as Provider
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Already a provider? 
+                    <a href="#" onclick="showLoginModal(); hideProviderSignupModal();" class="font-medium text-blue-600 hover:text-blue-500">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // Login modal
+        function showLoginModal() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.add('show');
+        }
+        
+        function hideLoginModal() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.remove('show');
+        }
+        
+        // Signup modal
+        function showSignupModal() {
+            const modal = document.getElementById('signup-modal');
+            modal.classList.add('show');
+        }
+        
+        function hideSignupModal() {
+            const modal = document.getElementById('signup-modal');
+            modal.classList.remove('show');
+        }
+        
+        // Provider signup modal
+        function showProviderSignup() {
+            const modal = document.getElementById('provider-signup-modal');
+            modal.classList.add('show');
+        }
+        
+        function hideProviderSignupModal() {
+            const modal = document.getElementById('provider-signup-modal');
+            modal.classList.remove('show');
+        }
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const loginModal = document.getElementById('login-modal');
+            const signupModal = document.getElementById('signup-modal');
+            const providerSignupModal = document.getElementById('provider-signup-modal');
+            
+            if (event.target === loginModal) {
+                hideLoginModal();
+            }
+            
+            if (event.target === signupModal) {
+                hideSignupModal();
+            }
+            
+            if (event.target === providerSignupModal) {
+                hideProviderSignupModal();
+            }
+        });
+        
+        // Initialize form validation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create embedded validation instance
+            const validator = new FormValidator();
+            
+            // Set up real-time validation for all forms
+            validator.setupRealTimeValidation('login-form');
+            validator.setupRealTimeValidation('signup-form');
+            
+            // Handle login form submission
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(event) {
+                    handleLoginSubmit(event, validator);
+                });
+            }
+            
+            // Handle signup form submission  
+            const signupForm = document.getElementById('signup-form');
+            if (signupForm) {
+                signupForm.addEventListener('submit', function(event) {
+                    handleSignupSubmit(event, validator);
+                });
+            }
+        });
+        
+        // Form Validator Class (embedded)
+        class FormValidator {
+            constructor() {
+                this.emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                this.phoneRegex = /^\+?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+                this.passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            }
+
+            // Validation methods
+            validateEmail(email) {
+                if (!email || typeof email !== 'string') {
+                    return { valid: false, message: 'Email is required' };
+                }
+                
+                const trimmed = email.trim();
+                if (trimmed.length > 254) {
+                    return { valid: false, message: 'Email address too long' };
+                }
+                
+                if (!this.emailRegex.test(trimmed)) {
+                    return { valid: false, message: 'Please enter a valid email address' };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            validatePassword(password) {
+                if (!password || typeof password !== 'string') {
+                    return { valid: false, message: 'Password is required' };
+                }
+                
+                if (password.length < 8) {
+                    return { valid: false, message: 'Password must be at least 8 characters long' };
+                }
+                
+                if (password.length > 128) {
+                    return { valid: false, message: 'Password too long' };
+                }
+                
+                if (!/[A-Z]/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+                }
+                
+                if (!/[a-z]/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+                }
+                
+                if (!/\d/.test(password)) {
+                    return { valid: false, message: 'Password must contain at least one number' };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            validateName(name, fieldName = 'Name') {
+                if (!name || typeof name !== 'string') {
+                    return { valid: false, message: `${fieldName} is required` };
+                }
+                
+                const trimmed = name.trim();
+                if (trimmed.length < 1) {
+                    return { valid: false, message: `${fieldName} is required` };
+                }
+                
+                if (trimmed.length > 50) {
+                    return { valid: false, message: `${fieldName} is too long` };
+                }
+                
+                if (!/^[a-zA-Z\s-'\.]+$/.test(trimmed)) {
+                    return { valid: false, message: `${fieldName} contains invalid characters` };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            // Form validation methods
+            validateLoginForm(formData) {
+                const errors = {};
+                
+                // Validate email
+                const emailResult = this.validateEmail(formData.email);
+                if (!emailResult.valid) {
+                    errors.email = emailResult.message;
+                }
+                
+                // Validate password (just check if present for login)
+                if (!formData.password || formData.password.trim() === '') {
+                    errors.password = 'Password is required';
+                }
+                
+                return {
+                    valid: Object.keys(errors).length === 0,
+                    errors: errors
+                };
+            }
+
+            validateRegistrationForm(formData) {
+                const errors = {};
+                
+                // Validate email
+                const emailResult = this.validateEmail(formData.email);
+                if (!emailResult.valid) {
+                    errors.email = emailResult.message;
+                }
+                
+                // Validate password
+                const passwordResult = this.validatePassword(formData.password);
+                if (!passwordResult.valid) {
+                    errors.password = passwordResult.message;
+                }
+                
+                // Validate first name
+                const firstNameResult = this.validateName(formData.firstName, 'First name');
+                if (!firstNameResult.valid) {
+                    errors.firstName = firstNameResult.message;
+                }
+                
+                // Validate last name
+                const lastNameResult = this.validateName(formData.lastName, 'Last name');
+                if (!lastNameResult.valid) {
+                    errors.lastName = lastNameResult.message;
+                }
+                
+                return {
+                    valid: Object.keys(errors).length === 0,
+                    errors: errors
+                };
+            }
+
+            // UI validation helpers
+            showFieldError(fieldId, message) {
+                const field = document.getElementById(fieldId);
+                if (!field) return;
+                
+                // Remove existing error styling
+                field.classList.remove('border-red-500', 'border-green-500');
+                
+                // Remove existing error message
+                const existingError = field.parentNode.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                if (message) {
+                    // Add error styling
+                    field.classList.add('border-red-500');
+                    
+                    // Create error message element
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'error-message text-red-500 text-sm mt-1';
+                    errorElement.textContent = message;
+                    
+                    // Insert error message after the field
+                    field.parentNode.insertBefore(errorElement, field.nextSibling);
+                } else {
+                    // Add success styling
+                    field.classList.add('border-green-500');
+                }
+            }
+
+            clearFieldErrors(formId) {
+                const form = document.getElementById(formId);
+                if (!form) return;
+                
+                // Remove all error styling and messages
+                const fields = form.querySelectorAll('input, select, textarea');
+                fields.forEach(field => {
+                    field.classList.remove('border-red-500', 'border-green-500');
+                });
+                
+                const errorMessages = form.querySelectorAll('.error-message');
+                errorMessages.forEach(error => error.remove());
+            }
+
+            // Real-time validation
+            setupRealTimeValidation(formId) {
+                const form = document.getElementById(formId);
+                if (!form) return;
+                
+                const fields = form.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], input[type="tel"]');
+                
+                fields.forEach(field => {
+                    let timeout;
+                    field.addEventListener('input', () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            this.validateField(field);
+                        }, 500); // Debounce validation
+                    });
+                    
+                    field.addEventListener('blur', () => {
+                        this.validateField(field);
+                    });
+                });
+            }
+
+            validateField(field) {
+                const fieldType = field.type;
+                const fieldName = field.name || field.id;
+                const fieldValue = field.value;
+                
+                let result = { valid: true, message: '' };
+                
+                switch (fieldType) {
+                    case 'email':
+                        result = this.validateEmail(fieldValue);
+                        break;
+                    case 'password':
+                        result = this.validatePassword(fieldValue);
+                        break;
+                    case 'text':
+                        if (fieldName.includes('firstName') || fieldName.includes('lastName')) {
+                            result = this.validateName(fieldValue, fieldName.includes('firstName') ? 'First name' : 'Last name');
+                        }
+                        break;
+                }
+                
+                this.showFieldError(field.id, result.valid ? '' : result.message);
+                return result.valid;
+            }
+        }
+        
+        // Show loading state
+        function showLoadingState(button) {
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+            button.setAttribute('data-original-text', originalText);
+        }
+        
+        // Hide loading state
+        function hideLoadingState(button) {
+            const originalText = button.getAttribute('data-original-text');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Handle login form submission
+        function handleLoginSubmit(event, validator) {
+            event.preventDefault();
+            const button = event.target.querySelector('button[type="submit"]');
+            
+            // Clear previous errors
+            validator.clearFieldErrors('login-form');
+            
+            // Get form data
+            const formData = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            
+            // Validate form
+            const validation = validator.validateLoginForm(formData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    validator.showFieldError(`login-${field}`, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState(button);
+            
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                hideLoadingState(button);
+                hideLoginModal();
+                showNotification('Welcome back! You have been successfully signed in.');
+                // In real app, redirect to dashboard or update UI state
+            }, 1500);
+        }
+        
+        // Handle signup form submission
+        function handleSignupSubmit(event, validator) {
+            event.preventDefault();
+            const button = event.target.querySelector('button[type="submit"]');
+            
+            // Clear previous errors
+            validator.clearFieldErrors('signup-form');
+            
+            // Get form data
+            const formData = {
+                firstName: document.getElementById('signup-firstName').value,
+                lastName: document.getElementById('signup-lastName').value,
+                email: document.getElementById('signup-email').value,
+                password: document.getElementById('signup-password').value
+            };
+            
+            // Validate form
+            const validation = validator.validateRegistrationForm(formData);
+            if (!validation.valid) {
+                // Show validation errors
+                Object.keys(validation.errors).forEach(field => {
+                    validator.showFieldError(`signup-${field}`, validation.errors[field]);
+                });
+                return;
+            }
+            
+            // Check terms acceptance
+            const termsCheckbox = document.getElementById('signup-terms');
+            if (!termsCheckbox.checked) {
+                showNotification('Please accept the Terms of Service and Privacy Policy to continue.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState(button);
+            
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                hideLoadingState(button);
+                hideSignupModal();
+                showNotification('Account created successfully! Please check your email to verify your account.');
+                // In real app, redirect to dashboard or show email verification step
+            }, 2000);
+        }
+    </script>
+    
+    <!-- Cookie Consent Script -->
+    <script src="/js/cookie-consent.js"></script>
+    
+    <!-- Footer with Legal Disclosures -->
+    <footer id="footer" class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">Biped Platform</h3>
+                    <p class="text-gray-300 mb-4">
+                        Australia's premier AI-powered trades marketplace connecting customers with verified trade professionals.
+                    </p>
+                    <div class="text-sm text-gray-400">
+                        <p><strong>ABN:</strong> [To be updated]</p>
+                        <p><strong>Address:</strong> [Business Address - To be updated]</p>
+                        <p><strong>Phone:</strong> [Business Phone - To be updated]</p>
+                        <p><strong>Email:</strong> support@biped.app</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="/" class="hover:text-white transition duration-300">Home</a></li>
+                        <li><a href="/dashboard" class="hover:text-white transition duration-300">Dashboard</a></li>
+                        <li><a href="/auth/login" class="hover:text-white transition duration-300">Login</a></li>
+                        <li><a href="/auth/register" class="hover:text-white transition duration-300">Sign Up</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="/privacy" class="hover:text-white transition duration-300">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition duration-300">Terms of Service</a></li>
+                        <li><button onclick="window.cookieConsent?.revokeConsent()" class="hover:text-white transition duration-300 text-left">Cookie Settings</button></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Biped Platform. All rights reserved.</p>
+                <p class="mt-2 text-sm">
+                    This platform operates under Australian Consumer Law and relevant trade regulations.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+

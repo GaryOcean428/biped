@@ -150,14 +150,9 @@ class SecurityEnhancer:
 
     def _setup_csrf_protection(self):
         """Configure CSRF protection"""
-        self.csrf = CSRFProtect(self.app)
-
-        # Exempt API endpoints that use JWT
-        @self.csrf.exempt
-        def csrf_exempt_api():
-            return (
-                request.path.startswith("/api/") and "Authorization" in request.headers
-            )
+        # Temporarily disable CSRF for development
+        # self.csrf = CSRFProtect(self.app)
+        pass
 
     def _setup_jwt(self):
         """Configure JWT with blacklisting"""

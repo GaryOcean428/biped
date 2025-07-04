@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - Biped</title>
+    <link rel="stylesheet" href="/static/css/global.css">
+    <style>
+        .post-job-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--surface-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .submit-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .post-job-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <h2>Biped</h2>
+            </a>
+            <div class="nav-links">
+                <a href="/browse-jobs">Browse Jobs</a>
+                <a href="/post-job" class="active">Post a Job</a>
+                <a href="/auth/login">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="post-job-container">
+        <h1>Post a Job</h1>
+        <p>Tell us about your project and we'll match you with qualified professionals.</p>
+        
+        <form id="jobForm">
+            <div class="form-group">
+                <label for="title">Job Title *</label>
+                <input type="text" id="title" name="title" required 
+                       placeholder="e.g., Kitchen Renovation, Website Design, Plumbing Repair">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Job Description *</label>
+                <textarea id="description" name="description" required 
+                          placeholder="Describe your project in detail. Include what needs to be done, any specific requirements, and timeline expectations."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category_id" required>
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="budget">Budget (AUD) *</label>
+                    <input type="number" id="budget" name="budget" required min="50" step="10"
+                           placeholder="e.g., 500">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" required 
+                           placeholder="e.g., Sydney, Melbourne, Brisbane">
+                </div>
+                
+                <div class="form-group">
+                    <label for="urgency">Urgency</label>
+                    <select id="urgency" name="urgency">
+                        <option value="normal">Normal (1-2 weeks)</option>
+                        <option value="urgent">Urgent (Within a week)</option>
+                        <option value="asap">ASAP (Within 24 hours)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="requirements">Special Requirements</label>
+                <textarea id="requirements" name="requirements" 
+                          placeholder="Any specific qualifications, certifications, or requirements for the job."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Post Job
+            </button>
+            
+            <div id="message"></div>
+        </form>
+    </main>
+
+    <script>
+        document.getElementById('jobForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Posting Job...';
+            messageDiv.innerHTML = '';
+            
+            // Get form data
+            const formData = new FormData(this);
+            const jobData = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jobData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = `<div class="success-message">${result.message}</div>`;
+                    this.reset();
+                    
+                    // Redirect to job detail page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = `/jobs/${result.job_id}`;
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = `<div class="error-message">${result.error}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error-message">Network error. Please try again.</div>`;
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Post Job';
+            }
+        });
+    </script>
+</body>
+</html>
+
