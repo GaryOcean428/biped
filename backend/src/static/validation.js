@@ -6,6 +6,24 @@ class FormValidator {
         this.passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     }
 
+    /**
+     * Sanitize input to prevent XSS attacks
+     * @param {string} input - The input string to sanitize
+     * @returns {string} - The sanitized string
+     */
+    sanitizeInput(input) {
+        if (typeof input !== 'string') return input;
+        
+        // Basic XSS prevention - escape HTML characters
+        return input
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;')
+            .replace(/\//g, '&#x2F;');
+    }
+
     // Validation methods
     validateEmail(email) {
         if (!email || typeof email !== 'string') {
@@ -89,6 +107,20 @@ class FormValidator {
         return { valid: true, message: '' };
     }
 
+    validateMinLength(value, minLength, fieldName) {
+        if (!value || value.trim().length < minLength) {
+            return { valid: false, message: `${fieldName} must be at least ${minLength} characters` };
+        }
+        return { valid: true, message: '' };
+    }
+
+    validateMaxLength(value, maxLength, fieldName) {
+        if (value && value.trim().length > maxLength) {
+            return { valid: false, message: `${fieldName} must be no more than ${maxLength} characters` };
+        }
+        return { valid: true, message: '' };
+    }
+
     // Form validation methods
     validateRegistrationForm(formData) {
         const errors = {};
@@ -153,6 +185,99 @@ class FormValidator {
         return {
             valid: Object.keys(errors).length === 0,
             errors: errors
+        };
+    }
+
+    validateJobPostingForm(formData) {
+        const errors = {};
+        
+        // Sanitize all inputs first
+        const sanitizedData = {};
+        for (const [key, value] of Object.entries(formData)) {
+            sanitizedData[key] = this.sanitizeInput(value);
+        }
+        
+        // Validate job title
+        const titleResult = this.validateRequired(sanitizedData.title, 'Job Title');
+        if (!titleResult.valid) {
+            errors.title = titleResult.message;
+        } else {
+            const minLengthResult = this.validateMinLength(sanitizedData.title, 10, 'Job Title');
+            if (!minLengthResult.valid) {
+                errors.title = minLengthResult.message;
+            } else {
+                const maxLengthResult = this.validateMaxLength(sanitizedData.title, 100, 'Job Title');
+                if (!maxLengthResult.valid) {
+                    errors.title = maxLengthResult.message;
+                }
+            }
+        }
+        
+        // Validate description
+        const descResult = this.validateRequired(sanitizedData.description, 'Job Description');
+        if (!descResult.valid) {
+            errors.description = descResult.message;
+        } else {
+            const minLengthResult = this.validateMinLength(sanitizedData.description, 50, 'Job Description');
+            if (!minLengthResult.valid) {
+                errors.description = minLengthResult.message;
+            } else {
+                const maxLengthResult = this.validateMaxLength(sanitizedData.description, 2000, 'Job Description');
+                if (!maxLengthResult.valid) {
+                    errors.description = maxLengthResult.message;
+                }
+            }
+        }
+        
+        // Validate location
+        const locationResult = this.validateRequired(sanitizedData.location, 'Location');
+        if (!locationResult.valid) {
+            errors.location = locationResult.message;
+        } else {
+            const minLengthResult = this.validateMinLength(sanitizedData.location, 5, 'Location');
+            if (!minLengthResult.valid) {
+                errors.location = minLengthResult.message;
+            }
+        }
+        
+        // Validate budget
+        const budgetResult = this.validateRequired(sanitizedData.budget, 'Budget');
+        if (!budgetResult.valid) {
+            errors.budget = budgetResult.message;
+        }
+        
+        // Validate timeline
+        const timelineResult = this.validateRequired(sanitizedData.timeline, 'Timeline');
+        if (!timelineResult.valid) {
+            errors.timeline = timelineResult.message;
+        }
+        
+        // Validate contact info if provided
+        if (sanitizedData.contact_name) {
+            const nameResult = this.validateName(sanitizedData.contact_name, 'Contact Name');
+            if (!nameResult.valid) {
+                errors.contact_name = nameResult.message;
+            }
+        }
+        
+        if (sanitizedData.contact_email) {
+            const emailResult = this.validateEmail(sanitizedData.contact_email);
+            if (!emailResult.valid) {
+                errors.contact_email = emailResult.message;
+            }
+        }
+        
+        if (sanitizedData.contact_phone) {
+            const phoneResult = this.validatePhone(sanitizedData.contact_phone);
+            if (!phoneResult.valid) {
+                errors.contact_phone = phoneResult.message;
+            }
+        }
+        
+        return {
+            valid: Object.keys(errors).length === 0,
+            errors: errors,
+            sanitizedData: sanitizedData
         };
     }
 

@@ -8,8 +8,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
+    <nav class="bg-white shadow-sm border-b" role="navigation" aria-label="Main navigation">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
@@ -24,28 +29,30 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <main id="main-content" class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-lg shadow-sm border p-8">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Post a Job</h1>
                 <p class="text-gray-600">Tell us about your project and get matched with qualified professionals.</p>
             </div>
 
-            <form id="jobPostingForm" class="space-y-8">
+            <form id="jobPostingForm" class="space-y-8" novalidate>
                 <!-- Service Selection -->
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">What service do you need?</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="1">
+                <fieldset class="bg-gray-50 p-6 rounded-lg">
+                    <legend class="text-xl font-semibold text-gray-900 mb-4">What service do you need?</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="group" aria-label="Service selection">
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                             data-service-id="1" role="button" tabindex="0" aria-pressed="false">
                             <div class="text-center">
-                                <i class="fas fa-hammer text-2xl text-blue-600 mb-2"></i>
+                                <i class="fas fa-hammer text-2xl text-blue-600 mb-2" aria-hidden="true"></i>
                                 <h3 class="font-medium">Construction & Renovation</h3>
                                 <p class="text-sm text-gray-500">General contractors, carpenters, painters</p>
                             </div>
                         </div>
-                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors" data-service-id="2">
+                        <div class="service-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                             data-service-id="2" role="button" tabindex="0" aria-pressed="false">
                             <div class="text-center">
-                                <i class="fas fa-wrench text-2xl text-blue-600 mb-2"></i>
+                                <i class="fas fa-wrench text-2xl text-blue-600 mb-2" aria-hidden="true"></i>
                                 <h3 class="font-medium">Plumbing & Electrical</h3>
                                 <p class="text-sm text-gray-500">Licensed plumbers, electricians, HVAC</p>
                             </div>

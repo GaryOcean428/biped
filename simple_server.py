@@ -31,6 +31,18 @@ def dashboard():
 def provider_dashboard():
     return send_from_directory('backend/src/static', 'provider-dashboard.html')
 
+@app.route('/privacy')
+def privacy_policy():
+    return send_from_directory('backend/src/static', 'privacy.html')
+
+@app.route('/terms')
+def terms_of_service():
+    return send_from_directory('backend/src/static', 'terms.html')
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return send_from_directory('backend/src/static', '404.html'), 404
+
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('backend/src/static', filename)
