@@ -74,17 +74,33 @@ def health_check():
 
     # Check database connection
     try:
-        # Test database connection using SQLAlchemy
-        db.session.execute(db.text("SELECT 1")).scalar()
-        health_status["checks"]["database"] = {
-            "status": "healthy",
-            "connected": True,
-            "url": (
-                os.environ.get("DATABASE_URL", "not_set")[:30] + "..."
-                if os.environ.get("DATABASE_URL")
-                else "not_set"
-            ),
-        }
+        # Test database connection using SQLAlchemy with proper error handling
+        from flask import has_app_context
+        if has_app_context():
+            db.session.execute(db.text("SELECT 1")).scalar()
+            health_status["checks"]["database"] = {
+                "status": "healthy",
+                "connected": True,
+                "url": (
+                    os.environ.get("DATABASE_URL", "not_set")[:30] + "..."
+                    if os.environ.get("DATABASE_URL")
+                    else "not_set"
+                ),
+            }
+        else:
+            # If no app context, just check if DATABASE_URL is configured
+            if os.environ.get("DATABASE_URL"):
+                health_status["checks"]["database"] = {
+                    "status": "degraded",
+                    "connected": False,
+                    "message": "Database URL configured but app context not available",
+                }
+            else:
+                health_status["checks"]["database"] = {
+                    "status": "unhealthy",
+                    "connected": False,
+                    "error": "No DATABASE_URL configured",
+                }
     except Exception as e:
         health_status["checks"]["database"] = {
             "status": "unhealthy",
