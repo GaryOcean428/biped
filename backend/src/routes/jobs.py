@@ -18,13 +18,36 @@ def post_job_page():
     """Serve the job posting page"""
     try:
         # Get service categories for the form
-        categories = ServiceCategory.query.all()
+        categories = []
+        try:
+            categories = ServiceCategory.query.all()
+        except Exception as db_error:
+            logging.warning(f"Database query failed, using empty categories: {db_error}")
+            categories = []
         
-        return render_template('post_job.html', categories=categories)
+        try:
+            return render_template('post_job.html', categories=categories)
+        except Exception as template_error:
+            logging.warning(f"Template rendering failed: {template_error}")
+            # Fallback to simple HTML response
+            return '''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Post a Job - Biped</title>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body>
+                <h1>Post a Job</h1>
+                <p>Job posting functionality is being set up. Please check back soon!</p>
+                <a href="/">← Back to Home</a>
+            </body>
+            </html>
+            '''
     except Exception as e:
         logging.error(f"Error loading post job page: {e}")
-        return render_template('error.html', 
-                             error="Unable to load job posting page. Please try again."), 500
+        return f"<h1>Error</h1><p>Unable to load job posting page: {str(e)}</p><a href='/'>← Back to Home</a>", 500
 
 @jobs_bp.route('/api/jobs', methods=['POST'])
 @limiter.limit("5 per minute")
