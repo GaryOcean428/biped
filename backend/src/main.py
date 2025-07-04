@@ -225,6 +225,67 @@ if not hasattr(app, "extensions") or "sqlalchemy" not in app.extensions:
 else:
     print("✅ Database already initialized, skipping")
 
+# Initialize database tables and default data
+def init_production_database():
+    """Initialize database with tables and default data for production"""
+    try:
+        # Create all tables
+        db.create_all()
+        print("✅ Database tables created")
+        
+        # Import models here to avoid circular imports
+        from src.models.admin import Admin
+        from src.models.service import ServiceCategory
+        
+        # Check if admin user exists
+        admin = Admin.query.filter_by(email='admin@biped.app').first()
+        if not admin:
+            admin = Admin(
+                username='admin',
+                email='admin@biped.app',
+                first_name='Admin',
+                last_name='User',
+                role='super_admin',
+                is_super_admin=True,
+                is_active=True
+            )
+            admin.set_password('biped_admin_2025')
+            db.session.add(admin)
+            print("✅ Default admin user created")
+        
+        # Create default service categories
+        categories = [
+            ('Construction & Renovation', 'construction-renovation'),
+            ('Plumbing & Electrical', 'plumbing-electrical'),
+            ('Tech & Digital', 'tech-digital'),
+            ('Automotive', 'automotive'),
+            ('Landscaping', 'landscaping'),
+            ('Cleaning & Maintenance', 'cleaning-maintenance')
+        ]
+        
+        for category_name, category_slug in categories:
+            category = ServiceCategory.query.filter_by(name=category_name).first()
+            if not category:
+                category = ServiceCategory(
+                    name=category_name,
+                    slug=category_slug,
+                    description=f'Professional {category_name.lower()} services',
+                    is_active=True
+                )
+                db.session.add(category)
+        
+        # Commit all changes
+        db.session.commit()
+        print("✅ Production database initialized successfully")
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"⚠️ Database initialization error: {e}")
+
+# Run database initialization
+with app.app_context():
+    init_production_database()
+
 # Initialize caching service if available
 trading_cache = TradingCacheService(app) if TradingCacheService else None
 if trading_cache:
