@@ -334,6 +334,13 @@ def create_app():
                 sample_user = User(
                     email="customer@biped.app",
                     password_hash=generate_password_hash("password123"),
+                    first_name="John",
+                    last_name="Doe",
+                    phone="+61400000000",
+                    street_address="123 Test Street",
+                    city="Sydney",
+                    state="NSW",
+                    postcode="2000",
                     user_type="customer",
                     is_active=True,
                     is_verified=True,
@@ -343,13 +350,6 @@ def create_app():
 
                 customer_profile = CustomerProfile(
                     user_id=sample_user.id,
-                    first_name="John",
-                    last_name="Doe",
-                    phone="+61400000000",
-                    street_address="123 Test Street",
-                    city="Sydney",
-                    state="NSW",
-                    postcode="2000",
                 )
                 db.session.add(customer_profile)
                 db.session.commit()

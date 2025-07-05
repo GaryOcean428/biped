@@ -191,16 +191,20 @@ def crm_webhook():
             lead_data = data.get("lead")
 
             # Create customer profile for lead
-            user = User(email=lead_data["email"], user_type="customer", is_active=True)
+            user = User(
+                email=lead_data["email"], 
+                first_name=lead_data.get("first_name", ""),
+                last_name=lead_data.get("last_name", ""),
+                phone=lead_data.get("phone", ""),
+                street_address=lead_data.get("address", ""),
+                user_type="customer", 
+                is_active=True
+            )
             db.session.add(user)
             db.session.flush()
 
             profile = CustomerProfile(
                 user_id=user.id,
-                first_name=lead_data.get("first_name", ""),
-                last_name=lead_data.get("last_name", ""),
-                phone=lead_data.get("phone", ""),
-                address=lead_data.get("address", ""),
             )
             db.session.add(profile)
             db.session.commit()
