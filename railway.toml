@@ -11,3 +11,23 @@ restartPolicyMaxRetries = 3
 [deploy.envs]
 PYTHONPATH = "/app:/app/backend"
 
+# AI Optimization Settings
+[deploy.resources]
+memory = "1GB"  # Increased memory for AI processing
+cpu = "1vCPU"   # Standard CPU allocation
+
+# Railway-specific configuration
+[services.web]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 60
+port = "$PORT"
+
+[services.web.env]
+# Core app settings
+ENVIRONMENT = "production"
+DEBUG = "false"
+
+# AI features
+AI_ENABLED = "true"
+AI_FALLBACK_MODE = "mock"  # Graceful degradation when providers unavailable
+
