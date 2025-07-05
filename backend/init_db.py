@@ -4,6 +4,11 @@ Database initialization script for TradeHub
 """
 import sys
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Add the src directory to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
@@ -18,14 +23,14 @@ def init_database():
     """Initialize the database with all tables and sample data"""
     with app.app_context():
         # Drop all tables and recreate
-        print("Dropping existing tables...")
+        logger.info("Dropping existing tables...")
         db.drop_all()
         
-        print("Creating all tables...")
+        logger.info("Creating all tables...")
         db.create_all()
         
         # Create service categories
-        print("Creating service categories...")
+        logger.info("Creating service categories...")
         categories = [
             ServiceCategory(name="Plumbing", description="Water, drainage, and pipe services", icon="🔧"),
             ServiceCategory(name="Electrical", description="Electrical installations and repairs", icon="⚡"),
@@ -41,12 +46,12 @@ def init_database():
             db.session.add(category)
         
         db.session.commit()
-        print("Database initialized successfully!")
+        logger.info("Database initialized successfully!")
         
-        # Print table info
-        print("\nCreated tables:")
+        # Log table info
+        logger.info("Created tables:")
         for table in db.metadata.tables.keys():
-            print(f"  - {table}")
+            logger.info(f"  - {table}")
 
 if __name__ == "__main__":
     init_database()

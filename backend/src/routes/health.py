@@ -184,6 +184,35 @@ def health_check():
         if check_name in critical_checks and check.get("status") == "unhealthy"
     ]
 
+    # Security configuration check
+    security_config = {
+        'secret_key_configured': bool(os.environ.get('SECRET_KEY')),
+        'admin_password_env': bool(os.environ.get('ADMIN_PASSWORD')),
+        'environment': os.environ.get('ENVIRONMENT', 'development'),
+        'debug_mode': os.environ.get('DEBUG', 'false').lower() == 'true',
+        'https_forced': os.environ.get('FORCE_HTTPS', 'false').lower() == 'true',
+        'security_headers': 'enabled'
+    }
+    
+    # Calculate security score
+    security_score = 0
+    if security_config['secret_key_configured']:
+        security_score += 2
+    if security_config['admin_password_env']:
+        security_score += 2
+    if security_config['environment'] == 'production':
+        security_score += 1
+    if not security_config['debug_mode']:
+        security_score += 1
+    if security_config['https_forced']:
+        security_score += 2
+    
+    security_config['security_score'] = f"{security_score}/8"
+    security_config['security_grade'] = 'A' if security_score >= 7 else 'B' if security_score >= 5 else 'C' if security_score >= 3 else 'D'
+    security_config['status'] = 'healthy' if security_score >= 5 else 'degraded'
+    
+    health_status["checks"]["security"] = security_config
+
     if critical_failures:
         health_status["status"] = "unhealthy"
         status_code = 503
