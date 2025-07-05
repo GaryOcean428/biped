@@ -1,0 +1,3 @@
+⚠️  Debug mode enabled - security risk
+✅ HTTPS enforcement found
+✅ Security headers implementation found

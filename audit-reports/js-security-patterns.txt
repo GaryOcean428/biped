@@ -1,0 +1,1 @@
+No dangerous JavaScript patterns found

@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from flask import Blueprint, g, jsonify, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from sqlalchemy import and_, desc, or_
+
 from src.models.job import Job, JobStatus
 from src.models.user import User, db
 

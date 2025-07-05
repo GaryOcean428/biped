@@ -1,0 +1,60 @@
+backend/src/routes/payment.py:stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+backend/src/routes/communication.py:            if "sendgrid_api_key" in email_config:
+backend/src/routes/communication.py:                os.environ["SENDGRID_API_KEY"] = email_config["sendgrid_api_key"]
+backend/src/routes/communication.py:                config_updates.append("SendGrid API key")
+backend/src/routes/communication.py:                os.environ["TWILIO_AUTH_TOKEN"] = sms_config["twilio_auth_token"]
+backend/src/routes/secure_api.py:        token = security_manager.generate_jwt_token(
+backend/src/routes/secure_api.py:        csrf_token = security_manager.generate_csrf_token()
+backend/src/routes/secure_api.py:@secure_api_bp.route("/security/csrf-token", methods=["GET"])
+backend/src/routes/secure_api.py:        token = security_manager.generate_csrf_token()
+backend/src/routes/admin.py:        admin_token = session.get("admin_token")
+backend/src/routes/admin.py:        admin = Admin.query.filter_by(session_token=admin_token).first()
+backend/src/routes/admin.py:        token = admin.generate_session_token()
+backend/src/routes/admin.py:        session["admin_token"] = token
+backend/src/models/admin.py:    session_token = db.Column(db.String(255), nullable=True)
+backend/src/models/admin.py:        self.session_token = secrets.token_urlsafe(32)
+backend/src/models/admin.py:        self.session_token = None
+backend/src/static/admin.js:        this.adminToken = localStorage.getItem('adminToken');
+backend/src/static/admin.js:                this.adminToken = data.token;
+backend/src/main.py.backup:        allow_headers=["Content-Type", "Authorization", "X-API-Key", "X-CSRF-Token"],
+backend/src/utils/config.py:    csrf_token_expiration_hours: int = 1
+backend/src/utils/config.py:                csrf_token_expiration_hours=int(os.getenv("CSRF_TOKEN_HOURS", "1")),
+backend/src/utils/security.py:    jwt_access_token_expires: timedelta = timedelta(minutes=15)
+backend/src/utils/security.py:    jwt_refresh_token_expires: timedelta = timedelta(days=30)
+backend/src/utils/security.py:        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = (
+backend/src/utils/security.py:        self.app.config["JWT_REFRESH_TOKEN_EXPIRES"] = (
+backend/src/utils/security.py:        self.app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
+backend/src/utils/security.py:            token_in_redis = self.redis_client.get_cache(f"blacklist:{jti}")
+backend/src/utils/security.py:        access_token = create_access_token(
+backend/src/utils/security.py:        refresh_token = create_access_token(
+backend/src/utils/security.py:    def revoke_token(self, jti: str, token_type: str = "access"):
+backend/src/utils/security.py:        if token_type == "refresh":
+backend/src/utils/security.py:        return totp.verify(token, valid_window=1)  # Allow 1 window tolerance
+backend/src/utils/security.py:    # API Key Management
+backend/src/utils/security.py:    def generate_api_key(
+backend/src/utils/security.py:        """Generate API key for user"""
+backend/src/utils/security.py:        api_key = f"bpd_{secrets.token_urlsafe(32)}"
+backend/src/utils/security.py:        key_hash = hashlib.sha256(api_key.encode()).hexdigest()
+backend/src/utils/security.py:        self.redis_client.set_cache(f"api_key:{key_hash}", key_data)
+backend/src/utils/security.py:        return {"api_key": api_key, "name": name, "permissions": permissions}
+backend/src/utils/security.py:    def validate_api_key(self, api_key: str) -> Optional[dict]:
+backend/src/utils/security.py:        """Validate API key and return user data"""
+backend/src/utils/security.py:        key_hash = hashlib.sha256(api_key.encode()).hexdigest()
+backend/src/utils/security.py:        key_data = self.redis_client.get_cache(f"api_key:{key_hash}")
+backend/src/utils/security.py:            self.redis_client.set_cache(f"api_key:{key_hash}", key_data)
+backend/src/utils/security.py:def require_api_key(security_enhancer: SecurityEnhancer):
+backend/src/utils/security.py:    """Decorator for API key authentication"""
+backend/src/utils/security.py:            api_key = request.headers.get("X-API-Key")
+backend/src/utils/security.py:            if not api_key:
+backend/src/utils/security.py:                return jsonify({"error": "API key required"}), 401
+backend/src/utils/security.py:            key_data = security_enhancer.validate_api_key(api_key)
+backend/src/utils/security.py:                return jsonify({"error": "Invalid API key"}), 401
+backend/src/utils/security.py:            g.api_key_data = key_data
+backend/src/services/communication.py:        self.sendgrid_api_key = os.getenv("SENDGRID_API_KEY")
+backend/src/services/communication.py:        if not self.sendgrid_api_key:
+backend/src/services/communication.py:            logger.error("SendGrid API key not configured")
+backend/src/services/communication.py:            "Authorization": f"Bearer {self.sendgrid_api_key}",
+backend/src/services/communication.py:        self.twilio_auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+backend/src/services/email_client.py:        self.email_service_api_key = os.getenv("EMAIL_SERVICE_API_KEY", "")
+backend/src/services/email_client.py:                    f"Bearer {self.email_service_api_key}"
+backend/src/services/email_client.py:                    if self.email_service_api_key

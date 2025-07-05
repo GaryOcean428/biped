@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request, session
+
 from src.models.user import CustomerProfile, ProviderProfile, User, db
 
 user_bp = Blueprint("user", __name__)

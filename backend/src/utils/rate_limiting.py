@@ -4,6 +4,7 @@ Uses Flask-Limiter for robust rate limiting with backward compatibility
 """
 
 import logging
+
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -15,7 +16,7 @@ limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per hour", "50 per minute"],
     storage_uri="memory://",  # Use memory storage for simplicity
-    strategy="fixed-window"
+    strategy="fixed-window",
 )
 
 # For backward compatibility - alias the limiter

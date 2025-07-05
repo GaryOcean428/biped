@@ -1,0 +1,2 @@
+✅ No .env file in root directory
+✅ .env.example file found - good practice

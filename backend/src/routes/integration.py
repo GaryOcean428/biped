@@ -8,6 +8,7 @@ import os
 import requests
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
+
 from src.models import CustomerProfile, ProviderProfile, User, db
 from src.utils.rate_limiting import limiter
 from src.utils.validation import validate_email

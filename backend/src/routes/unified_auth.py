@@ -12,9 +12,10 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Blueprint, current_app, g, jsonify, request, session
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Import models
-from src.models import db, Admin, CustomerProfile, ProviderProfile, User
+from src.models import Admin, CustomerProfile, ProviderProfile, User, db
 
 # Import utilities
 from src.utils.error_handling import handle_error
@@ -24,7 +25,6 @@ from src.utils.validation import (
     validate_password,
     validate_required_fields,
 )
-from werkzeug.security import check_password_hash, generate_password_hash
 
 # Create blueprint
 auth_bp = Blueprint("unified_auth", __name__, url_prefix="/api/auth")
