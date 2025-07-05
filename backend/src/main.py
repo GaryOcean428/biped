@@ -240,7 +240,7 @@ def create_app():
     
     # Register blueprints
     try:
-        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp
+        from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp, ai_bp
         from src.routes.integration import integration_bp
         
         app.register_blueprint(health_bp)
@@ -249,6 +249,7 @@ def create_app():
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         app.register_blueprint(integration_bp)
         app.register_blueprint(jobs_bp)
+        app.register_blueprint(ai_bp)
         
         logger.info("✅ Blueprints registered successfully")
         
