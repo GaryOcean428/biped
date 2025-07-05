@@ -90,7 +90,7 @@ except Exception as e:
         grep -r "dangerouslySetInnerHTML" src/ > "$AUDIT_DIR/dangerous-html-patterns.txt" 2>/dev/null || \
         echo "No dangerouslySetInnerHTML patterns found" > "$AUDIT_DIR/dangerous-html-patterns.txt"
         
-        grep -r "eval\|innerHTML\|document\.write" src/ > "$AUDIT_DIR/js-security-patterns.txt" 2>/dev/null || \
+        grep -rE "eval|innerHTML|document\.write" src/ > "$AUDIT_DIR/js-security-patterns.txt" 2>/dev/null || \
         echo "No dangerous JavaScript patterns found" > "$AUDIT_DIR/js-security-patterns.txt"
         
         # Check for hardcoded URLs/APIs

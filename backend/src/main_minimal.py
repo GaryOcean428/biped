@@ -37,10 +37,10 @@ def create_app():
                 "SECRET_KEY environment variable is required in production"
             )
         else:
-            # Generate a random secret for development
-            secret_key = secrets.token_hex(32)
+            # Use a consistent development secret key
+            secret_key = "dev-secret-key-change-in-production-" + secrets.token_hex(16)
             logger.warning(
-                "⚠️  Using auto-generated secret key for development. Set SECRET_KEY environment variable."
+                "⚠️  Using development secret key. Set SECRET_KEY environment variable for production."
             )
 
     app.config["SECRET_KEY"] = secret_key

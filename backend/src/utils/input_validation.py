@@ -145,16 +145,20 @@ class InputValidator:
                 return False
 
             # Block localhost and private IPs in production
-            blocked_hosts = [
-                "localhost",
-                "127.0.0.1",
-                "0.0.0.0",
-                "10.",
-                "172.",
-                "192.168.",
-            ]
-            if any(parsed.netloc.startswith(host) for host in blocked_hosts):
-                return False
+            import ipaddress
+            try:
+                # Extract hostname without port
+                hostname = parsed.hostname or parsed.netloc.split(':')[0]
+                if hostname in ['localhost', '127.0.0.1', '0.0.0.0']:
+                    return False
+                # Check if it's a private IP
+                ip = ipaddress.ip_address(hostname)
+                if ip.is_private or ip.is_loopback:
+                    return False
+            except (ValueError, ipaddress.AddressValueError):
+                # Not an IP address, check for localhost variants
+                if hostname.lower() in ['localhost', 'local']:
+                    return False
 
             return True
 

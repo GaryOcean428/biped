@@ -12,7 +12,10 @@ class TestHelpers:
         """Assert that response is JSON with expected status."""
         assert response.status_code == expected_status
         assert response.content_type == "application/json"
-        return json.loads(response.data)
+        try:
+            return json.loads(response.data)
+        except json.JSONDecodeError as e:
+            raise AssertionError(f"Response data is not valid JSON: {e}")
 
     @staticmethod
     def assert_error_response(response, expected_status=400):

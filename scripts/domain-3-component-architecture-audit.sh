@@ -24,8 +24,8 @@ generate_component_catalog() {
     echo -e "${BLUE}Generating comprehensive component catalog...${NC}"
     
     # Find all React components
-    COMPONENT_FILES=$(find "$FRONTEND_DIR" -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" 2>/dev/null || echo "")
-    COMPONENT_COUNT=$(echo "$COMPONENT_FILES" | wc -l)
+    COMPONENT_FILES=$(find "$FRONTEND_DIR" -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" 2>/dev/null | grep -v '^$' || echo "")
+    COMPONENT_COUNT=$(echo "$COMPONENT_FILES" | grep -c . || echo "0")
     
     # Create component catalog
     cat > "$REPORTS_DIR/component-catalog.json" << EOF
