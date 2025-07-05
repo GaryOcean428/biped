@@ -143,7 +143,7 @@ class NotificationManager:
         count = (
             db.session.query(Notification)
             .filter(
-                and_(Notification.user_id == user_id, Notification.is_read == False)
+                and_(Notification.user_id == user_id, Notification.is_read.is_(False))
             )
             .update({"is_read": True, "read_at": datetime.utcnow()})
         )

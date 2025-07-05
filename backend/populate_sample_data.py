@@ -401,7 +401,7 @@ def main():
         create_sample_reviews()
         
         print("✅ Sample data population complete!")
-        print(f"Created:")
+        print("Created:")
         print(f"  - {User.query.count()} users")
         print(f"  - {Job.query.count()} jobs")
         print(f"  - {Invoice.query.count()} invoices")

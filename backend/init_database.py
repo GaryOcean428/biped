@@ -170,7 +170,7 @@ def init_database():
             admin_count = Admin.query.count()
             category_count = ServiceCategory.query.count()
             
-            print(f"\n📊 Database Summary:")
+            print("\n📊 Database Summary:")
             print(f"   Users: {user_count}")
             print(f"   Admins: {admin_count}")
             print(f"   Service Categories: {category_count}")

@@ -262,7 +262,7 @@ class AdvancedSearchEngine:
         )
 
         # Apply filters
-        filters = [User.is_active == True]  # Only active users
+        filters = [User.is_active.is_(True)]  # Only active users
 
         # Text search across multiple fields
         if query:
