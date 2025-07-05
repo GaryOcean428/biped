@@ -364,11 +364,14 @@ def create_app():
     try:
         from src.routes import (
             admin_bp,
+            advanced_search_bp,
             ai_bp,
             auth_bp,
             dashboard_bp,
             health_bp,
             jobs_bp,
+            jobs_api_bp,
+            payment_bp,
         )
 
         logger.info("✅ Blueprints imported successfully")
@@ -387,6 +390,15 @@ def create_app():
 
         app.register_blueprint(jobs_bp)
         logger.info("✅ Jobs blueprint registered")
+
+        app.register_blueprint(jobs_api_bp)
+        logger.info("✅ Jobs API blueprint registered")
+
+        app.register_blueprint(payment_bp, url_prefix="/api/payments")
+        logger.info("✅ Payment blueprint registered")
+
+        app.register_blueprint(advanced_search_bp)
+        logger.info("✅ Advanced Search blueprint registered")
 
         app.register_blueprint(ai_bp)
         logger.info("✅ AI blueprint registered")
@@ -425,6 +437,79 @@ def create_app():
                 "version": "2.0",
             }
         )
+
+    # Additional page routes to fix 404 errors
+    @app.route("/dashboard")
+    def dashboard():
+        """Customer dashboard"""
+        try:
+            return render_template("dashboard.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("dashboard.html")
+
+    @app.route("/provider-dashboard")
+    def provider_dashboard():
+        """Provider dashboard"""
+        try:
+            return render_template("provider-dashboard.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("provider-dashboard.html")
+
+    @app.route("/jobs")
+    def jobs():
+        """Job listings page"""
+        try:
+            return render_template("job-posting.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("job-posting.html")
+
+    @app.route("/post-job")
+    def post_job():
+        """Job posting page"""
+        try:
+            return render_template("post_job.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("post_job.html")
+
+    @app.route("/about")
+    def about():
+        """About page"""
+        try:
+            return render_template("about.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("about.html")
+
+    @app.route("/contact")
+    def contact():
+        """Contact page"""
+        try:
+            return render_template("contact.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("contact.html")
+
+    @app.route("/privacy")
+    def privacy():
+        """Privacy policy page"""
+        try:
+            return render_template("privacy.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("privacy.html")
+
+    @app.route("/terms")
+    def terms():
+        """Terms of service page"""
+        try:
+            return render_template("terms.html")
+        except Exception:
+            # Fallback to serving the static file directly
+            return app.send_static_file("terms.html")
 
     # Enhanced Error handlers with custom pages and security
     @app.errorhandler(404)
