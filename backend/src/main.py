@@ -28,8 +28,18 @@ def create_app():
                 static_folder='static',
                 template_folder='static/templates')
     
-    # Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    # Configuration - Secure secret management
+    secret_key = os.environ.get('SECRET_KEY')
+    if not secret_key:
+        if os.environ.get('ENVIRONMENT') == 'production':
+            raise ValueError("SECRET_KEY environment variable is required in production")
+        else:
+            # Generate a random secret for development
+            import secrets
+            secret_key = secrets.token_hex(32)
+            logger.warning("⚠️  Using auto-generated secret key for development. Set SECRET_KEY environment variable.")
+    
+    app.config['SECRET_KEY'] = secret_key
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -37,7 +47,9 @@ def create_app():
         'pool_recycle': 3600,
         'pool_pre_ping': True
     }
-    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
+    
+    jwt_secret_key = os.environ.get('JWT_SECRET_KEY', secret_key)
+    app.config['JWT_SECRET_KEY'] = jwt_secret_key
     
     # Secure CORS configuration - restrict to specific domains in production
     allowed_origins = [
@@ -67,6 +79,22 @@ def create_app():
             "supports_credentials": True
         }
     })
+    
+    # Add essential security headers
+    @app.after_request
+    def add_security_headers(response):
+        """Add security headers to all responses"""
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:;"
+        
+        # Only add HSTS in production with HTTPS
+        if os.environ.get('ENVIRONMENT') == 'production':
+            response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
+        
+        return response
     
     # Initialize extensions
     from src.models import db
@@ -113,10 +141,19 @@ def create_app():
             from src.models import Admin
             if not Admin.query.filter_by(username='admin').first():
                 from werkzeug.security import generate_password_hash
+                import secrets
+                
+                # Get admin password from environment or generate secure one
+                admin_password = os.environ.get('ADMIN_PASSWORD')
+                if not admin_password:
+                    admin_password = secrets.token_urlsafe(16)
+                    logger.warning(f"⚠️  Generated admin password: {admin_password}")
+                    logger.warning("⚠️  Set ADMIN_PASSWORD environment variable to use a custom password")
+                
                 admin = Admin(
                     username='admin',
                     email='admin@biped.app',
-                    password_hash=generate_password_hash('biped_admin_2025'),
+                    password_hash=generate_password_hash(admin_password),
                     first_name='Admin',
                     last_name='User',
                     role='super_admin',
