@@ -1,0 +1,20 @@
+{
+  "renderingOptimizations": {
+    "reactMemo": 0,
+    "useMemo": 0,
+    "useCallback": 0,
+    "propDrilling": "unknown"
+  },
+  "performanceIssues": {
+    "unnecessaryRerenders": [],
+    "expensiveComputations": [],
+    "stateManagementIssues": []
+  },
+  "recommendations": [
+    "Implement React.memo for pure components",
+    "Use useMemo for expensive calculations",
+    "Use useCallback for event handlers",
+    "Consider state management optimization"
+  ],
+  "score": 40
+}

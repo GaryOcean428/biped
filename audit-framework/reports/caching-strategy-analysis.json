@@ -1,0 +1,24 @@
+{
+  "browserCaching": {
+    "staticAssets": "unknown",
+    "cacheHeaders": "unknown",
+    "versioning": "unknown"
+  },
+  "serviceWorker": {
+    "implemented": false,
+    "cachingStrategy": "none",
+    "offlineSupport": false
+  },
+  "apiCaching": {
+    "responseCache": "unknown",
+    "clientSideCache": "basic",
+    "staleWhileRevalidate": false
+  },
+  "recommendations": [
+    "Implement service worker with caching strategy",
+    "Add proper cache headers for static assets",
+    "Implement API response caching",
+    "Use cache-first strategy for static content"
+  ],
+  "score": 20
+}

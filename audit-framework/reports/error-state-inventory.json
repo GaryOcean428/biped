@@ -1,0 +1,18 @@
+{
+  "errorStates": {
+    "networkFailures": [],
+    "validationErrors": [],
+    "authenticationFailures": [],
+    "componentLoadFailures": []
+  },
+  "errorMessages": {
+    "consistency": "LOW",
+    "userFriendliness": "MEDIUM",
+    "actionability": "LOW"
+  },
+  "recoveryMechanisms": {
+    "retryStrategies": [],
+    "fallbackOptions": [],
+    "userGuidance": []
+  }
+}

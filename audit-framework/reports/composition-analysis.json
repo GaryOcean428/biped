@@ -1,0 +1,33 @@
+{
+  "patterns": {
+    "composition": {
+      "usage": "GOOD",
+      "childrenProps": "BASIC",
+      "renderProps": "NOT_USED",
+      "compoundComponents": "NOT_IMPLEMENTED"
+    },
+    "inheritance": {
+      "classComponents": "MINIMAL",
+      "hoc": "NOT_USED",
+      "mixins": "NOT_USED"
+    }
+  },
+  "opportunities": {
+    "compoundComponents": [
+      "Modal with header/body/footer",
+      "Card with image/content/actions",
+      "Form with fields/validation/submit"
+    ],
+    "renderProps": [
+      "Data fetching components",
+      "State management components",
+      "Animation components"
+    ]
+  },
+  "recommendations": [
+    "Implement compound component patterns",
+    "Use render props for reusable logic",
+    "Avoid inheritance in favor of composition",
+    "Create higher-order component utilities"
+  ]
+}
