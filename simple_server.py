@@ -52,6 +52,22 @@ def business_info():
 def provider_verification():
     return send_from_directory('backend/src/static', 'provider-verification.html')
 
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('backend/src/static', 'manifest.json', mimetype='application/manifest+json')
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('backend/src/static/js', filename, mimetype='application/javascript')
+
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory('backend/src/static/css', filename, mimetype='text/css')
+
+@app.route('/images/<path:filename>')
+def serve_images(filename):
+    return send_from_directory('backend/src/static', filename)
+
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('backend/src/static', filename)
