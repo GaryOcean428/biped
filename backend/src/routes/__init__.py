@@ -10,6 +10,7 @@ from .dashboard import dashboard_bp
 from .health import health_bp
 from .jobs import jobs_bp
 from .legal import legal_bp
+from .ai import ai_bp
 
 # Create aliases for backward compatibility
 auth = auth_bp
@@ -22,6 +23,7 @@ __all__ = [
     'dashboard_bp', 
     'health_bp',
     'jobs_bp',
-    'legal_bp'
+    'legal_bp',
+    'ai_bp'
 ]
 
