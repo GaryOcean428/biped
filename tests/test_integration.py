@@ -12,8 +12,8 @@ import unittest
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
-from src.main import app, db
-from src.models.user import User
+from src.main import app, db  # noqa: E402
+from src.models.user import User  # noqa: E402
 
 
 class APIIntegrationTestCase(unittest.TestCase):

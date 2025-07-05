@@ -531,7 +531,6 @@ def require_permission(permission: str):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             # Check JWT permissions
-            current_user = get_jwt_identity()
             claims = get_jwt()
             user_permissions = claims.get("permissions", [])
 
