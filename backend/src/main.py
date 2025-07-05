@@ -100,6 +100,10 @@ def create_app():
     from src.models import db
     db.init_app(app)
     
+    # Initialize rate limiter
+    from src.utils.rate_limiting import limiter
+    limiter.init_app(app)
+    
     # Initialize security enhancements
     try:
         security_config = SecurityConfig()
@@ -241,20 +245,32 @@ def create_app():
     # Register blueprints
     try:
         from src.routes import auth_bp, admin_bp, dashboard_bp, health_bp, jobs_bp, ai_bp
-        from src.routes.integration import integration_bp
+        logger.info("✅ Blueprints imported successfully")
         
         app.register_blueprint(health_bp)
-        app.register_blueprint(auth_bp, url_prefix='/auth')
-        app.register_blueprint(admin_bp, url_prefix='/admin')
-        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-        app.register_blueprint(integration_bp)
-        app.register_blueprint(jobs_bp)
-        app.register_blueprint(ai_bp)
+        logger.info("✅ Health blueprint registered")
         
-        logger.info("✅ Blueprints registered successfully")
+        app.register_blueprint(auth_bp)  # auth_bp already has /api/auth prefix
+        logger.info("✅ Auth blueprint registered")
+        
+        app.register_blueprint(admin_bp, url_prefix='/admin')
+        logger.info("✅ Admin blueprint registered")
+        
+        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+        logger.info("✅ Dashboard blueprint registered")
+        
+        app.register_blueprint(jobs_bp)
+        logger.info("✅ Jobs blueprint registered")
+        
+        app.register_blueprint(ai_bp)
+        logger.info("✅ AI blueprint registered")
+        
+        logger.info("✅ All blueprints registered successfully")
         
     except ImportError as e:
         logger.warning(f"⚠️ Blueprint import error: {e}")
+    except Exception as e:
+        logger.error(f"❌ Blueprint registration error: {e}")
     
     # Root routes
     @app.route('/')
