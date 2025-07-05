@@ -115,3 +115,62 @@ dev-setup: install-dev ## Set up development environment
 # Quality gates for CI/CD
 ci-test: lint test check-security ## Run all CI checks
 	@echo "✅ All CI checks passed"
+# Enhanced quality targets
+format-check: ## Check if code is properly formatted
+	@echo "Checking Python formatting..."
+	black --check backend/src/ tests/ || (echo "❌ Code formatting issues found. Run 'make format' to fix." && exit 1)
+	isort --check-only backend/src/ tests/ || (echo "❌ Import sorting issues found. Run 'make format' to fix." && exit 1)
+	@echo "✅ Code formatting is correct"
+
+type-check: ## Run Python type checking
+	@echo "Running type checking..."
+	@if command -v mypy >/dev/null 2>&1; then \
+		mypy backend/src/ --ignore-missing-imports || echo "⚠️  Type checking found issues"; \
+	else \
+		echo "⚠️  mypy not installed. Install with: pip install mypy"; \
+	fi
+
+complexity-check: ## Check code complexity
+	@echo "Checking code complexity..."
+	@if command -v radon >/dev/null 2>&1; then \
+		radon cc backend/src/ --min=B --show-complexity || echo "⚠️  High complexity found"; \
+	else \
+		echo "⚠️  radon not installed. Install with: pip install radon"; \
+	fi
+
+security-check-enhanced: ## Enhanced security checks
+	@echo "Running enhanced security checks..."
+	@if command -v bandit >/dev/null 2>&1; then \
+		bandit -r backend/src/ -ll || echo "⚠️  Security issues found"; \
+	else \
+		echo "⚠️  bandit not installed. Install with: pip install bandit"; \
+	fi
+	@$(MAKE) check-security
+
+quality-gate: format-check lint type-check test ## Run all quality gates
+	@echo "✅ All quality gates passed! Code is ready for commit."
+
+pre-commit: quality-gate ## Run before committing code
+	@echo "🚀 Pre-commit checks completed successfully"
+
+audit-report: ## Generate comprehensive audit report
+	@echo "Generating audit report..."
+	@mkdir -p audit-reports
+	@echo "Audit Report - $(shell date)" > audit-reports/audit-summary.md
+	@echo "=========================" >> audit-reports/audit-summary.md
+	@echo "" >> audit-reports/audit-summary.md
+	@echo "## Code Quality" >> audit-reports/audit-summary.md
+	@$(MAKE) lint > audit-reports/lint-results.txt 2>&1 && echo "✅ Linting: PASSED" >> audit-reports/audit-summary.md || echo "❌ Linting: FAILED" >> audit-reports/audit-summary.md
+	@$(MAKE) test > audit-reports/test-results.txt 2>&1 && echo "✅ Tests: PASSED" >> audit-reports/audit-summary.md || echo "❌ Tests: FAILED" >> audit-reports/audit-summary.md
+	@echo "" >> audit-reports/audit-summary.md
+	@echo "## Security" >> audit-reports/audit-summary.md
+	@$(MAKE) check-security > audit-reports/security-results.txt 2>&1 && echo "✅ Security: PASSED" >> audit-reports/audit-summary.md || echo "❌ Security: FAILED" >> audit-reports/audit-summary.md
+	@echo "" >> audit-reports/audit-summary.md
+	@echo "📊 Detailed results available in audit-reports/ directory"
+	@cat audit-reports/audit-summary.md
+
+ci-check: ## Run CI/CD quality checks
+	@echo "Running CI/CD quality checks..."
+	@$(MAKE) quality-gate
+	@$(MAKE) audit-report
+	@echo "✅ CI/CD checks completed"

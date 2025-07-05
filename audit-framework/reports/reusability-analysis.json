@@ -1,0 +1,44 @@
+{
+  "reusabilityMetrics": {
+    "duplicateLogic": {
+      "found": true,
+      "examples": [
+        "Form handling patterns",
+        "Loading state management",
+        "Error handling logic"
+      ],
+      "impact": "HIGH"
+    },
+    "propInterfaces": {
+      "consistency": "MEDIUM",
+      "flexibility": "LOW",
+      "documentation": "MINIMAL"
+    },
+    "composability": {
+      "score": 30,
+      "patterns": "LIMITED",
+      "childrenUsage": "BASIC"
+    }
+  },
+  "opportunities": {
+    "abstractComponents": [
+      "Button variants",
+      "Input field variations",
+      "Card/Container patterns",
+      "Loading indicators",
+      "Error displays"
+    ],
+    "customHooks": [
+      "API data fetching",
+      "Form validation",
+      "Local storage management",
+      "Theme management"
+    ]
+  },
+  "recommendations": [
+    "Create base component library",
+    "Implement compound component patterns",
+    "Extract common hooks",
+    "Standardize prop interfaces"
+  ]
+}

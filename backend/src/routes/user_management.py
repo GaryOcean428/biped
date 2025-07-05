@@ -7,6 +7,7 @@ with the UserService layer to handle all user operations.
 """
 
 from flask import Blueprint, jsonify, request, session
+
 from src.routes.unified_auth import admin_required, login_required, role_required
 from src.services.user_service import RoleBasedAccessControl, UserService
 from src.utils.error_handling import handle_error
@@ -397,6 +398,7 @@ def get_user_statistics():
     """Get user statistics (admin only)"""
     try:
         from sqlalchemy import func
+
         from src.models.user import User
 
         # Get basic counts

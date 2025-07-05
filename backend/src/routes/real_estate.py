@@ -9,6 +9,7 @@ from decimal import Decimal
 
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
+
 from src.models.financial import FinancialQuote, Invoice
 from src.models.user import User, db
 

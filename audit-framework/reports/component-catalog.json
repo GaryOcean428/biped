@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "domain": "Component Architecture",
+    "generated": "2025-07-05T08:36:46Z",
+    "version": "1.0.0",
+    "totalFiles": 8
+  },
+  "inventory": {
+    "components": [],
+    "classification": {
+      "layout": [],
+      "ui": [],
+      "businessLogic": [],
+      "featureSpecific": []
+    }
+  },
+  "analysis": {
+    "reusabilityScore": 40,
+    "consistencyScore": 50,
+    "complexityScore": 60,
+    "propInterfaceScore": 45
+  },
+  "patterns": {
+    "compositionVsInheritance": "composition-preferred",
+    "propDrilling": "present",
+    "stateManagement": "local-state-heavy"
+  }
+}

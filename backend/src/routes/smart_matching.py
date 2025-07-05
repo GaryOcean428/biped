@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Tuple
 
 from flask import Blueprint, g, jsonify, request
 from sqlalchemy import and_, desc, func, or_
+
 from src.models.job import Job, JobStatus
 from src.models.review import Review
 from src.models.service import Service, ServiceCategory

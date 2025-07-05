@@ -1,0 +1,8 @@
+Python Environment:
+Python 3.12.3
+Python path: /usr/bin/python3
+Node.js version: v20.19.2
+npm version: 10.8.2
+yarn version: 1.22.22
+Python files: 60
+Total lines:  22647 total

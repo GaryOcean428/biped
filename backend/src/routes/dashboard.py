@@ -8,6 +8,7 @@ from decimal import Decimal
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy import and_, func
+
 from src.models.financial import Invoice, PlatformRevenue
 from src.models.job import Job, JobStatus
 from src.models.review import Review

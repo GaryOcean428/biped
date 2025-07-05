@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 from flask import Blueprint, jsonify, request, session
 from sqlalchemy import and_, or_
+
 from src.models.job import Job, JobMessage, JobMilestone, JobStatus, Quote
 from src.models.service import Service
 from src.models.user import ProviderProfile, User, db

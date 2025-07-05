@@ -7,8 +7,9 @@ import mimetypes
 import os
 
 from flask import Blueprint, jsonify, request, send_file
-from src.utils.storage import storage_manager
 from werkzeug.utils import secure_filename
+
+from src.utils.storage import storage_manager
 
 storage_bp = Blueprint("storage", __name__, url_prefix="/api/storage")
 

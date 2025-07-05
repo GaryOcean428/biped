@@ -12,6 +12,7 @@ from functools import wraps
 import requests
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
+
 from src.models.financial import PlatformRevenue
 from src.models.user import User, db
 

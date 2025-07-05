@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request, session
+
 from src.models.user import User, db
 from src.utils.performance import (
     cache_result,

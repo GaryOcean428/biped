@@ -1,0 +1,76 @@
+{
+  "auditMetadata": {
+    "version": "1.0.0",
+    "generated": "2024-01-01T00:00:00Z",
+    "framework": "Biped Architecture & UX Audit",
+    "totalDomains": 8
+  },
+  "overallScores": {
+    "average": 46.25,
+    "weighted": 47.5,
+    "grade": "C+",
+    "status": "NEEDS_IMPROVEMENT"
+  },
+  "domainScores": {
+    "errorResilience": {
+      "score": 25,
+      "weight": 20,
+      "priority": "CRITICAL",
+      "impact": "HIGH"
+    },
+    "performance": {
+      "score": 35,
+      "weight": 20,
+      "priority": "HIGH",
+      "impact": "HIGH"
+    },
+    "componentArchitecture": {
+      "score": 50,
+      "weight": 15,
+      "priority": "MEDIUM_HIGH",
+      "impact": "MEDIUM"
+    },
+    "designSystem": {
+      "score": 60,
+      "weight": 10,
+      "priority": "MEDIUM",
+      "impact": "MEDIUM"
+    },
+    "navigation": {
+      "score": 40,
+      "weight": 15,
+      "priority": "HIGH",
+      "impact": "HIGH"
+    },
+    "userExperience": {
+      "score": 35,
+      "weight": 15,
+      "priority": "HIGH",
+      "impact": "HIGH"
+    },
+    "featureUtilization": {
+      "score": 70,
+      "weight": 2.5,
+      "priority": "LOW",
+      "impact": "LOW"
+    },
+    "codeDeduplication": {
+      "score": 55,
+      "weight": 2.5,
+      "priority": "MEDIUM",
+      "impact": "MEDIUM"
+    }
+  },
+  "priorityMatrix": {
+    "critical": ["errorResilience"],
+    "high": ["performance", "navigation", "userExperience"],
+    "medium": ["componentArchitecture", "designSystem", "codeDeduplication"],
+    "low": ["featureUtilization"]
+  },
+  "estimatedImpact": {
+    "developmentVelocity": "40% improvement",
+    "userExperience": "70% improvement",
+    "maintainability": "60% improvement",
+    "performance": "80% improvement"
+  }
+}

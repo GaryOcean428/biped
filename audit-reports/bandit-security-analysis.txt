@@ -1,0 +1,326 @@
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.12.3
+Working... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:01
+Run started:2025-07-05 08:27:49.139211
+
+Test results:
+>> Issue: [B201:flask_debug_true] A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.
+   Severity: High   Confidence: Medium
+   CWE: CWE-94 (https://cwe.mitre.org/data/definitions/94.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b201_flask_debug_true.html
+   Location: backend/src/ai_test_server.py:341:4
+340	    logger.info(f"🚀 Starting AI testing server on port {port}")
+341	    app.run(host="0.0.0.0", port=port, debug=True)
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: backend/src/ai_test_server.py:341:17
+340	    logger.info(f"🚀 Starting AI testing server on port {port}")
+341	    app.run(host="0.0.0.0", port=port, debug=True)
+
+--------------------------------------------------
+>> Issue: [B201:flask_debug_true] A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.
+   Severity: High   Confidence: Medium
+   CWE: CWE-94 (https://cwe.mitre.org/data/definitions/94.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b201_flask_debug_true.html
+   Location: backend/src/main.py:556:4
+555	    logger.info(f"🔧 Development mode - starting on port {port}")
+556	    app.run(host="0.0.0.0", port=port, debug=True)
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: backend/src/main.py:556:17
+555	    logger.info(f"🔧 Development mode - starting on port {port}")
+556	    app.run(host="0.0.0.0", port=port, debug=True)
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: backend/src/main_minimal.py:160:17
+159	
+160	    app.run(host="0.0.0.0", port=port, debug=debug)
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: backend/src/main_with_ai.py:173:17
+172	
+173	    app.run(host="0.0.0.0", port=port, debug=debug)
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'biped-webhook-secret-2025'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b105_hardcoded_password_string.html
+   Location: backend/src/routes/integrations.py:27:17
+26	# Webhook security (you should set this as an environment variable)
+27	WEBHOOK_SECRET = "biped-webhook-secret-2025"
+28	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:479:39
+478	        "report_generated": datetime.now().isoformat(),
+479	        "overall_quality_score": round(random.uniform(75, 95), 1),
+480	        "total_images_analyzed": random.randint(5, 15),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:480:33
+479	        "overall_quality_score": round(random.uniform(75, 95), 1),
+480	        "total_images_analyzed": random.randint(5, 15),
+481	        "defects_summary": {
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:482:29
+481	        "defects_summary": {
+482	            "total_defects": random.randint(0, 8),
+483	            "critical": random.randint(0, 1),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:483:24
+482	            "total_defects": random.randint(0, 8),
+483	            "critical": random.randint(0, 1),
+484	            "major": random.randint(0, 3),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:484:21
+483	            "critical": random.randint(0, 1),
+484	            "major": random.randint(0, 3),
+485	            "minor": random.randint(0, 5),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:485:21
+484	            "major": random.randint(0, 3),
+485	            "minor": random.randint(0, 5),
+486	        },
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:488:33
+487	        "safety_compliance": {
+488	            "overall_compliant": random.choice([True, False]),
+489	            "compliance_score": round(random.uniform(80, 98), 1),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:489:38
+488	            "overall_compliant": random.choice([True, False]),
+489	            "compliance_score": round(random.uniform(80, 98), 1),
+490	            "violations_count": random.randint(0, 3),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:490:32
+489	            "compliance_score": round(random.uniform(80, 98), 1),
+490	            "violations_count": random.randint(0, 3),
+491	        },
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:493:43
+492	        "progress_tracking": {
+493	            "completion_percentage": round(random.uniform(60, 100), 1),
+494	            "milestones_completed": random.randint(3, 8),
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/blacklists/blacklist_calls.html#b311-random
+   Location: backend/src/routes/vision.py:494:36
+493	            "completion_percentage": round(random.uniform(60, 100), 1),
+494	            "milestones_completed": random.randint(3, 8),
+495	            "estimated_completion": "2025-01-15",
+
+--------------------------------------------------
+>> Issue: [B113:request_without_timeout] Call to requests without timeout
+   Severity: Medium   Confidence: Low
+   CWE: CWE-400 (https://cwe.mitre.org/data/definitions/400.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b113_request_without_timeout.html
+   Location: backend/src/services/communication.py:90:19
+89	
+90	        response = requests.post(url, json=data, headers=headers)
+91	        return response.status_code == 202
+
+--------------------------------------------------
+>> Issue: [B113:request_without_timeout] Call to requests without timeout
+   Severity: Medium   Confidence: Low
+   CWE: CWE-400 (https://cwe.mitre.org/data/definitions/400.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b113_request_without_timeout.html
+   Location: backend/src/services/communication.py:169:19
+168	
+169	        response = requests.post(
+170	            url, data=data, auth=(self.twilio_account_sid, self.twilio_auth_token)
+171	        )
+172	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b324_hashlib.html
+   Location: backend/src/utils/cv_fallback.py:160:23
+159	
+160	            image_id = hashlib.md5(image_data).hexdigest()[:8]
+161	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b324_hashlib.html
+   Location: backend/src/utils/cv_fallback.py:189:20
+188	
+189	        before_id = hashlib.md5(before_data).hexdigest()[:8]
+190	        after_id = hashlib.md5(after_data).hexdigest()[:8]
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b324_hashlib.html
+   Location: backend/src/utils/cv_fallback.py:190:19
+189	        before_id = hashlib.md5(before_data).hexdigest()[:8]
+190	        after_id = hashlib.md5(after_data).hexdigest()[:8]
+191	
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: backend/src/utils/input_validation.py:151:16
+150	                "127.0.0.1",
+151	                "0.0.0.0",
+152	                "10.",
+153	                "172.",
+154	                "192.168.",
+155	            ]
+156	            if any(parsed.netloc.startswith(host) for host in blocked_hosts):
+157	                return False
+158	
+159	            return True
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b324_hashlib.html
+   Location: backend/src/utils/performance.py:35:15
+34	        key_string = json.dumps(key_data, sort_keys=True)
+35	        return hashlib.md5(key_string.encode()).hexdigest()
+36	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b324_hashlib.html
+   Location: backend/src/utils/performance.py:283:35
+282	        response.headers["Cache-Control"] = f"public, max-age={max_age}"
+283	        response.headers["ETag"] = hashlib.md5(response.data).hexdigest()
+284	
+
+--------------------------------------------------
+>> Issue: [B107:hardcoded_password_default] Possible hardcoded password: 'access'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b107_hardcoded_password_default.html
+   Location: backend/src/utils/security.py:276:4
+275	
+276	    def revoke_token(self, jti: str, token_type: str = "access"):
+277	        """Add token to blacklist"""
+278	        ttl = int(self.config.jwt_access_token_expires.total_seconds())
+279	        if token_type == "refresh":
+280	            ttl = int(self.config.jwt_refresh_token_expires.total_seconds())
+281	
+282	        self.redis_client.set_cache(f"blacklist:{jti}", True, ttl=ttl)
+283	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'refresh'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b105_hardcoded_password_string.html
+   Location: backend/src/utils/security.py:279:25
+278	        ttl = int(self.config.jwt_access_token_expires.total_seconds())
+279	        if token_type == "refresh":
+280	            ttl = int(self.config.jwt_refresh_token_expires.total_seconds())
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.8.5/plugins/b105_hardcoded_password_string.html
+   Location: backend/src/utils/validation.py:18:23
+17	    PHONE_PATTERN = r"^\+?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+18	    PASSWORD_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+19	
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 17712
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 15
+		Medium: 7
+		High: 7
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 2
+		Medium: 11
+		High: 16
+Files skipped (0):

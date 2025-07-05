@@ -1,0 +1,25 @@
+{
+  "propDesign": {
+    "complexity": "MEDIUM",
+    "consistency": "LOW",
+    "validation": "MINIMAL",
+    "documentation": "POOR"
+  },
+  "commonIssues": [
+    "Inconsistent prop naming",
+    "Missing prop validation",
+    "Complex prop interfaces",
+    "Poor prop documentation"
+  ],
+  "typescript": {
+    "adoption": "PARTIAL",
+    "interfaceDefinitions": "INCOMPLETE",
+    "genericUsage": "LIMITED"
+  },
+  "recommendations": [
+    "Implement comprehensive TypeScript interfaces",
+    "Establish prop naming conventions",
+    "Add prop validation",
+    "Create component documentation"
+  ]
+}

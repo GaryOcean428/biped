@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Union
 
 from flask import current_app
 from sqlalchemy.exc import IntegrityError
+
 from src.models.admin import Admin
 from src.models.user import CustomerProfile, ProviderProfile, User, db
 from src.utils.error_handling import ServiceError

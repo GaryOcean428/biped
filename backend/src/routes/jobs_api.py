@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 
 from flask import Blueprint, jsonify, request
+
 from src.utils.error_handling import ErrorHandler
 
 jobs_api_bp = Blueprint("jobs_api", __name__)
@@ -294,9 +295,10 @@ def get_jobs():
     except Exception as e:
         # Log the error for debugging but don't expose internal details
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Error fetching jobs: {str(e)}", exc_info=True)
-        
+
         return ErrorHandler.handle_server_error(
             "Failed to fetch jobs. Please try again later."
         )
@@ -316,9 +318,10 @@ def get_job(job_id):
     except Exception as e:
         # Log the error for debugging but don't expose internal details
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Error fetching job {job_id}: {str(e)}", exc_info=True)
-        
+
         return ErrorHandler.handle_server_error(
             "Failed to fetch job details. Please try again later."
         )
