@@ -364,12 +364,14 @@ def create_app():
     try:
         from src.routes import (
             admin_bp,
+            advanced_search_bp,
             ai_bp,
             auth_bp,
             dashboard_bp,
             health_bp,
             jobs_bp,
             jobs_api_bp,
+            payment_bp,
         )
 
         logger.info("✅ Blueprints imported successfully")
@@ -391,6 +393,12 @@ def create_app():
 
         app.register_blueprint(jobs_api_bp)
         logger.info("✅ Jobs API blueprint registered")
+
+        app.register_blueprint(payment_bp, url_prefix="/api/payments")
+        logger.info("✅ Payment blueprint registered")
+
+        app.register_blueprint(advanced_search_bp)
+        logger.info("✅ Advanced Search blueprint registered")
 
         app.register_blueprint(ai_bp)
         logger.info("✅ AI blueprint registered")
