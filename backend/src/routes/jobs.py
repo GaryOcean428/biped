@@ -81,66 +81,64 @@ def create_job():
         if not os.path.exists(db_path):
             os.makedirs("instance", exist_ok=True)
 
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
 
-        # Create table if it doesn't exist
-        cursor.execute(
+            # Create table if it doesn't exist
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS job (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    customer_id INTEGER NOT NULL,
+                    service_id INTEGER,
+                    title VARCHAR(200) NOT NULL,
+                    description TEXT NOT NULL,
+                    street_address VARCHAR(255),
+                    city VARCHAR(100),
+                    state VARCHAR(50),
+                    postcode VARCHAR(10),
+                    budget_min DECIMAL(10, 2),
+                    budget_max DECIMAL(10, 2),
+                    budget_type VARCHAR(20) DEFAULT 'fixed',
+                    property_type VARCHAR(50) DEFAULT 'residential',
+                    is_urgent BOOLEAN DEFAULT 0,
+                    special_requirements TEXT,
+                    status VARCHAR(20) DEFAULT 'posted',
+                    posted_at DATETIME,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
             """
-            CREATE TABLE IF NOT EXISTS job (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                customer_id INTEGER NOT NULL,
-                service_id INTEGER,
-                title VARCHAR(200) NOT NULL,
-                description TEXT NOT NULL,
-                street_address VARCHAR(255),
-                city VARCHAR(100),
-                state VARCHAR(50),
-                postcode VARCHAR(10),
-                budget_min DECIMAL(10, 2),
-                budget_max DECIMAL(10, 2),
-                budget_type VARCHAR(20) DEFAULT 'fixed',
-                property_type VARCHAR(50) DEFAULT 'residential',
-                is_urgent BOOLEAN DEFAULT 0,
-                special_requirements TEXT,
-                status VARCHAR(20) DEFAULT 'posted',
-                posted_at DATETIME,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
 
-        # Insert the job
-        cursor.execute(
-            """
-            INSERT INTO job (customer_id, service_id, title, description, street_address, 
-                           city, state, postcode, budget_min, budget_max, budget_type, 
-                           property_type, is_urgent, special_requirements, status, posted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                data.get("customer_id", 1),  # Default customer
-                data["category_id"],
-                data["title"],
-                data["description"],
-                data["location"],
-                data["location"],
-                "NSW",  # Default state
-                "2000",  # Default postcode
-                float(data["budget"]),
-                float(data["budget"]),
-                "fixed",
-                "residential",
-                1 if data.get("urgency") == "asap" else 0,
-                data.get("requirements", ""),
-                "posted",
-                datetime.utcnow().isoformat(),
-            ),
-        )
+            # Insert the job
+            cursor.execute(
+                """
+                INSERT INTO job (customer_id, service_id, title, description, street_address,
+                               city, state, postcode, budget_min, budget_max, budget_type,
+                               property_type, is_urgent, special_requirements, status, posted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    data.get("customer_id", 1),  # Default customer
+                    data["category_id"],
+                    data["title"],
+                    data["description"],
+                    data["location"],
+                    data["location"],
+                    "NSW",  # Default state
+                    "2000",  # Default postcode
+                    float(data["budget"]),
+                    float(data["budget"]),
+                    "fixed",
+                    "residential",
+                    1 if data.get("urgency") == "asap" else 0,
+                    data.get("requirements", ""),
+                    "posted",
+                    datetime.utcnow().isoformat(),
+                ),
+            )
 
-        job_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
+            job_id = cursor.lastrowid
 
         return (
             jsonify(

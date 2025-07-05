@@ -103,7 +103,7 @@ def create_app():
         )
 
         # Only add HSTS in production with HTTPS
-        if os.environ.get("ENVIRONMENT") == "production":
+        if os.environ.get("ENVIRONMENT") == "production" and request.is_secure:
             response.headers["Strict-Transport-Security"] = (
                 "max-age=63072000; includeSubDomains; preload"
             )

@@ -208,11 +208,14 @@ def health_check():
         security_score += 2
 
     security_config["security_score"] = f"{security_score}/8"
-    security_config["security_grade"] = (
-        "A"
-        if security_score >= 7
-        else "B" if security_score >= 5 else "C" if security_score >= 3 else "D"
-    )
+    if security_score >= 7:
+        security_config["security_grade"] = "A"
+    elif security_score >= 5:
+        security_config["security_grade"] = "B"
+    elif security_score >= 3:
+        security_config["security_grade"] = "C"
+    else:
+        security_config["security_grade"] = "D"
     security_config["status"] = "healthy" if security_score >= 5 else "degraded"
 
     health_status["checks"]["security"] = security_config

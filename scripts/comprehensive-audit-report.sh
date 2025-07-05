@@ -116,9 +116,11 @@ if [ -f "$AUDIT_DIR/python-file-count.txt" ]; then
     echo "- **Python Files:** $PYTHON_FILES files analyzed" >> "$REPORT_FILE"
 fi
 
-if [ -f "$AUDIT_DIR/python-line-count.txt" ]; then
-    PYTHON_LINES=$(cat "$AUDIT_DIR/python-line-count.txt" | awk '{print $1}')
-    echo "- **Lines of Code:** $PYTHON_LINES lines in Python codebase" >> "$REPORT_FILE"
+if [ -f "$AUDIT_DIR/python-line-count.txt" ] && [ -s "$AUDIT_DIR/python-line-count.txt" ]; then
+    PYTHON_LINES=$(cat "$AUDIT_DIR/python-line-count.txt" | awk 'NF && $1 ~ /^[0-9]+$/ {print $1; exit}')
+    if [ -n "$PYTHON_LINES" ]; then
+        echo "- **Lines of Code:** $PYTHON_LINES lines in Python codebase" >> "$REPORT_FILE"
+    fi
 fi
 
 cat >> "$REPORT_FILE" << EOF
