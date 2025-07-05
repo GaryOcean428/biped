@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse all service categories on Biped - from plumbing and electrical to cleaning and landscaping. Find verified professionals for any job.">
+    <title>Service Categories - Find Professionals | Biped</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .categories-section {
+            padding: 60px 0;
+            background: #f8f9fa;
+        }
+        
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .category-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .category-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .category-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .avg-price {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .popular-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .category-card {
+            position: relative;
+        }
+        
+        .stats-section {
+            padding: 60px 0;
+            background: white;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .stat-item {
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .cta-section {
+            padding: 60px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="container">
+            <h1>Service Categories</h1>
+            <p>Find verified professionals for any job. Browse by category or search for specific services.</p>
+        </div>
+    </section>
+
+    <section class="categories-section">
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search for a service (e.g., plumber, electrician, cleaner)..." id="categorySearch">
+            </div>
+            
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Home Maintenance -->
+                <div class="category-card" data-category="plumbing">
+                    <div class="popular-badge">Popular</div>
+                    <span class="category-icon">🔧</span>
+                    <h3>Plumbing</h3>
+                    <p>Leak repairs, pipe installation, drain cleaning, hot water systems, and emergency plumbing services.</p>
+                    <div class="category-stats">
+                        <span>127 professionals</span>
+                        <span class="avg-price">$85-150/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="electrical">
+                    <div class="popular-badge">Popular</div>
+                    <span class="category-icon">⚡</span>
+                    <h3>Electrical</h3>
+                    <p>Wiring, lighting installation, switchboard upgrades, ceiling fans, and electrical repairs.</p>
+                    <div class="category-stats">
+                        <span>94 professionals</span>
+                        <span class="avg-price">$90-160/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="hvac">
+                    <span class="category-icon">🌡️</span>
+                    <h3>HVAC & Air Conditioning</h3>
+                    <p>AC installation, heating repair, ducted systems, split systems, and maintenance services.</p>
+                    <div class="category-stats">
+                        <span>68 professionals</span>
+                        <span class="avg-price">$120-200/hr</span>
+                    </div>
+                </div>
+                
+                <!-- Construction & Renovation -->
+                <div class="category-card" data-category="painting">
+                    <span class="category-icon">🎨</span>
+                    <h3>Painting & Decorating</h3>
+                    <p>Interior/exterior painting, wallpapering, staining, pressure washing, and color consultation.</p>
+                    <div class="category-stats">
+                        <span>156 professionals</span>
+                        <span class="avg-price">$45-75/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="carpentry">
+                    <span class="category-icon">🔨</span>
+                    <h3>Carpentry & Joinery</h3>
+                    <p>Custom cabinets, shelving, door installation, deck building, and furniture repair.</p>
+                    <div class="category-stats">
+                        <span>89 professionals</span>
+                        <span class="avg-price">$60-95/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="flooring">
+                    <span class="category-icon">🏠</span>
+                    <h3>Flooring</h3>
+                    <p>Hardwood, laminate, tile, carpet installation, floor sanding, and polishing services.</p>
+                    <div class="category-stats">
+                        <span>73 professionals</span>
+                        <span class="avg-price">$35-65/hr</span>
+                    </div>
+                </div>
+                
+                <!-- Cleaning & Maintenance -->
+                <div class="category-card" data-category="cleaning">
+                    <div class="popular-badge">Popular</div>
+                    <span class="category-icon">🧽</span>
+                    <h3>Cleaning Services</h3>
+                    <p>Regular cleaning, deep cleaning, end of lease, carpet cleaning, and window cleaning.</p>
+                    <div class="category-stats">
+                        <span>203 professionals</span>
+                        <span class="avg-price">$25-45/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="gardening">
+                    <span class="category-icon">🌱</span>
+                    <h3>Gardening & Landscaping</h3>
+                    <p>Lawn mowing, garden maintenance, landscape design, tree trimming, and irrigation.</p>
+                    <div class="category-stats">
+                        <span>145 professionals</span>
+                        <span class="avg-price">$40-70/hr</span>
+                    </div>
+                </div>
+                
+                <div class="category-card" data-category="pest-control">
+                    <span class="category-icon">🐛</span>
+                    <h3>Pest Control</h3>
+                    <p>Termite treatment, rodent control, spider treatment, and general pest management.</p>
+                    <div class="category-stats">
+                        <span>52 professionals</span>
+                        <span class="avg-price">$150-300/service</span>
+                    </div>
+                </div>
+                
+                <!-- Automotive -->
+                <div class="category-card" data-category="automotive">
+                    <span class="category-icon">🚗</span>
+                    <h3>Automotive Services</h3>
+                    <p>Mobile mechanics, car servicing, brake repair, battery replacement, and diagnostics.</p>
+                    <div class="category-stats">
+                        <span>78 professionals</span>
+                        <span class="avg-price">$80-120/hr</span>
+                    </div>
+                </div>
+                
+                <!-- Technology -->
+                <div class="category-card" data-category="technology">
+                    <span class="category-icon">💻</span>
+                    <h3>Technology & IT</h3>
+                    <p>Computer repair, network setup, security systems, smart home installation, and TV mounting.</p>
+                    <div class="category-stats">
+                        <span>91 professionals</span>
+                        <span class="avg-price">$70-110/hr</span>
+                    </div>
+                </div>
+                
+                <!-- Beauty & Wellness -->
+                <div class="category-card" data-category="beauty">
+                    <span class="category-icon">💄</span>
+                    <h3>Beauty & Wellness</h3>
+                    <p>Mobile hairdressing, makeup artistry, massage therapy, and personal training.</p>
+                    <div class="category-stats">
+                        <span>134 professionals</span>
+                        <span class="avg-price">$50-90/hr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="container">
+            <h2>Why Choose Biped?</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">1,200+</span>
+                    <span class="stat-label">Verified Professionals</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24min</span>
+                    <span class="stat-label">Average Response Time</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">98.5%</span>
+                    <span class="stat-label">Customer Satisfaction</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$2.8M</span>
+                    <span class="stat-label">Jobs Completed</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Find Your Professional?</h2>
+            <p>Get matched with verified professionals in minutes. Safe, secure, and satisfaction guaranteed.</p>
+            <a href="/post-job" class="cta-button">Post Your Job Now</a>
+        </div>
+    </section>
+
+    <script>
+        // Search functionality
+        document.getElementById('categorySearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.category-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                const category = card.getAttribute('data-category');
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Category card click handling
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const category = this.getAttribute('data-category');
+                console.log('Category clicked:', category);
+                // In production, navigate to category page or trigger job posting
+                // window.location.href = `/category/${category}`;
+            });
+        });
+        
+        // Track page interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Service categories page loaded');
+        });
+    </script>
+</body>
+</html>

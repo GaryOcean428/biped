@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how Biped connects you with verified local tradespeople and professionals. Transparent, secure, and trusted.">
+    <title>How Biped Works - Connect with Verified Professionals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .steps-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 60px;
+        }
+        
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .step-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .step-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .step-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .verification-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .verification-item {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .verification-item h4 {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .verification-item p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .transparency-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .transparency-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-top: 40px;
+        }
+        
+        .transparency-box h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .transparency-list {
+            list-style: none;
+        }
+        
+        .transparency-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #666;
+        }
+        
+        .transparency-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #218838;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="container">
+            <h1>How Biped Works</h1>
+            <p>Connect with verified local tradespeople and professionals in three simple steps. Transparent, secure, and trusted by thousands of Australians.</p>
+        </div>
+    </section>
+
+    <section class="steps-section">
+        <div class="container">
+            <h2 class="section-title">Simple. Transparent. Secure.</h2>
+            <p class="section-subtitle">Our platform makes finding trusted professionals effortless</p>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Describe Your Job</h3>
+                    <p>Tell us what you need done. Include details about the work, your budget range, location, and timeline. Our system will analyze your requirements to find the best matches.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Get Matched Instantly</h3>
+                    <p>Our AI system instantly matches you with up to 5 verified professionals based on skills, location, availability, budget compatibility, and past performance ratings.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Choose & Connect</h3>
+                    <p>Review detailed profiles, ratings, and quotes. Chat directly with professionals, schedule site visits, and hire with confidence knowing all payments are protected.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="verification-section">
+        <div class="container">
+            <h2 class="section-title">7-Step Verification Process</h2>
+            <p class="section-subtitle">Every professional undergoes our comprehensive verification before joining Biped</p>
+            
+            <div class="verification-grid">
+                <div class="verification-item">
+                    <h4>🆔 Identity Verification</h4>
+                    <p>Government-issued ID verification with real-time document authentication and facial recognition matching.</p>
+                </div>
+                
+                <div class="verification-item">
+                    <h4>📋 License & Credentials</h4>
+                    <p>Direct verification with licensing authorities for all trade-specific certifications and professional qualifications.</p>
+                </div>
+                
+                <div class="verification-item">
+                    <h4>🛡️ Background Checks</h4>
+                    <p>Comprehensive criminal background screening and professional conduct history review.</p>
+                </div>
+                
+                <div class="verification-item">
+                    <h4>💼 Insurance Validation</h4>
+                    <p>Verification of current public liability insurance, workers compensation, and professional indemnity coverage.</p>
+                </div>
+                
+                <div class="verification-item">
+                    <h4>📞 Reference Verification</h4>
+                    <p>Contact verification with previous clients and professional references to confirm work quality and reliability.</p>
+                </div>
+                
+                <div class="verification-item">
+                    <h4>🎯 Skills Assessment</h4>
+                    <p>Portfolio review, skills testing, and technical competency validation for each service category.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="transparency-section">
+        <div class="container">
+            <h2 class="section-title">Complete Transparency</h2>
+            <p class="section-subtitle">Know exactly how our platform works and what you're paying for</p>
+            
+            <div class="transparency-box">
+                <h3>🔍 AI Matching Explained</h3>
+                <p style="margin-bottom: 20px;">Our matching algorithm considers multiple factors to find the best professionals for your job:</p>
+                <ul class="transparency-list">
+                    <li><strong>Skill Match (30%):</strong> Exact skills needed vs. professional's verified expertise</li>
+                    <li><strong>Location Score (25%):</strong> Distance and travel time to your location</li>
+                    <li><strong>Availability (20%):</strong> Real-time availability matching your timeline</li>
+                    <li><strong>Budget Compatibility (15%):</strong> Your budget vs. professional's typical rates</li>
+                    <li><strong>Quality Score (10%):</strong> Customer ratings, completion rate, and performance history</li>
+                </ul>
+            </div>
+            
+            <div class="transparency-box">
+                <h3>💰 Pricing Transparency</h3>
+                <ul class="transparency-list">
+                    <li>No hidden fees - all costs disclosed upfront</li>
+                    <li>Service fee: 12% of job value (competitive with industry)</li>
+                    <li>Payment protection included at no extra cost</li>
+                    <li>Free to post jobs and get quotes</li>
+                    <li>Money-back guarantee if work doesn't meet standards</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">98.5%</span>
+                    <span class="stat-label">Customer Satisfaction</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24min</span>
+                    <span class="stat-label">Average Match Time</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Verified Professionals</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$2.8M</span>
+                    <span class="stat-label">Jobs Completed Safely</span>
+                </div>
+            </div>
+            
+            <h2 style="margin-bottom: 20px;">Ready to Get Started?</h2>
+            <p style="margin-bottom: 30px;">Join thousands of satisfied customers who trust Biped for their home and business projects.</p>
+            
+            <a href="/register" class="cta-button">Find Professionals Now</a>
+            <a href="/professionals/register" class="cta-button" style="margin-left: 20px; background: transparent; border: 2px solid white;">Join as Professional</a>
+        </div>
+    </section>
+
+    <script>
+        // Simple analytics and interaction tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track page view
+            console.log('How It Works page loaded');
+            
+            // Track CTA clicks
+            const ctaButtons = document.querySelectorAll('.cta-button');
+            ctaButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    console.log('CTA clicked:', e.target.textContent);
+                    // In production, send to analytics
+                });
+            });
+        });
+    </script>
+</body>
+</html>
