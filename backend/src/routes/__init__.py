@@ -8,6 +8,7 @@ from .ai import ai_bp
 from .dashboard import dashboard_bp
 from .health import health_bp
 from .jobs import jobs_bp
+from .jobs_api import jobs_api_bp
 from .legal import legal_bp
 
 # Import all blueprints
@@ -24,6 +25,7 @@ __all__ = [
     "dashboard_bp",
     "health_bp",
     "jobs_bp",
+    "jobs_api_bp",
     "legal_bp",
     "ai_bp",
 ]

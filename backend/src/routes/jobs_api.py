@@ -304,6 +304,62 @@ def get_jobs():
         )
 
 
+@jobs_api_bp.route("/api/jobs/", methods=["POST"])
+def create_job():
+    """Create a new job posting"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ["title", "description", "budget_min", "budget_max"]
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        # Create new job object
+        new_job = {
+            "id": len(SAMPLE_JOBS) + 1,
+            "title": data["title"],
+            "description": data["description"],
+            "budget_min": float(data["budget_min"]),
+            "budget_max": float(data["budget_max"]),
+            "budget_display": f"${data['budget_min']:,} - ${data['budget_max']:,}",
+            "category": data.get("category", "General"),
+            "subcategory": data.get("subcategory", ""),
+            "location": data.get("location", "Location not specified"),
+            "suburb": data.get("suburb", ""),
+            "posted_date": datetime.now(),
+            "posted_display": "Just now",
+            "quotes_count": 0,
+            "urgent": data.get("urgent", False),
+            "status": "open",
+            "customer_id": 1,  # This would come from session in real app
+            "customer_name": "User",
+            "customer_rating": 5.0,
+            "skills_required": data.get("skills_required", []),
+            "timeline": data.get("timeline", "To be discussed"),
+            "property_type": data.get("property_type", "Not specified"),
+        }
+        
+        # Add to sample jobs (in real app, this would be saved to database)
+        SAMPLE_JOBS.append(new_job)
+        
+        return jsonify({
+            "success": True,
+            "message": "Job posted successfully",
+            "job": new_job
+        }), 201
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error creating job: {str(e)}", exc_info=True)
+        
+        return jsonify({
+            "error": "Failed to create job. Please try again later."
+        }), 500
+
+
 @jobs_api_bp.route("/api/jobs/<int:job_id>", methods=["GET"])
 def get_job(job_id):
     """Get specific job details"""
