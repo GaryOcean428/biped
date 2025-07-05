@@ -19,7 +19,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
-from src.models.user import db
+from . import db
 
 
 class InvoiceStatus(Enum):

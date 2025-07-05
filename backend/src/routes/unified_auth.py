@@ -14,8 +14,7 @@ from functools import wraps
 from flask import Blueprint, current_app, g, jsonify, request, session
 
 # Import models
-from src.models.admin import Admin
-from src.models.user import CustomerProfile, ProviderProfile, User, db
+from src.models import db, Admin, CustomerProfile, ProviderProfile, User
 
 # Import utilities
 from src.utils.error_handling import handle_error

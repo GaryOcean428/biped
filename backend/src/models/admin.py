@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-# Import db from user model to ensure same instance
-from .user import db
+# Import db from models package to avoid circular imports
+from . import db
 
 
 class Admin(db.Model):

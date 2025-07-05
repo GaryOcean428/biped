@@ -4,7 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Numeric
 from werkzeug.security import check_password_hash, generate_password_hash
 
-db = SQLAlchemy()
+# Import db from models package to avoid multiple instances
+from . import db
 
 
 class User(db.Model):

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import Numeric
-from src.models.user import db
+from . import db
 
 
 class JobStatus(Enum):
