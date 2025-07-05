@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Numeric
-from src.models.user import db
+from . import db
 
 
 class ServiceCategory(db.Model):

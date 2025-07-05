@@ -5,10 +5,10 @@ Exports all models and database instance
 
 from flask_sqlalchemy import SQLAlchemy
 
-# Initialize database instance
+# Initialize database instance FIRST
 db = SQLAlchemy()
 
-# Import all models to ensure they're registered
+# Import all models to ensure they're registered AFTER db is defined
 from .admin import Admin, AdminAction
 from .financial import (
     Expense,
