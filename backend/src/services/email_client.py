@@ -253,11 +253,11 @@ class EnhancedNotificationService:
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="color: #2563eb;">Welcome to Biped!</h1>
                 </div>
-                
+
                 <p>Hi {user_name},</p>
-                
+
                 <p>Welcome to Biped, the premier marketplace connecting customers with skilled service providers!</p>
-                
+
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #2563eb; margin-top: 0;">What you can do on Biped:</h3>
                     <ul>
@@ -267,18 +267,18 @@ class EnhancedNotificationService:
                         <li>Make secure payments with our escrow system</li>
                     </ul>
                 </div>
-                
+
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://biped.com/dashboard" 
+                    <a href="https://biped.com/dashboard"
                        style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         Get Started
                     </a>
                 </div>
-                
+
                 <p>If you have any questions, our support team is here to help!</p>
-                
+
                 <p>Best regards,<br>The Biped Team</p>
-                
+
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                 <p style="font-size: 12px; color: #6b7280; text-align: center;">
                     This email was sent to {user_email}. If you didn't create an account, please ignore this email.
@@ -292,21 +292,21 @@ class EnhancedNotificationService:
         """Get welcome email text content"""
         return f"""
         Welcome to Biped!
-        
+
         Hi {user_name},
-        
+
         Welcome to Biped, the premier marketplace connecting customers with skilled service providers!
-        
+
         What you can do on Biped:
         - Post jobs and get quotes from qualified professionals
         - Browse and hire from our network of verified service providers
         - Manage projects with built-in communication tools
         - Make secure payments with our escrow system
-        
+
         Get started: https://biped.com/dashboard
-        
+
         If you have any questions, our support team is here to help!
-        
+
         Best regards,
         The Biped Team
         """
@@ -320,25 +320,25 @@ class EnhancedNotificationService:
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #2563eb;">New Job Opportunity</h2>
-                
+
                 <p>Hi {provider_name},</p>
-                
+
                 <p>A new job has been posted that matches your skills:</p>
-                
+
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #2563eb; margin-top: 0;">{job_title}</h3>
                     <p><strong>Job ID:</strong> {job_id}</p>
                 </div>
-                
+
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://biped.com/jobs/{job_id}" 
+                    <a href="https://biped.com/jobs/{job_id}"
                        style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         View Job & Submit Quote
                     </a>
                 </div>
-                
+
                 <p>Don't miss out on this opportunity!</p>
-                
+
                 <p>Best regards,<br>The Biped Team</p>
             </div>
         </body>
@@ -358,26 +358,26 @@ class EnhancedNotificationService:
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #2563eb;">New Quote Received</h2>
-                
+
                 <p>Hi {customer_name},</p>
-                
+
                 <p>You've received a new quote for your job:</p>
-                
+
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #2563eb; margin-top: 0;">{job_title}</h3>
                     <p><strong>Provider:</strong> {provider_name}</p>
                     <p><strong>Quote Amount:</strong> ${quote_amount:,.2f}</p>
                 </div>
-                
+
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://biped.com/dashboard" 
+                    <a href="https://biped.com/dashboard"
                        style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                         Review Quote
                     </a>
                 </div>
-                
+
                 <p>Review the quote and provider profile to make your decision.</p>
-                
+
                 <p>Best regards,<br>The Biped Team</p>
             </div>
         </body>
@@ -393,19 +393,19 @@ class EnhancedNotificationService:
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #2563eb;">Payment Confirmation</h2>
-                
+
                 <p>Hi {user_name},</p>
-                
+
                 <p>Your payment has been processed successfully:</p>
-                
+
                 <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <p><strong>Job:</strong> {job_title}</p>
                     <p><strong>Amount:</strong> ${amount:,.2f}</p>
                     <p><strong>Date:</strong> {datetime.now().strftime('%B %d, %Y')}</p>
                 </div>
-                
+
                 <p>Thank you for using Biped!</p>
-                
+
                 <p>Best regards,<br>The Biped Team</p>
             </div>
         </body>

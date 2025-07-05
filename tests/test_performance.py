@@ -16,7 +16,7 @@ import psutil
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
-from src.main import app, db
+from src.main import app, db  # noqa: E402
 
 
 class PerformanceTestCase(unittest.TestCase):
@@ -87,6 +87,7 @@ class ResponseTimeTests(PerformanceTestCase):
         response_time = (end_time - start_time) * 1000
 
         # Should respond quickly even for invalid credentials
+        self.assertIsNotNone(response)
         self.assertLess(
             response_time,
             200,
@@ -101,6 +102,7 @@ class ResponseTimeTests(PerformanceTestCase):
 
         response_time = (end_time - start_time) * 1000
 
+        self.assertIsNotNone(response)
         self.assertLess(
             response_time,
             300,
@@ -217,7 +219,7 @@ class MemoryUsageTests(PerformanceTestCase):
                 self.assertLess(
                     memory_increase,
                     50,
-                    f"Memory increased by {memory_increase:.2f}MB after {i+1} requests",
+                    f"Memory increased by {memory_increase:.2f}MB after {i + 1} requests",
                 )
 
     def test_no_memory_leak_in_error_handling(self):
@@ -244,7 +246,7 @@ class MemoryUsageTests(PerformanceTestCase):
                 self.assertLess(
                     memory_increase,
                     30,
-                    f"Memory increased by {memory_increase:.2f}MB after {i+1} error requests",
+                    f"Memory increased by {memory_increase:.2f}MB after {i + 1} error requests",
                 )
 
 

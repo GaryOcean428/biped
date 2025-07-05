@@ -186,6 +186,60 @@ class UserService:
             raise ServiceError(f"Failed to create user: {str(e)}")
 
     @staticmethod
+    def _update_admin_fields(admin, profile_data):
+        """Update admin specific fields"""
+        updatable_fields = ["first_name", "last_name", "phone"]
+        for field in updatable_fields:
+            if field in profile_data:
+                setattr(admin, field, profile_data[field])
+
+    @staticmethod
+    def _update_user_fields(user, profile_data):
+        """Update user specific fields"""
+        updatable_fields = [
+            "first_name",
+            "last_name",
+            "phone",
+            "street_address",
+            "city",
+            "state",
+            "postcode",
+            "bio",
+        ]
+        for field in updatable_fields:
+            if field in profile_data:
+                setattr(user, field, profile_data[field])
+
+    @staticmethod
+    def _update_customer_profile(profile, profile_data):
+        """Update customer profile specific fields"""
+        if profile:
+            profile_fields = [
+                "preferred_contact_method",
+                "notification_preferences",
+            ]
+            for field in profile_fields:
+                if field in profile_data:
+                    setattr(profile, field, profile_data[field])
+
+    @staticmethod
+    def _update_provider_profile(profile, profile_data):
+        """Update provider profile specific fields"""
+        if profile:
+            profile_fields = [
+                "business_name",
+                "abn",
+                "years_experience",
+                "hourly_rate",
+                "bio",
+                "skills",
+                "availability",
+            ]
+            for field in profile_fields:
+                if field in profile_data:
+                    setattr(profile, field, profile_data[field])
+
+    @staticmethod
     def update_user_profile(
         user_id: int, profile_data: Dict, user_type: str = "user"
     ) -> Dict:
@@ -196,14 +250,8 @@ class UserService:
                 if not admin:
                     raise ServiceError("Admin not found")
 
-                # Update admin fields
-                updatable_fields = ["first_name", "last_name", "phone"]
-                for field in updatable_fields:
-                    if field in profile_data:
-                        setattr(admin, field, profile_data[field])
-
+                UserService._update_admin_fields(admin, profile_data)
                 db.session.commit()
-
                 return {"user": admin.to_dict(), "user_type": "admin", "profile": None}
 
             else:
@@ -211,52 +259,19 @@ class UserService:
                 if not user:
                     raise ServiceError("User not found")
 
-                # Update user fields
-                updatable_fields = [
-                    "first_name",
-                    "last_name",
-                    "phone",
-                    "street_address",
-                    "city",
-                    "state",
-                    "postcode",
-                    "bio",
-                ]
-                for field in updatable_fields:
-                    if field in profile_data:
-                        setattr(user, field, profile_data[field])
+                UserService._update_user_fields(user, profile_data)
 
                 # Update profile based on user type
                 profile = None
                 if user.user_type == "customer":
                     profile = CustomerProfile.query.filter_by(user_id=user.id).first()
-                    if profile:
-                        profile_fields = [
-                            "preferred_contact_method",
-                            "notification_preferences",
-                        ]
-                        for field in profile_fields:
-                            if field in profile_data:
-                                setattr(profile, field, profile_data[field])
+                    UserService._update_customer_profile(profile, profile_data)
 
                 elif user.user_type == "provider":
                     profile = ProviderProfile.query.filter_by(user_id=user.id).first()
-                    if profile:
-                        profile_fields = [
-                            "business_name",
-                            "abn",
-                            "years_experience",
-                            "hourly_rate",
-                            "bio",
-                            "skills",
-                            "availability",
-                        ]
-                        for field in profile_fields:
-                            if field in profile_data:
-                                setattr(profile, field, profile_data[field])
+                    UserService._update_provider_profile(profile, profile_data)
 
                 db.session.commit()
-
                 return {
                     "user": user.to_dict(),
                     "user_type": user.user_type,

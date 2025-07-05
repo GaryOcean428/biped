@@ -404,7 +404,7 @@ def create_app():
         """Landing page"""
         try:
             return render_template("landing.html")
-        except:
+        except Exception:
             return jsonify(
                 {
                     "message": "🚀 Biped Platform Running",
@@ -448,7 +448,7 @@ def create_app():
         else:
             try:
                 return render_template("errors/404.html"), 404
-            except:
+            except Exception:
                 return (
                     jsonify(
                         {
@@ -481,7 +481,7 @@ def create_app():
         else:
             try:
                 return render_template("errors/403.html"), 403
-            except:
+            except Exception:
                 return (
                     jsonify(
                         {
@@ -517,7 +517,7 @@ def create_app():
         else:
             try:
                 return render_template("errors/500.html"), 500
-            except:
+            except Exception:
                 return (
                     jsonify(
                         {

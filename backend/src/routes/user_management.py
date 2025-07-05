@@ -7,7 +7,10 @@ with the UserService layer to handle all user operations.
 """
 
 from flask import Blueprint, jsonify, request, session
+from sqlalchemy import func
 
+from src.main import db
+from src.models.user import User
 from src.routes.unified_auth import admin_required, login_required, role_required
 from src.services.user_service import RoleBasedAccessControl, UserService
 from src.utils.error_handling import handle_error

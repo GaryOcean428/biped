@@ -3,6 +3,7 @@ Storage Management Routes for Biped Platform
 Handles file operations and storage monitoring
 """
 
+import logging
 import mimetypes
 import os
 
@@ -11,6 +12,7 @@ from werkzeug.utils import secure_filename
 
 from src.utils.storage import storage_manager
 
+logger = logging.getLogger(__name__)
 storage_bp = Blueprint("storage", __name__, url_prefix="/api/storage")
 
 

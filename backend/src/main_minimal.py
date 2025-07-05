@@ -154,7 +154,7 @@ if __name__ == "__main__":
     debug = os.environ.get("ENVIRONMENT") != "production"
 
     logger.info(f"🚀 Starting Biped app on port {port}")
-    logger.info(f"🔒 Security headers: enabled")
-    logger.info(f"🛡️  CORS protection: enabled")
+    logger.info("🔒 Security headers: enabled")
+    logger.info("🛡️  CORS protection: enabled")
 
     app.run(host="0.0.0.0", port=port, debug=debug)

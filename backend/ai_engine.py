@@ -213,7 +213,7 @@ class BipedAIEngine:
                 return 0.4
             else:
                 return 0.2
-        except:
+        except Exception:
             return 0.5  # Default score if calculation fails
     
     def calculate_budget_compatibility(self, job_budget: Tuple[float, float], 

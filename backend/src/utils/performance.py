@@ -265,7 +265,7 @@ class PerformanceMonitor:
                     self.record_request(response_time, 200)
 
                 return result
-            except Exception as e:
+            except Exception:
                 response_time = time.time() - start_time
                 self.record_request(response_time, 500)
                 raise

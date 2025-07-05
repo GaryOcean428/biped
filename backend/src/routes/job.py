@@ -135,7 +135,7 @@ def get_jobs():
                 and_(
                     Job.service_id.in_(provider_service_ids),
                     Job.status.in_([JobStatus.POSTED, JobStatus.MATCHED]),
-                    Job.is_active == True,
+                    Job.is_active.is_(True),
                     Job.assigned_provider_id.is_(None),  # Not yet assigned
                 )
             )
