@@ -219,6 +219,27 @@ def validate_json_request(validation_config: Dict[str, Any]):
     return decorator
 
 
+def _convert_param_types(params: Dict[str, str], param_types: Dict[str, type]) -> None:
+    """Convert string parameters to expected types"""
+    for param, expected_type in param_types.items():
+        if param in params:
+            try:
+                if expected_type == int:
+                    params[param] = int(params[param])
+                elif expected_type == float:
+                    params[param] = float(params[param])
+                elif expected_type == bool:
+                    params[param] = params[param].lower() in (
+                        "true",
+                        "1",
+                        "yes",
+                    )
+            except (ValueError, TypeError):
+                raise ValidationError(
+                    f"Parameter {param} must be of type {expected_type.__name__}"
+                )
+
+
 def validate_query_params(validation_config: Dict[str, Any]):
     """
     Decorator to validate query parameters
@@ -242,24 +263,7 @@ def validate_query_params(validation_config: Dict[str, Any]):
                 )
 
             if "param_types" in validation_config:
-                # Convert string params to expected types
-                for param, expected_type in validation_config["param_types"].items():
-                    if param in params:
-                        try:
-                            if expected_type == int:
-                                params[param] = int(params[param])
-                            elif expected_type == float:
-                                params[param] = float(params[param])
-                            elif expected_type == bool:
-                                params[param] = params[param].lower() in (
-                                    "true",
-                                    "1",
-                                    "yes",
-                                )
-                        except (ValueError, TypeError):
-                            raise ValidationError(
-                                f"Parameter {param} must be of type {expected_type.__name__}"
-                            )
+                _convert_param_types(params, validation_config["param_types"])
 
             if "enum_params" in validation_config:
                 validator.validate_enum_values(params, validation_config["enum_params"])

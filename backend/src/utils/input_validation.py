@@ -191,17 +191,8 @@ class InputValidator:
             return False
 
     @classmethod
-    def validate_job_posting(cls, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate complete job posting data"""
-        errors = {}
-
-        # Required fields
-        required_fields = ["title", "description", "category", "location"]
-        for field in required_fields:
-            if field not in data or not data[field]:
-                errors[field] = f"{field.title()} is required"
-
-        # Validate specific fields
+    def _validate_job_posting_fields(cls, data: Dict[str, Any], errors: Dict[str, str]) -> None:
+        """Validate individual job posting fields"""
         if "title" in data:
             if not cls.validate_text_content(data["title"], "title"):
                 errors["title"] = "Invalid title format"
@@ -222,6 +213,20 @@ class InputValidator:
             if not cls.validate_phone(data["phone"]):
                 errors["phone"] = "Invalid phone number format"
 
+    @classmethod
+    def validate_job_posting(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate complete job posting data"""
+        errors = {}
+
+        # Required fields
+        required_fields = ["title", "description", "category", "location"]
+        for field in required_fields:
+            if field not in data or not data[field]:
+                errors[field] = f"{field.title()} is required"
+
+        # Validate specific fields
+        cls._validate_job_posting_fields(data, errors)
+
         return {
             "valid": len(errors) == 0,
             "errors": errors,
@@ -232,17 +237,8 @@ class InputValidator:
         }
 
     @classmethod
-    def validate_user_registration(cls, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate user registration data"""
-        errors = {}
-
-        # Required fields
-        required_fields = ["email", "password", "first_name", "last_name"]
-        for field in required_fields:
-            if field not in data or not data[field]:
-                errors[field] = f"{field.replace('_', ' ').title()} is required"
-
-        # Validate specific fields
+    def _validate_user_registration_fields(cls, data: Dict[str, Any], errors: Dict[str, str]) -> None:
+        """Validate individual user registration fields"""
         if "email" in data:
             if not cls.validate_email(data["email"]):
                 errors["email"] = "Invalid email format"
@@ -263,6 +259,20 @@ class InputValidator:
             password_validation = cls.validate_password_strength(data["password"])
             if not password_validation["valid"]:
                 errors["password"] = password_validation["message"]
+
+    @classmethod
+    def validate_user_registration(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate user registration data"""
+        errors = {}
+
+        # Required fields
+        required_fields = ["email", "password", "first_name", "last_name"]
+        for field in required_fields:
+            if field not in data or not data[field]:
+                errors[field] = f"{field.replace('_', ' ').title()} is required"
+
+        # Validate specific fields
+        cls._validate_user_registration_fields(data, errors)
 
         return {
             "valid": len(errors) == 0,
